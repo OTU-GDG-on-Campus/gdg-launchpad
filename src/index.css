@@ -1,0 +1,54 @@
+/* Global styles and the design tokens every component reads. Tailwind v4 configures in CSS.
+   Dark is the default. Token values are re-declared under [data-theme] so the toggle can swap them. */
+
+@import 'tailwindcss';
+
+@theme {
+  --color-surface-muted: #0b0c10;
+  --color-surface: #1f2833;
+  --color-surface-raised: #121a21;
+  --color-line: #2f3c4f;
+
+  --color-ink: #e9eaec;
+  --color-ink-soft: #c5c6c7;
+  --color-ink-muted: #8e9aa6;
+
+  --color-brand-50: #0f2233;
+  --color-brand-500: #0072ce;
+  --color-brand-600: #1f8ae0;
+  --color-brand-700: #46b8ff;
+
+  --color-accent: #45a29e;
+  --color-accent-soft: #142b2a;
+  --color-flare: #ff9500;
+}
+
+[data-theme='light'] {
+  --color-surface-muted: #f6f7f9;
+  --color-surface: #ffffff;
+  --color-surface-raised: #f0f2f5;
+  --color-line: #e3e6eb;
+
+  --color-ink: #14181f;
+  --color-ink-soft: #333a45;
+  --color-ink-muted: #5c6573;
+
+  --color-brand-50: #eef4ff;
+  --color-brand-500: #0072ce;
+  --color-brand-600: #005ca8;
+  --color-brand-700: #1a46a0;
+
+  --color-accent: #2f7a76;
+  --color-accent-soft: #e6f2f1;
+  --color-flare: #b45c00;
+}
+
+@layer base {
+  body {
+    @apply bg-surface-muted text-ink antialiased;
+  }
+
+  :focus-visible {
+    @apply outline-brand-700 outline-2 outline-offset-2;
+  }
+}
