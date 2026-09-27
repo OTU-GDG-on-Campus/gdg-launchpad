@@ -1,35 +1,100 @@
-// Auth provider. Currently backed by a local demo session so the UI can be built before
-// Supabase Google OAuth is wired in. Swap the body of signIn/signOut only - the context
-// shape and every consumer stay the same. See docs/auth.md for the real flow.
+// Auth provider. Uses Supabase Google sign-in when VITE_SUPABASE_* is set, and falls back to a
+// local demo student otherwise so the UI still runs on mock data. See docs/auth.md for the flow.
 
-import { useCallback, useMemo, useState, type ReactNode } from 'react'
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
+import {
+  getCurrentUser,
+  isBackendConfigured,
+  signInWithGoogle,
+  signOutUser,
+  subscribeToAuthChanges,
+} from '@/lib/api/client'
+import type { User } from '@/types'
 import { AuthContext, type AuthContextValue, type AuthStatus } from './auth-context'
 import { allowedDomainsLabel, isAllowedStudentEmail } from './domain'
-import { DEMO_USER } from '@/lib/api/mock/users'
+
+const OAUTH_ERROR_PARAMS = ['error', 'error_code', 'error_description']
+
+/** Reads and strips the error Supabase appends to the URL when the sign-up trigger rejects. */
+function takeOAuthError(): string | null {
+  const url = new URL(window.location.href)
+  const hash = new URLSearchParams(url.hash.slice(1))
+  const description =
+    url.searchParams.get('error_description') ??
+    hash.get('error_description') ??
+    url.searchParams.get('error') ??
+    hash.get('error')
+  if (!description) return null
+
+  OAUTH_ERROR_PARAMS.forEach((param) => {
+    url.searchParams.delete(param)
+    hash.delete(param)
+  })
+  url.hash = hash.toString()
+  window.history.replaceState(null, '', url.toString())
+  return description
+}
+
+function domainError(): string {
+  return `Sign in with your Ontario Tech Google account (${allowedDomainsLabel()}).`
+}
+
+const initialError = isBackendConfigured && takeOAuthError() ? domainError() : null
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [status, setStatus] = useState<AuthStatus>('signed-out')
-  const [user, setUser] = useState<AuthContextValue['user']>(null)
-  const [error, setError] = useState<string | null>(null)
+  const [status, setStatus] = useState<AuthStatus>(isBackendConfigured ? 'loading' : 'signed-out')
+  const [user, setUser] = useState<User | null>(null)
+  const [error, setError] = useState<string | null>(initialError)
+
+  const applyUser = useCallback((next: User | null) => {
+    if (next && !isAllowedStudentEmail(next.email)) {
+      setUser(null)
+      setStatus('signed-out')
+      setError(domainError())
+      return
+    }
+    setUser(next)
+    setStatus(next ? 'signed-in' : 'signed-out')
+  }, [])
+
+  useEffect(() => {
+    if (!isBackendConfigured) return
+    const refresh = () =>
+      getCurrentUser()
+        .then(applyUser)
+        .catch(() => {
+          applyUser(null)
+          setError('Could not load your account. Try signing in again.')
+        })
+    void refresh()
+    return subscribeToAuthChanges(() => void refresh())
+  }, [applyUser])
 
   const signIn = useCallback(async () => {
     setStatus('loading')
     setError(null)
 
-    if (!isAllowedStudentEmail(DEMO_USER.email)) {
-      setStatus('signed-out')
-      setError(`Sign in with your Ontario Tech account (${allowedDomainsLabel()}).`)
+    if (!isBackendConfigured) {
+      applyUser(await getCurrentUser())
       return
     }
 
-    setUser(DEMO_USER)
-    setStatus('signed-in')
-  }, [])
+    try {
+      await signInWithGoogle(window.location.href)
+    } catch {
+      setStatus('signed-out')
+      setError('Google sign-in could not start. Try again.')
+    }
+  }, [applyUser])
 
   const signOut = useCallback(async () => {
-    setUser(null)
-    setStatus('signed-out')
-    setError(null)
+    try {
+      await signOutUser()
+    } finally {
+      setUser(null)
+      setStatus('signed-out')
+      setError(null)
+    }
   }, [])
 
   const value = useMemo<AuthContextValue>(

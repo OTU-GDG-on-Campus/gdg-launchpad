@@ -58,11 +58,12 @@ typecheck clean. Data and auth are deliberately stubbed.
 | Semester Sprints      | Landing page, sprint cards, and detail page done                  |
 | Comments              | List renders from mock data. No composer, posting is not built    |
 | Upvoting              | UI done, toggles local state only                                 |
-| Auth                  | Stubbed. `signIn()` returns a fixed demo user                     |
+| Auth                  | Supabase Google sign-in wired, not yet verified live. Demo user   |
+|                       | when `VITE_SUPABASE_*` is unset                                   |
 | Submission form       | Placeholder page                                                  |
 | Admin panel           | Placeholder page listing planned sections                         |
 | Project cover art     | Type field exists, every mock row is null so cards show a tint    |
-| Backend               | Not started. Supabase plus Vercel functions is the chosen path    |
+| Backend               | `profiles` table, sign-up trigger, and RLS in `supabase/`         |
 
 Before starting work, re-read this table and correct it if it has drifted.
 
@@ -104,6 +105,7 @@ src/
   types/index.ts       Shared domain types, mirroring future DB tables
   lib/
     api/client.ts      The only seam between UI and data
+    api/supabase.ts    Supabase browser client, null without env vars. Only client.ts imports it
     api/mock/          Placeholder records, deleted once the DB is live
     auth/              AuthProvider, context, useAuth hook, domain rules
     theme/             ThemeProvider, context, useTheme hook
@@ -121,6 +123,8 @@ src/
                        ContributorStack, CommentList
     sprints/           SprintCard, SprintGrid
   pages/               One file per route
+supabase/
+  migrations/          SQL migrations, applied in filename order
 ```
 
 Rule of thumb for placement: if it knows about a domain type it goes in a feature folder, if it

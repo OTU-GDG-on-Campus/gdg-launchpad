@@ -24,8 +24,9 @@ The smallest set that makes the site real. Everything P0 below rolls up here.
 - [x] Client-side domain helper (`isAllowedStudentEmail`)
 - [ ] **P0** Supabase project created, env vars set in Vercel
 - [ ] **P0** Google OAuth client configured, provider enabled in Supabase
-- [ ] **P0** Replace the demo session in `AuthProvider` with real Supabase sign-in
-- [ ] **P0** `profiles` table plus a trigger on `auth.users` rejecting non-OTU domains
+- [ ] **P0** Replace the demo session in `AuthProvider` with real Supabase sign-in (code done,
+      needs a live project to verify)
+- [x] **P0** `profiles` table plus a trigger on `auth.users` rejecting non-OTU domains
 - [ ] **P0** Verify a personal Gmail account is actually rejected end to end
 - [ ] **P1** Session persistence across reloads and token refresh
 - [ ] **P1** Profile page: your projects, your upvotes, edit display name
@@ -125,7 +126,7 @@ The smallest set that makes the site real. Everything P0 below rolls up here.
 Things a reader might mistake for finished work.
 
 - Everything reads from `src/lib/api/mock/`. No database exists.
-- `signIn()` returns a fixed demo student. Nothing is verified.
+- Without `VITE_SUPABASE_*` set, `signIn()` returns a fixed demo student. Nothing is verified.
 - Upvotes and filters are in-memory only and reset on reload.
 - No project has a real cover image or screenshot, so tinted placeholders stand in.
 - Sprint records, including the "active" Discord Bot sprint, are placeholder rows.
