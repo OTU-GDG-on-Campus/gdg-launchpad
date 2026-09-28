@@ -1,3 +1,7 @@
 dist
 node_modules
 package-lock.json
+
+# Static design mockups and vendored libraries. Not part of the Vite build, and reformatting
+# minified vendor bundles would be churn at best and breakage at worst.
+UI
