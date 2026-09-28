@@ -55,13 +55,15 @@ the client.** Read them from the verified token or from the database, on the ser
 
 ## Setup checklist
 
-Not done yet. Tracked here so whoever picks this up is not starting from a blank page.
+Step by step setup lives in [supabase.md](supabase.md). This is the summary.
 
-- [ ] Create the Supabase project, save the URL and anon key into Vercel env vars
+- [x] Create the Supabase project. Ref `eavnzbmsfpslwdgpjfjv`, region `us-west-2`
+- [x] Write the `profiles` table and the `auth.users` trigger enforcing the domain rule
+- [x] Write RLS policies for `projects`, `upvotes`, and `comments`
+- [ ] Apply the initial migration, which has been syntax checked but never run
+- [ ] Save the URL and anon key into Vercel env vars
 - [ ] Create a Google Cloud OAuth client, add the Supabase callback as an authorized redirect URI
 - [ ] Enable the Google provider in Supabase Auth with that client ID and secret
-- [ ] Write the `profiles` table and the `auth.users` trigger enforcing the domain rule
-- [ ] Write RLS policies for `projects`, `upvotes`, and `comments`
 - [ ] Replace the `signIn` and `signOut` bodies in `AuthProvider.tsx`
 - [ ] Delete `src/lib/api/mock/users.ts`
 - [ ] Test with a personal Gmail account and confirm it is rejected

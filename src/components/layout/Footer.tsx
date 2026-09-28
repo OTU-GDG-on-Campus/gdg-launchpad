@@ -7,6 +7,8 @@ import { LogoMark, Wordmark } from '@/components/ui/Logo'
 const LINK_CLASS = 'text-ink-muted hover:text-ink text-sm transition-colors'
 
 export function Footer() {
+
+
   return (
     <footer className="border-line bg-surface-raised mt-20 border-t">
       <div className="mx-auto grid max-w-6xl gap-10 px-4 py-12 md:grid-cols-[2fr_3fr]">
