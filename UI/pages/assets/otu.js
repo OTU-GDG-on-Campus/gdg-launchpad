@@ -1,6 +1,9 @@
 // Shared data, demo session, role gating and header/footer logic for the split LaunchPad pages.
 // Loaded before dc-runtime, so it only defines window.OTU; each page's Component calls into it.
 ;(function () {
+  // Without this map dc-runtime re-fetches its own page, which browsers block on file:// URLs.
+  window.__resources = window.__resources || {}
+
   const BLUE = '#00417A'
   const ORANGE = '#e2572a'
   const REPO_URL = 'https://github.com/gdg-otu/launchpad'
@@ -11,24 +14,46 @@
     const w = 'rgba(255,255,255,.3)'
     const block = (c) => `linear-gradient(${c} 0 0)`
     const shapes = {
-      orbit: [{ img: `radial-gradient(circle at 26% 30%, ${b} 0 12%, transparent 13%)` }, { img: `radial-gradient(circle at 72% 64%, rgba(255,255,255,.22) 0 22%, transparent 23%)` }],
+      orbit: [
+        { img: `radial-gradient(circle at 26% 30%, ${b} 0 12%, transparent 13%)` },
+        { img: `radial-gradient(circle at 72% 64%, rgba(255,255,255,.22) 0 22%, transparent 23%)` },
+      ],
       bars: [
         { img: block(b), size: '9% 26%', pos: '14% 86%' },
         { img: block(w), size: '9% 46%', pos: '32% 86%' },
         { img: block(b), size: '9% 34%', pos: '50% 86%' },
         { img: block(w), size: '9% 58%', pos: '68% 86%' },
       ],
-      arc: [{ img: `radial-gradient(circle at 50% 118%, transparent 0 34%, ${b} 34.5% 39%, transparent 40%)` }, { img: `radial-gradient(circle at 50% 118%, transparent 0 52%, rgba(255,255,255,.28) 52.5% 56%, transparent 57%)` }],
-      nodes: [{ img: `radial-gradient(circle at 22% 26%, rgba(255,255,255,.34) 0 6%, transparent 7%)` }, { img: `radial-gradient(circle at 62% 22%, ${b} 0 5%, transparent 6%)` }, { img: `radial-gradient(circle at 78% 70%, rgba(255,255,255,.3) 0 7%, transparent 8%)` }, { img: `radial-gradient(circle at 36% 74%, ${b} 0 4%, transparent 5%)` }],
+      arc: [
+        {
+          img: `radial-gradient(circle at 50% 118%, transparent 0 34%, ${b} 34.5% 39%, transparent 40%)`,
+        },
+        {
+          img: `radial-gradient(circle at 50% 118%, transparent 0 52%, rgba(255,255,255,.28) 52.5% 56%, transparent 57%)`,
+        },
+      ],
+      nodes: [
+        { img: `radial-gradient(circle at 22% 26%, rgba(255,255,255,.34) 0 6%, transparent 7%)` },
+        { img: `radial-gradient(circle at 62% 22%, ${b} 0 5%, transparent 6%)` },
+        { img: `radial-gradient(circle at 78% 70%, rgba(255,255,255,.3) 0 7%, transparent 8%)` },
+        { img: `radial-gradient(circle at 36% 74%, ${b} 0 4%, transparent 5%)` },
+      ],
       stack: [
         { img: block(b), size: '62% 8%', pos: '18% 28%' },
         { img: block(w), size: '46% 8%', pos: '18% 50%' },
         { img: block(b), size: '28% 8%', pos: '18% 72%' },
       ],
-      wave: [{ img: `radial-gradient(circle at 10% 90%, rgba(255,255,255,.3) 0 30%, transparent 31%)` }, { img: `radial-gradient(circle at 90% 10%, ${b} 0 26%, transparent 27%)` }],
+      wave: [
+        { img: `radial-gradient(circle at 10% 90%, rgba(255,255,255,.3) 0 30%, transparent 31%)` },
+        { img: `radial-gradient(circle at 90% 10%, ${b} 0 26%, transparent 27%)` },
+      ],
     }
     const L = shapes[kind] || shapes.orbit
-    const imgs = L.map((l) => l.img).concat(['linear-gradient(rgba(255,255,255,.12) 1px,transparent 1px)', 'linear-gradient(90deg,rgba(255,255,255,.12) 1px,transparent 1px)', `linear-gradient(135deg,${a} 0%, ${a} 55%, rgba(0,0,0,.22) 100%)`])
+    const imgs = L.map((l) => l.img).concat([
+      'linear-gradient(rgba(255,255,255,.12) 1px,transparent 1px)',
+      'linear-gradient(90deg,rgba(255,255,255,.12) 1px,transparent 1px)',
+      `linear-gradient(135deg,${a} 0%, ${a} 55%, rgba(0,0,0,.22) 100%)`,
+    ])
     const sizes = L.map((l) => l.size || 'auto').concat(['26px 26px', '26px 26px', 'auto'])
     const poss = L.map((l) => l.pos || '0 0').concat(['0 0', '0 0', '0 0'])
     const reps = L.map(() => 'no-repeat').concat(['repeat', 'repeat', 'no-repeat'])
@@ -36,39 +61,258 @@
   }
 
   const PROJECTS = [
-    { slug: 'campus-nav-ar', title: 'Campus Nav AR', blurb: 'Augmented reality navigation built for the OTU campus.', tags: ['React', 'Python', 'AR'], votes: 142, open: true, featured: true, cat: 'Mobile', program: 'Computer Science', year: 'Year 3', sem: 'Fall 2026', student: 'aisha-rahman', a: BLUE, b: '#FFB893', kind: 'nodes', artLabel: 'AR WAYFINDING OVERLAY' },
-    { slug: 'gridwatch', title: 'GridWatch', blurb: 'Live dashboard for Ontario electricity demand and carbon intensity.', tags: ['Next.js', 'TimescaleDB', 'D3'], votes: 118, open: false, featured: true, cat: 'Data', program: 'Electrical Engineering', year: 'Year 4', sem: 'Fall 2026', student: 'marcus-oyelaran', a: '#12395C', b: ORANGE, kind: 'bars', artLabel: 'DEMAND · 24H WINDOW' },
-    { slug: 'labqueue', title: 'LabQueue', blurb: 'Queue system that replaced the sign-up sheet outside the ENG labs.', tags: ['Svelte', 'Go', 'Postgres'], votes: 96, open: true, featured: true, cat: 'Web', program: 'Software Engineering', year: 'Year 2', sem: 'Fall 2026', student: 'priya-nandakumar', a: '#0C4F78', b: '#FFD2BC', kind: 'stack', artLabel: 'QUEUE STATE MACHINE' },
-    { slug: 'rover-sim', title: 'Rover Sim', blurb: 'Physics sandbox for testing rover suspension over simulated terrain.', tags: ['C++', 'OpenGL', 'ROS'], votes: 87, open: true, featured: false, cat: 'Simulation', program: 'Mechatronics Engineering', year: 'Year 4', sem: 'Spring 2026', student: 'daniel-kovac', a: '#1B3A52', b: ORANGE, kind: 'arc', artLabel: 'SUSPENSION TRAVEL TEST' },
-    { slug: 'notecrate', title: 'Notecrate', blurb: 'Shared course notes with version history and citation checking.', tags: ['Vue', 'Rust', 'SQLite'], votes: 74, open: false, featured: false, cat: 'Web', program: 'Computer Science', year: 'Year 3', sem: 'Spring 2026', student: 'aisha-rahman', a: BLUE, b: '#9EC7E8', kind: 'stack', artLabel: 'REVISION GRAPH' },
-    { slug: 'thermalcam', title: 'ThermalCam', blurb: 'Low-cost thermal imaging rig for building envelope inspections.', tags: ['Python', 'OpenCV', 'Arduino'], votes: 68, open: true, featured: false, cat: 'Hardware', program: 'Electrical Engineering', year: 'Year 4', sem: 'Fall 2025', student: 'marcus-oyelaran', a: '#7A2E12', b: '#FFC79B', kind: 'wave', artLabel: 'THERMAL GRADIENT MAP' },
-    { slug: 'shiftly', title: 'Shiftly', blurb: 'Shift-swapping app for students working campus jobs.', tags: ['React Native', 'Firebase'], votes: 61, open: true, featured: false, cat: 'Mobile', program: 'Software Engineering', year: 'Year 2', sem: 'Fall 2025', student: 'priya-nandakumar', a: '#0E4E63', b: '#FFB893', kind: 'orbit', artLabel: 'SHIFT SWAP FLOW' },
-    { slug: 'trainsight', title: 'TrainSight', blurb: 'Computer vision model that flags defects on freight rail bogies.', tags: ['PyTorch', 'FastAPI'], votes: 53, open: false, featured: false, cat: 'ML', program: 'Computer Science', year: 'Year 4', sem: 'Spring 2025', student: 'daniel-kovac', a: '#22304A', b: ORANGE, kind: 'nodes', artLabel: 'DEFECT CONFIDENCE MAP' },
-    { slug: 'pitchdeck-tutor', title: 'Pitch Tutor', blurb: 'Practice tool that scores delivery pacing for capstone presentations.', tags: ['Whisper', 'Next.js'], votes: 44, open: true, featured: false, cat: 'Web', program: 'Business & IT', year: 'Year 3', sem: 'Spring 2025', student: 'lena-fitzgerald', a: '#2A4A3C', b: '#FFD2BC', kind: 'wave', artLabel: 'PACING WAVEFORM' },
+    {
+      slug: 'campus-nav-ar',
+      title: 'Campus Nav AR',
+      blurb: 'Augmented reality navigation built for the OTU campus.',
+      tags: ['React', 'Python', 'AR'],
+      votes: 142,
+      open: true,
+      featured: true,
+      cat: 'Mobile',
+      program: 'Computer Science',
+      year: 'Year 3',
+      sem: 'Fall 2026',
+      student: 'aisha-rahman',
+      a: BLUE,
+      b: '#FFB893',
+      kind: 'nodes',
+      artLabel: 'AR WAYFINDING OVERLAY',
+    },
+    {
+      slug: 'gridwatch',
+      title: 'GridWatch',
+      blurb: 'Live dashboard for Ontario electricity demand and carbon intensity.',
+      tags: ['Next.js', 'TimescaleDB', 'D3'],
+      votes: 118,
+      open: false,
+      featured: true,
+      cat: 'Data',
+      program: 'Electrical Engineering',
+      year: 'Year 4',
+      sem: 'Fall 2026',
+      student: 'marcus-oyelaran',
+      a: '#12395C',
+      b: ORANGE,
+      kind: 'bars',
+      artLabel: 'DEMAND · 24H WINDOW',
+    },
+    {
+      slug: 'labqueue',
+      title: 'LabQueue',
+      blurb: 'Queue system that replaced the sign-up sheet outside the ENG labs.',
+      tags: ['Svelte', 'Go', 'Postgres'],
+      votes: 96,
+      open: true,
+      featured: true,
+      cat: 'Web',
+      program: 'Software Engineering',
+      year: 'Year 2',
+      sem: 'Fall 2026',
+      student: 'priya-nandakumar',
+      a: '#0C4F78',
+      b: '#FFD2BC',
+      kind: 'stack',
+      artLabel: 'QUEUE STATE MACHINE',
+    },
+    {
+      slug: 'rover-sim',
+      title: 'Rover Sim',
+      blurb: 'Physics sandbox for testing rover suspension over simulated terrain.',
+      tags: ['C++', 'OpenGL', 'ROS'],
+      votes: 87,
+      open: true,
+      featured: false,
+      cat: 'Simulation',
+      program: 'Mechatronics Engineering',
+      year: 'Year 4',
+      sem: 'Spring 2026',
+      student: 'daniel-kovac',
+      a: '#1B3A52',
+      b: ORANGE,
+      kind: 'arc',
+      artLabel: 'SUSPENSION TRAVEL TEST',
+    },
+    {
+      slug: 'notecrate',
+      title: 'Notecrate',
+      blurb: 'Shared course notes with version history and citation checking.',
+      tags: ['Vue', 'Rust', 'SQLite'],
+      votes: 74,
+      open: false,
+      featured: false,
+      cat: 'Web',
+      program: 'Computer Science',
+      year: 'Year 3',
+      sem: 'Spring 2026',
+      student: 'aisha-rahman',
+      a: BLUE,
+      b: '#9EC7E8',
+      kind: 'stack',
+      artLabel: 'REVISION GRAPH',
+    },
+    {
+      slug: 'thermalcam',
+      title: 'ThermalCam',
+      blurb: 'Low-cost thermal imaging rig for building envelope inspections.',
+      tags: ['Python', 'OpenCV', 'Arduino'],
+      votes: 68,
+      open: true,
+      featured: false,
+      cat: 'Hardware',
+      program: 'Electrical Engineering',
+      year: 'Year 4',
+      sem: 'Fall 2025',
+      student: 'marcus-oyelaran',
+      a: '#7A2E12',
+      b: '#FFC79B',
+      kind: 'wave',
+      artLabel: 'THERMAL GRADIENT MAP',
+    },
+    {
+      slug: 'shiftly',
+      title: 'Shiftly',
+      blurb: 'Shift-swapping app for students working campus jobs.',
+      tags: ['React Native', 'Firebase'],
+      votes: 61,
+      open: true,
+      featured: false,
+      cat: 'Mobile',
+      program: 'Software Engineering',
+      year: 'Year 2',
+      sem: 'Fall 2025',
+      student: 'priya-nandakumar',
+      a: '#0E4E63',
+      b: '#FFB893',
+      kind: 'orbit',
+      artLabel: 'SHIFT SWAP FLOW',
+    },
+    {
+      slug: 'trainsight',
+      title: 'TrainSight',
+      blurb: 'Computer vision model that flags defects on freight rail bogies.',
+      tags: ['PyTorch', 'FastAPI'],
+      votes: 53,
+      open: false,
+      featured: false,
+      cat: 'ML',
+      program: 'Computer Science',
+      year: 'Year 4',
+      sem: 'Spring 2025',
+      student: 'daniel-kovac',
+      a: '#22304A',
+      b: ORANGE,
+      kind: 'nodes',
+      artLabel: 'DEFECT CONFIDENCE MAP',
+    },
+    {
+      slug: 'pitchdeck-tutor',
+      title: 'Pitch Tutor',
+      blurb: 'Practice tool that scores delivery pacing for capstone presentations.',
+      tags: ['Whisper', 'Next.js'],
+      votes: 44,
+      open: true,
+      featured: false,
+      cat: 'Web',
+      program: 'Business & IT',
+      year: 'Year 3',
+      sem: 'Spring 2025',
+      student: 'lena-fitzgerald',
+      a: '#2A4A3C',
+      b: '#FFD2BC',
+      kind: 'wave',
+      artLabel: 'PACING WAVEFORM',
+    },
   ]
 
   const STUDENTS = {
-    'aisha-rahman': { name: 'Aisha Rahman', program: 'Computer Science', year: 3, skills: ['React', 'Python', 'Computer Vision'], bio: 'Third-year CS student working mostly on spatial computing. I like problems where the interface has to understand the room it is in.', building: 'AI-powered course planning platform' },
-    'marcus-oyelaran': { name: 'Marcus Oyelaran', program: 'Electrical Engineering', year: 4, skills: ['Embedded C', 'Data Viz', 'Hardware'], bio: 'Energy systems and instrumentation. Most of my projects start because a piece of equipment I needed cost more than my tuition.', building: 'Open-source power quality logger' },
-    'priya-nandakumar': { name: 'Priya Nandakumar', program: 'Software Engineering', year: 2, skills: ['Svelte', 'Go', 'Postgres'], bio: 'I build small tools that remove small frictions on campus. Two of them are now used by actual staff, which still surprises me.', building: 'Campus room booking rewrite' },
-    'daniel-kovac': { name: 'Daniel Kovac', program: 'Mechatronics Engineering', year: 4, skills: ['C++', 'ROS', 'Simulation'], bio: 'Robotics and simulation. Currently on the Ontario Tech rover team, mostly on the controls side.', building: 'Terrain classifier for the rover team' },
-    'lena-fitzgerald': { name: 'Lena Fitzgerald', program: 'Business & IT', year: 3, skills: ['Product', 'Figma', 'Next.js'], bio: 'I sit between design and code. Interested in tools that make people less nervous about presenting their work.', building: 'Interview prep platform for co-op students' },
+    'aisha-rahman': {
+      name: 'Aisha Rahman',
+      program: 'Computer Science',
+      year: 3,
+      skills: ['React', 'Python', 'Computer Vision'],
+      bio: 'Third-year CS student working mostly on spatial computing. I like problems where the interface has to understand the room it is in.',
+      building: 'AI-powered course planning platform',
+    },
+    'marcus-oyelaran': {
+      name: 'Marcus Oyelaran',
+      program: 'Electrical Engineering',
+      year: 4,
+      skills: ['Embedded C', 'Data Viz', 'Hardware'],
+      bio: 'Energy systems and instrumentation. Most of my projects start because a piece of equipment I needed cost more than my tuition.',
+      building: 'Open-source power quality logger',
+    },
+    'priya-nandakumar': {
+      name: 'Priya Nandakumar',
+      program: 'Software Engineering',
+      year: 2,
+      skills: ['Svelte', 'Go', 'Postgres'],
+      bio: 'I build small tools that remove small frictions on campus. Two of them are now used by actual staff, which still surprises me.',
+      building: 'Campus room booking rewrite',
+    },
+    'daniel-kovac': {
+      name: 'Daniel Kovac',
+      program: 'Mechatronics Engineering',
+      year: 4,
+      skills: ['C++', 'ROS', 'Simulation'],
+      bio: 'Robotics and simulation. Currently on the Ontario Tech rover team, mostly on the controls side.',
+      building: 'Terrain classifier for the rover team',
+    },
+    'lena-fitzgerald': {
+      name: 'Lena Fitzgerald',
+      program: 'Business & IT',
+      year: 3,
+      skills: ['Product', 'Figma', 'Next.js'],
+      bio: 'I sit between design and code. Interested in tools that make people less nervous about presenting their work.',
+      building: 'Interview prep platform for co-op students',
+    },
   }
 
-  const ME = { key: 'aisha-rahman', first: 'Aisha', initials: 'AR', email: 'aisha.rahman@ontariotechu.net' }
+  const ME = {
+    key: 'aisha-rahman',
+    first: 'Aisha',
+    initials: 'AR',
+    email: 'aisha.rahman@ontariotechu.net',
+  }
 
   const NOTIFICATIONS = [
-    { title: 'Campus Nav AR was approved', body: 'Your project is now public.', when: '2 HOURS AGO' },
-    { title: 'Marcus Oyelaran upvoted Campus Nav AR', body: 'You have 142 upvotes total.', when: 'YESTERDAY' },
-    { title: 'Collaboration request on LabQueue', body: 'Priya wants to help with routing.', when: '2 DAYS AGO' },
-    { title: 'Fall 2026 Sprint starts in 14 days', body: 'Build for Campus · registration open.', when: '3 DAYS AGO' },
+    {
+      title: 'Campus Nav AR was approved',
+      body: 'Your project is now public.',
+      when: '2 HOURS AGO',
+    },
+    {
+      title: 'Marcus Oyelaran upvoted Campus Nav AR',
+      body: 'You have 142 upvotes total.',
+      when: 'YESTERDAY',
+    },
+    {
+      title: 'Collaboration request on LabQueue',
+      body: 'Priya wants to help with routing.',
+      when: '2 DAYS AGO',
+    },
+    {
+      title: 'Fall 2026 Sprint starts in 14 days',
+      body: 'Build for Campus · registration open.',
+      when: '3 DAYS AGO',
+    },
   ]
 
   const PAGES = {
-    home: 'index.html', projects: 'projects.html', detail: 'project.html', students: 'students.html',
-    profile: 'profile.html', sprints: 'sprints.html', submit: 'submit.html', dashboard: 'dashboard.html',
-    admin: 'admin.html', about: 'about.html', contribute: 'contribute.html', login: 'login.html',
-    signup: 'signup.html', settings: 'settings.html',
+    home: 'index.html',
+    projects: 'projects.html',
+    detail: 'project.html',
+    students: 'students.html',
+    profile: 'profile.html',
+    sprints: 'sprints.html',
+    submit: 'submit.html',
+    dashboard: 'dashboard.html',
+    admin: 'admin.html',
+    about: 'about.html',
+    contribute: 'contribute.html',
+    login: 'login.html',
+    signup: 'signup.html',
+    settings: 'settings.html',
   }
 
   const ROLES = ['student', 'moderator', 'admin']
@@ -159,7 +403,17 @@
 
   function state(extra) {
     return Object.assign(
-      { menuOpen: false, notifsOpen: false, sheetOpen: false, isMobile: false, heroTier: 'full', toast: null, now: Date.now(), votes: {}, popped: null },
+      {
+        menuOpen: false,
+        notifsOpen: false,
+        sheetOpen: false,
+        isMobile: false,
+        heroTier: 'full',
+        toast: null,
+        now: Date.now(),
+        votes: {},
+        popped: null,
+      },
       extra || {},
     )
   }
@@ -182,7 +436,8 @@
           document.querySelectorAll('[data-par]').forEach((el) => {
             const d = parseFloat(el.getAttribute('data-par')) || 10
             const base = el.getAttribute('data-par-base') || ''
-            el.style.transform = base + ' translate3d(' + (-dx * d).toFixed(1) + 'px,' + (-dy * d).toFixed(1) + 'px,0)'
+            el.style.transform =
+              base + ' translate3d(' + (-dx * d).toFixed(1) + 'px,' + (-dy * d).toFixed(1) + 'px,0)'
           })
         })
       }
@@ -207,7 +462,8 @@
       if (el.getBoundingClientRect().top > window.innerHeight * 0.9) {
         el.style.opacity = '0'
         el.style.transform = 'translateY(18px)'
-        el.style.transition = 'opacity .55s cubic-bezier(.16,1,.3,1),transform .55s cubic-bezier(.16,1,.3,1)'
+        el.style.transition =
+          'opacity .55s cubic-bezier(.16,1,.3,1),transform .55s cubic-bezier(.16,1,.3,1)'
       }
       self._io.observe(el)
     })
@@ -249,7 +505,10 @@
   }
 
   function initials(name) {
-    return name.split(' ').map((x) => x[0]).join('')
+    return name
+      .split(' ')
+      .map((x) => x[0])
+      .join('')
   }
 
   function decorate(self, p) {
@@ -264,10 +523,18 @@
       voteBg: voted ? '#FDEFE9' : '#fff',
       voteFg: voted ? '#A83B15' : '#3D4855',
       voteBorder: voted ? '#E2572A' : '#E6E4DE',
-      voteAnim: self.state.popped === p.slug ? 'display:inline-block;animation:otuPop .4s ease-out' : 'display:inline-block',
+      voteAnim:
+        self.state.popped === p.slug
+          ? 'display:inline-block;animation:otuPop .4s ease-out'
+          : 'display:inline-block',
       voteLabel: (voted ? 'Remove upvote from ' : 'Upvote ') + p.title,
       openLabel: 'Open ' + p.title,
-      author: { name: author.name, initials: initials(author.name), program: author.program, year: author.year },
+      author: {
+        name: author.name,
+        initials: initials(author.name),
+        program: author.program,
+        year: author.year,
+      },
       open: () => go('detail', { slug: p.slug }),
       openAuthor: () => go('profile', { student: p.student }),
       vote: () => toggleVote(self, p.slug),
@@ -308,7 +575,9 @@
           label,
           current: on ? 'page' : 'false',
           fg: on ? BLUE : '#3D4855',
-          bar: 'display:block;height:2px;margin-top:6px;border-radius:2px;background:' + (on ? BLUE : 'transparent'),
+          bar:
+            'display:block;height:2px;margin-top:6px;border-radius:2px;background:' +
+            (on ? BLUE : 'transparent'),
           go: () => go(route),
         }
       }),
@@ -320,8 +589,9 @@
       sheetOpen: !!s.sheetOpen,
       sheetVisible: !!(s.isMobile && s.sheetOpen),
       sheetAria: s.sheetOpen ? 'Close menu' : 'Open menu',
-      sheetIcon: s.sheetOpen ? 'M4 4l10 10M14 4L4 14' : 'M2 5h14M2 9h14M2 13h14',
-      toggleSheet: () => self.setState({ sheetOpen: !s.sheetOpen, menuOpen: false, notifsOpen: false }),
+      sheetClosed: !s.sheetOpen,
+      toggleSheet: () =>
+        self.setState({ sheetOpen: !s.sheetOpen, menuOpen: false, notifsOpen: false }),
       closeSheet: () => self.setState({ sheetOpen: false }),
 
       goHome: () => go('home'),
@@ -336,8 +606,9 @@
       goSubmit,
       focusSearch: () => {
         const el = document.getElementById('otu-search')
-        if (el) el.focus()
-        else go('projects', { focus: 'search' })
+        if (!el) return go('projects', { focus: 'search' })
+        self.setState({ sheetOpen: false })
+        el.focus()
       },
 
       loggedIn: !!me,
@@ -356,9 +627,31 @@
       notifications: NOTIFICATIONS,
 
       footerCols: [
-        { title: 'PLATFORM', links: [['Projects', () => go('projects')], ['Students', () => go('students')], ['Semester Sprints', () => go('sprints')], ['About', () => go('about')]] },
-        { title: 'COMMUNITY', links: [['Submit Project', goSubmit], ['Contribute', () => go('contribute')], ['Guidelines', () => go('about')], ['Report an Issue', external(REPO_URL + '/issues')]] },
-        { title: 'CONNECT', links: [['GitHub', external(REPO_URL)], ['Discord', external(DISCORD_URL)]] },
+        {
+          title: 'PLATFORM',
+          links: [
+            ['Projects', () => go('projects')],
+            ['Students', () => go('students')],
+            ['Semester Sprints', () => go('sprints')],
+            ['About', () => go('about')],
+          ],
+        },
+        {
+          title: 'COMMUNITY',
+          links: [
+            ['Submit Project', goSubmit],
+            ['Contribute', () => go('contribute')],
+            ['Guidelines', () => go('about')],
+            ['Report an Issue', external(REPO_URL + '/issues')],
+          ],
+        },
+        {
+          title: 'CONNECT',
+          links: [
+            ['GitHub', external(REPO_URL)],
+            ['Discord', external(DISCORD_URL)],
+          ],
+        },
       ].map((c) => ({ title: c.title, links: c.links.map(([label, fn]) => ({ label, go: fn })) })),
 
       toast: s.toast,
@@ -367,8 +660,36 @@
   }
 
   window.OTU = {
-    BLUE, ORANGE, REPO_URL, DISCORD_URL, SPRINT_DEADLINE, PROJECTS, STUDENTS, ME, ROLES, STAFF_ROLES,
-    art, initials, param, href, go, session, isStaff, signIn, signOut, guard, requireLogin, flashNext,
-    state, mount, unmount, motion, flash, decorate, sprintLeft, chrome, external,
+    BLUE,
+    ORANGE,
+    REPO_URL,
+    DISCORD_URL,
+    SPRINT_DEADLINE,
+    PROJECTS,
+    STUDENTS,
+    ME,
+    ROLES,
+    STAFF_ROLES,
+    art,
+    initials,
+    param,
+    href,
+    go,
+    session,
+    isStaff,
+    signIn,
+    signOut,
+    guard,
+    requireLogin,
+    flashNext,
+    state,
+    mount,
+    unmount,
+    motion,
+    flash,
+    decorate,
+    sprintLeft,
+    chrome,
+    external,
   }
 })()
