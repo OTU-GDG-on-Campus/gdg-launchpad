@@ -134,7 +134,7 @@ src/
   pages/               One file per route
 
 supabase/
-  config.toml          Local stack config, kept in git
+  config.toml          Local stack config, kept in git. Comments sit inline, after the setting
   migrations/          Ordered SQL. Never edit one that has already been pushed
 ```
 
