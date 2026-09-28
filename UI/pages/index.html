@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<!-- Landing page: hero, live activity graph and featured projects. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OTU LaunchPad</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 10 10%27%3E%3Crect width=%2710%27 height=%2710%27 rx=%272%27 fill=%27%2300417A%27/%3E%3Crect x=%274%27 y=%274%27 width=%272%27 height=%272%27 fill=%27%23E2572A%27/%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/otu.css">
+<script src="assets/otu.js"></script>
+<script src="assets/vendor/react.production.min.js"></script>
+<script src="assets/vendor/react-dom.production.min.js"></script>
+<script src="assets/vendor/dc-runtime.js"></script>
+</head>
+<body>
+<x-dc>
+<div style="min-height:100vh;display:flex;flex-direction:column;background:#FBFBF9">
+
+<a href="#otu-main" style="position:absolute;left:-9999px;top:8px;z-index:100;background:#00417A;color:#fff;padding:11px 18px;border-radius:8px;font-size:14px;font-weight:700" style-focus="left:16px">Skip to content</a>
+
+<header style="position:sticky;top:0;z-index:60;background:rgba(251,251,249,.94);border-bottom:1px solid #E6E4DE">
+  <div style="max-width:1340px;margin:0 auto;padding:0 clamp(24px,4vw,44px);height:64px;display:flex;align-items:center;gap:clamp(12px,3vw,36px)">
+    <button sc-camel-on-click="{{ goHome }}" aria-label="OTU LaunchPad home" style="background:none;border:0;padding:0;cursor:pointer;font-size:19px;font-weight:800;letter-spacing:-.02em;color:#10151B">
+      <span style="color:#00417A">OTU</span> <span style="color:#E2572A">Launch</span><span style="color:#10151B">Pad.</span>
+    </button>
+    <sc-if value="{{ desktopNav }}" hint-placeholder-val="{{ true }}">
+    <nav aria-label="Primary" style="display:flex;align-items:center;gap:4px;margin-left:8px">
+      <sc-for list="{{ navItems }}" as="n" hint-placeholder-count="4">
+        <button sc-camel-on-click="{{ n.go }}" aria-current="{{ n.current }}" style="background:none;border:0;cursor:pointer;padding:9px 11px 6px;font-size:14.5px;font-weight:600;color:{{ n.fg }};transition:color .18s" style-hover="color:#00417A">
+          <span style="display:block">{{ n.label }}</span>
+          <span style="{{ n.bar }}"></span>
+        </button>
+      </sc-for>
+    </nav>
+    </sc-if>
+    <div style="flex:1"></div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <sc-if value="{{ mobileNav }}" hint-placeholder-val="{{ false }}">
+        <button sc-camel-on-click="{{ toggleSheet }}" aria-label="{{ sheetAria }}" aria-expanded="{{ sheetOpen }}" style="width:40px;height:40px;display:grid;place-items:center;background:none;border:1px solid #E6E4DE;border-radius:8px;cursor:pointer" style-hover="border-color:#00417A">
+          <svg width="18" height="18" sc-camel-view-box="0 0 18 18" fill="none" stroke="#10151B" stroke-width="1.7" stroke-linecap="round"><path d="{{ sheetIcon }}"></path></svg>
+        </button>
+      </sc-if>
+      <button sc-camel-on-click="{{ focusSearch }}" aria-label="Search projects" style="width:36px;height:36px;display:grid;place-items:center;background:none;border:1px solid #E6E4DE;border-radius:8px;cursor:pointer" style-hover="border-color:#00417A">
+        <svg width="16" height="16" sc-camel-view-box="0 0 16 16" fill="none" stroke="#3D4855" stroke-width="1.6"><circle cx="7" cy="7" r="4.6"></circle><path d="M10.5 10.5 14 14"></path></svg>
+      </button>
+      <sc-if value="{{ loggedOut }}" hint-placeholder-val="{{ true }}">
+        <button sc-camel-on-click="{{ openLogin }}" style="background:#00417A;color:#fff;border:0;border-radius:8px;padding:9px 18px;font-size:14px;font-weight:700;cursor:pointer" style-hover="background:#002C52">Login</button>
+      </sc-if>
+      <sc-if value="{{ loggedIn }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;align-items:center;gap:10px;position:relative">
+          <button sc-camel-on-click="{{ toggleNotifs }}" aria-label="Notifications" style="position:relative;width:36px;height:36px;display:grid;place-items:center;background:none;border:1px solid #E6E4DE;border-radius:8px;cursor:pointer" style-hover="border-color:#00417A">
+            <svg width="16" height="16" sc-camel-view-box="0 0 16 16" fill="none" stroke="#3D4855" stroke-width="1.6"><path d="M4 6.5a4 4 0 1 1 8 0c0 3 1 4 1 4H3s1-1 1-4Z"></path><path d="M6.6 13a1.6 1.6 0 0 0 2.8 0"></path></svg>
+            <span style="position:absolute;top:-4px;right:-4px;min-width:16px;height:16px;padding:0 4px;background:#E2572A;color:#fff;border-radius:99px;font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:500;display:grid;place-items:center">{{ notifCount }}</span>
+          </button>
+          <button sc-camel-on-click="{{ toggleMenu }}" aria-label="Account menu" style="display:flex;align-items:center;gap:8px;background:none;border:1px solid #E6E4DE;border-radius:99px;padding:3px 10px 3px 3px;cursor:pointer" style-hover="border-color:#00417A">
+            <span style="width:28px;height:28px;border-radius:99px;background:#00417A;color:#fff;font-size:11.5px;font-weight:700;display:grid;place-items:center">{{ meInitials }}</span>
+            <sc-if value="{{ desktopNav }}" hint-placeholder-val="{{ true }}"><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#3D4855">{{ meRole }}</span></sc-if>
+          </button>
+          <sc-if value="{{ notifsOpen }}" hint-placeholder-val="{{ false }}">
+            <div role="dialog" aria-label="Notifications" style="position:absolute;top:46px;right:0;width:340px;background:#fff;border:1px solid #E6E4DE;border-radius:12px;box-shadow:0 18px 40px rgba(16,21,27,.13);overflow:hidden;z-index:70">
+              <div style="padding:13px 16px;border-bottom:1px solid #EFEDE7;font-size:13px;font-weight:700">Notifications</div>
+              <sc-for list="{{ notifications }}" as="nt" hint-placeholder-count="3">
+                <div style="display:flex;gap:11px;padding:13px 16px;border-bottom:1px solid #F3F1EB">
+                  <span style="width:7px;height:7px;border-radius:99px;background:#E2572A;margin-top:6px;flex:none"></span>
+                  <div>
+                    <div style="font-size:13.5px;font-weight:600;color:#10151B">{{ nt.title }}</div>
+                    <div style="font-size:12.5px;color:#55606C;margin-top:2px">{{ nt.body }}</div>
+                    <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#5A6470;margin-top:5px">{{ nt.when }}</div>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+          <sc-if value="{{ menuOpen }}" hint-placeholder-val="{{ false }}">
+            <div role="menu" style="position:absolute;top:46px;right:0;width:230px;background:#fff;border:1px solid #E6E4DE;border-radius:12px;box-shadow:0 18px 40px rgba(16,21,27,.13);padding:6px;z-index:70">
+              <sc-for list="{{ menuItems }}" as="m" hint-placeholder-count="4">
+                <button sc-camel-on-click="{{ m.go }}" role="menuitem" style="display:block;width:100%;text-align:left;background:none;border:0;padding:9px 11px;border-radius:8px;font-size:13.5px;font-weight:600;color:#3D4855;cursor:pointer" style-hover="background:#F1EFE9;color:#00417A">{{ m.label }}</button>
+              </sc-for>
+              <div style="height:1px;background:#EFEDE7;margin:6px 4px"></div>
+              <button sc-camel-on-click="{{ signOut }}" role="menuitem" style="display:block;width:100%;text-align:left;background:none;border:0;padding:9px 11px;border-radius:8px;font-size:13.5px;font-weight:600;color:#A83B15;cursor:pointer" style-hover="background:#F1EFE9">Sign out</button>
+            </div>
+          </sc-if>
+        </div>
+      </sc-if>
+    </div>
+  </div>
+</header>
+
+<sc-if value="{{ sheetVisible }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;inset:64px 0 0 0;z-index:55;background:rgba(16,21,27,.32)" sc-camel-on-click="{{ closeSheet }}"></div>
+  <nav aria-label="Primary" style="position:fixed;top:64px;left:0;right:0;z-index:56;background:#FDFDFC;border-bottom:1px solid #E6E4DE;box-shadow:0 24px 48px rgba(16,21,27,.14);padding:10px clamp(24px,4vw,44px) 18px;animation:otuRise .22s cubic-bezier(.16,1,.3,1)">
+    <sc-for list="{{ navItems }}" as="n" hint-placeholder-count="4">
+      <button sc-camel-on-click="{{ n.go }}" aria-current="{{ n.current }}" style="display:flex;align-items:center;justify-content:space-between;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid #EFEDE7;padding:16px 4px;font-size:18px;font-weight:700;letter-spacing:-.015em;color:{{ n.fg }};cursor:pointer">{{ n.label }}<span style="color:#E2572A">→</span></button>
+    </sc-for>
+    <div style="display:flex;gap:10px;margin-top:16px">
+      <button sc-camel-on-click="{{ goProjects }}" style="flex:1;background:#00417A;color:#fff;border:0;border-radius:9px;padding:14px;font-size:15px;font-weight:700;cursor:pointer">Explore Projects</button>
+      <button sc-camel-on-click="{{ goSubmit }}" style="flex:1;background:#fff;color:#10151B;border:1px solid #D2CEC4;border-radius:9px;padding:14px;font-size:15px;font-weight:700;cursor:pointer">Launch a Project</button>
+    </div>
+  </nav>
+</sc-if>
+
+<main id="otu-main" style="flex:1">
+<div>
+  <section id="otu-hero" aria-labelledby="otu-hero-title" style="position:relative;overflow:hidden;background:#FAFAF8">
+    <div aria-hidden="true" data-par="5" style="position:absolute;left:-24px;right:-24px;top:-24px;height:calc(100vh + 40px);background-image:linear-gradient(rgba(0,65,122,.055) 1px,transparent 1px),linear-gradient(90deg,rgba(0,65,122,.055) 1px,transparent 1px),linear-gradient(rgba(0,65,122,.09) 1px,transparent 1px),linear-gradient(90deg,rgba(0,65,122,.09) 1px,transparent 1px);background-size:24px 24px,24px 24px,120px 120px,120px 120px;background-position:center top;-webkit-mask-image:radial-gradient(ellipse 64% 60% at 50% 46%,#000 0%,rgba(0,0,0,.5) 55%,transparent 100%);mask-image:radial-gradient(ellipse 64% 60% at 50% 46%,#000 0%,rgba(0,0,0,.5) 55%,transparent 100%);animation:otuFade 1.4s ease-out both;will-change:transform"></div>
+    <div aria-hidden="true" style="position:absolute;left:0;right:0;top:0;height:100vh;pointer-events:none;background:radial-gradient(ellipse 46% 40% at 50% 44%,rgba(0,65,122,.07),rgba(0,65,122,0) 72%),radial-gradient(ellipse 34% 26% at 50% 46%,rgba(250,250,248,.85),rgba(250,250,248,0) 80%)"></div>
+
+    <div style="position:relative;min-height:clamp(600px,calc(90vh - 64px),860px);display:flex;flex-direction:column">
+      <sc-if value="{{ heroFull }}" hint-placeholder-val="{{ true }}">
+        <div aria-hidden="true" style="position:absolute;inset:0;pointer-events:none;animation:otuFade 1.6s ease-out .9s both">
+          <svg sc-camel-view-box="0 0 1000 1000" sc-camel-preserve-aspect-ratio="none" style="position:absolute;inset:0;width:100%;height:100%" fill="none" stroke="#00417A" stroke-width="1" stroke-dasharray="3 6" opacity=".32">
+            <path vector-effect="non-scaling-stroke" style="animation:otuDash 3.5s linear infinite" d="M150 190H320V250"></path>
+            <path vector-effect="non-scaling-stroke" style="animation:otuDash 4s linear infinite" d="M850 190H680V250"></path>
+          </svg>
+          <span style="position:absolute;left:32%;top:25%;width:5px;height:5px;margin:-2.5px 0 0 -2.5px;background:#00417A"></span>
+          <span style="position:absolute;left:68%;top:25%;width:5px;height:5px;margin:-2.5px 0 0 -2.5px;background:#E2572A"></span>
+        </div>
+        <div data-par="9" style="position:absolute;left:6%;top:15%;z-index:1;will-change:transform"><div style="animation:otuIn 1s cubic-bezier(.16,1,.3,1) 1.05s both"><div style="animation:otuFloat 11s ease-in-out infinite;display:flex;flex-direction:column;align-items:flex-start;gap:8px">
+          <div style="background:rgba(255,255,255,.78);backdrop-filter:blur(12px) saturate(1.2);-webkit-backdrop-filter:blur(12px) saturate(1.2);border:1px solid rgba(16,21,27,.09);border-radius:12px;box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 14px 34px -16px rgba(16,21,27,.22);border-radius:99px;padding:6px 14px 6px 6px;display:flex;align-items:center;gap:10px">
+            <span style="width:26px;height:26px;border-radius:99px;background:#00417A;display:grid;place-items:center"><span style="width:8px;height:8px;border-radius:99px;background:#fff"></span></span>
+            <span><span style="display:block;font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.12em;color:#55606C">PRJ-0142</span><span style="display:block;font-size:13px;font-weight:700;color:#10151B;letter-spacing:-.01em">Campus Nav AR</span></span>
+          </div>
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.08em;color:#5A6470;padding-left:10px">+ 43.9448° N, 78.8964° W</span>
+        </div></div></div>
+        <div data-par="10" style="position:absolute;right:6%;top:15%;z-index:1;will-change:transform"><div style="animation:otuIn 1s cubic-bezier(.16,1,.3,1) 1.15s both"><div style="animation:otuFloat 12s ease-in-out infinite;animation-delay:-5s">
+          <div style="background:rgba(255,255,255,.78);backdrop-filter:blur(12px) saturate(1.2);-webkit-backdrop-filter:blur(12px) saturate(1.2);border:1px solid rgba(16,21,27,.09);border-radius:12px;box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 14px 34px -16px rgba(16,21,27,.22);border-radius:99px;padding:9px 16px;display:flex;align-items:center;gap:9px;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.14em;color:#10151B"><span style="width:7px;height:7px;border-radius:99px;background:#E2572A;animation:otuPulse 2s ease-out infinite"></span>SPRINT 16 · {{ sprintLeft }}</div>
+        </div></div></div>
+      </sc-if>
+
+      <div style="position:relative;z-index:2;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:clamp(56px,9vh,104px) clamp(20px,4vw,44px) clamp(40px,6vh,64px)">
+        <div style="display:inline-flex;align-items:center;gap:10px;animation:otuIn .7s cubic-bezier(.16,1,.3,1) .15s both">
+          <span style="width:7px;height:7px;background:#E2572A"></span>
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.18em;color:#00417A">OTU STUDENT BUILDER COMMUNITY</span>
+        </div>
+        <h1 id="otu-hero-title" style="margin:clamp(22px,3vh,32px) 0 0;max-width:1050px;font-size:clamp(2.75rem,7.2vw,6.75rem);line-height:.93;letter-spacing:-.045em;font-weight:800;color:#10151B;text-wrap:balance">
+          <span style="display:block;animation:otuUp 1s cubic-bezier(.16,1,.3,1) .28s both">Where <span style="color:#00417A">Ontario Tech</span></span>
+          <span style="display:block;animation:otuUp 1s cubic-bezier(.16,1,.3,1) .4s both">builds what's next<span style="color:#E2572A">.</span></span>
+        </h1>
+        <p style="max-width:46ch;margin:clamp(22px,3.2vh,32px) 0 0;font-size:clamp(17px,1.35vw,20px);line-height:1.6;color:#3D4855;text-wrap:pretty;animation:otuIn .8s cubic-bezier(.16,1,.3,1) .58s both">Discover projects built by students, meet the people behind them, and find something worth building yourself.</p>
+        <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:12px;margin-top:clamp(28px,4vh,40px);animation:otuIn .8s cubic-bezier(.16,1,.3,1) .7s both">
+          <button sc-camel-on-click="{{ goProjects }}" sc-camel-on-mouse-enter="{{ ctaEnter }}" sc-camel-on-mouse-leave="{{ ctaLeave }}" style="display:inline-flex;align-items:center;gap:10px;background:#00417A;color:#fff;border:0;border-radius:10px;padding:16px 26px 16px 30px;font-size:15.5px;font-weight:700;cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 1px 0 rgba(0,44,82,.6),0 10px 26px -12px rgba(0,65,122,.6);transition:transform .25s cubic-bezier(.16,1,.3,1),background .2s,box-shadow .25s" style-hover="background:#003566;transform:translateY(-2px);box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 1px 0 rgba(0,44,82,.6),0 16px 30px -12px rgba(0,65,122,.6)" style-active="transform:translateY(0)">Explore Projects<span aria-hidden="true" style="display:inline-block;transition:transform .3s cubic-bezier(.16,1,.3,1);transform:{{ ctaArrow }}">→</span></button>
+          <button sc-camel-on-click="{{ goSubmit }}" style="background:rgba(255,255,255,.72);color:#10151B;border:1px solid #D5D2CA;border-radius:10px;padding:16px 28px;font-size:15.5px;font-weight:700;cursor:pointer;transition:transform .25s cubic-bezier(.16,1,.3,1),background .2s,border-color .2s" style-hover="background:#fff;border-color:#10151B;transform:translateY(-2px)" style-active="transform:translateY(0)">Launch Your Project</button>
+        </div>
+        <dl style="display:flex;justify-content:center;margin:clamp(40px,6vh,60px) 0 0;animation:otuIn .8s cubic-bezier(.16,1,.3,1) .84s both">
+          <div style="padding:0 clamp(18px,3vw,38px)"><dt style="font-size:clamp(24px,2.2vw,30px);font-weight:800;letter-spacing:-.035em;color:#10151B;line-height:1">124</dt><dd style="margin:8px 0 0;font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.16em;color:#55606C">PROJECTS SHIPPED</dd></div>
+          <div style="padding:0 clamp(18px,3vw,38px);border-left:1px solid #E1DED6"><dt style="font-size:clamp(24px,2.2vw,30px);font-weight:800;letter-spacing:-.035em;color:#10151B;line-height:1">387</dt><dd style="margin:8px 0 0;font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.16em;color:#55606C">BUILDERS</dd></div>
+          <div style="padding:0 clamp(18px,3vw,38px);border-left:1px solid #E1DED6"><dt style="font-size:clamp(24px,2.2vw,30px);font-weight:800;letter-spacing:-.035em;color:#10151B;line-height:1">16<span style="color:#E2572A">.</span></dt><dd style="margin:8px 0 0;font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.16em;color:#55606C">SPRINTS</dd></div>
+        </dl>
+      </div>
+    </div>
+
+    <div aria-label="What's happening on LaunchPad" role="region" style="position:relative;padding:0 clamp(20px,4vw,44px) clamp(28px,4vh,40px)">
+      <div aria-hidden="true" style="position:absolute;inset:0;background-image:linear-gradient(rgba(0,65,122,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(0,65,122,.05) 1px,transparent 1px),linear-gradient(rgba(0,65,122,.085) 1px,transparent 1px),linear-gradient(90deg,rgba(0,65,122,.085) 1px,transparent 1px);background-size:24px 24px,24px 24px,120px 120px,120px 120px;background-position:center top;-webkit-mask-image:radial-gradient(ellipse 60% 70% at 50% 55%,#000 10%,transparent 90%);mask-image:radial-gradient(ellipse 60% 70% at 50% 55%,#000 10%,transparent 90%)"></div>
+      <div aria-hidden="true" style="position:relative;width:1px;height:56px;margin:0 auto;background:repeating-linear-gradient(180deg,#00417A 0 3px,transparent 3px 9px);opacity:.4"></div>
+
+      <sc-if value="{{ heroFull }}" hint-placeholder-val="{{ true }}">
+        <div style="position:relative;width:min(1240px,100%);height:600px;margin:0 auto">
+          <svg aria-hidden="true" sc-camel-view-box="0 0 1000 600" sc-camel-preserve-aspect-ratio="none" style="position:absolute;inset:0;width:100%;height:100%" fill="none" stroke="#00417A" stroke-width="1" stroke-dasharray="3 6" opacity=".4">
+            <path vector-effect="non-scaling-stroke" style="animation:otuDash 4s linear infinite" d="M500 44V96M170 96H830M170 96V128M500 96V128M830 96V128"></path>
+            <path vector-effect="non-scaling-stroke" style="animation:otuDash 3.6s linear infinite" d="M170 156V176M170 390V474"></path>
+            <path vector-effect="non-scaling-stroke" style="animation:otuDash 4.4s linear infinite" d="M500 156V176M500 222V246M500 418V474M500 516V600"></path>
+            <path vector-effect="non-scaling-stroke" style="animation:otuDash 3.8s linear infinite" d="M830 156V176M830 296V322M830 392V474"></path>
+          </svg>
+          <span style="position:absolute;left:17%;top:96px;width:5px;height:5px;margin:-2.5px 0 0 -2.5px;background:#00417A"></span><span style="position:absolute;left:50%;top:96px;width:5px;height:5px;margin:-2.5px 0 0 -2.5px;background:#E2572A"></span><span style="position:absolute;left:83%;top:96px;width:5px;height:5px;margin:-2.5px 0 0 -2.5px;background:#00417A"></span>
+          <div style="position:absolute;left:50%;top:0px;width:0;display:flex;justify-content:center"><div style="flex:none"><div style="display:flex;align-items:center;gap:10px;background:#10151B;color:#fff;border-radius:99px;padding:9px 18px 9px 10px;box-shadow:0 12px 28px -12px rgba(16,21,27,.5)"><span style="width:24px;height:24px;border-radius:6px;background:#00417A;display:grid;place-items:center"><span style="width:8px;height:8px;background:#E2572A"></span></span><span style="font-size:14px;font-weight:800;letter-spacing:-.01em">LaunchPad</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.14em;color:#B9C2CC">FALL 2026</span></div></div></div>
+          <div style="position:absolute;left:17%;top:128px;width:0;display:flex;justify-content:center"><div data-reveal="" style="flex:none"><span style="display:inline-flex;align-items:center;gap:8px;background:#FAFAF8;border:1px solid #D5D2CA;border-radius:99px;padding:5px 12px 5px 10px;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.16em;color:#10151B;white-space:nowrap"><span style="width:6px;height:6px;background:#00417A"></span>PROJECTS</span></div></div><div style="position:absolute;left:50%;top:128px;width:0;display:flex;justify-content:center"><div data-reveal="" style="flex:none"><span style="display:inline-flex;align-items:center;gap:8px;background:#FAFAF8;border:1px solid #D5D2CA;border-radius:99px;padding:5px 12px 5px 10px;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.16em;color:#10151B;white-space:nowrap"><span style="width:6px;height:6px;background:#10151B"></span>BUILDERS</span></div></div><div style="position:absolute;left:83%;top:128px;width:0;display:flex;justify-content:center"><div data-reveal="" style="flex:none"><span style="display:inline-flex;align-items:center;gap:8px;background:#FAFAF8;border:1px solid #D5D2CA;border-radius:99px;padding:5px 12px 5px 10px;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.16em;color:#10151B;white-space:nowrap"><span style="width:6px;height:6px;background:#E2572A"></span>SPRINTS</span></div></div>
+          <div style="position:absolute;left:17%;top:176px;width:0;display:flex;justify-content:center"><div data-reveal="" style="flex:none"><button sc-camel-on-click="{{ fmain.open }}" aria-label="Open featured project Campus Nav AR" style="background:rgba(255,255,255,.78);backdrop-filter:blur(12px) saturate(1.2);-webkit-backdrop-filter:blur(12px) saturate(1.2);border:1px solid rgba(16,21,27,.09);border-radius:12px;box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 14px 34px -16px rgba(16,21,27,.22);font:inherit;color:inherit;cursor:pointer;text-align:left;display:block;width:288px;padding:10px 10px 14px;transition:transform .3s cubic-bezier(.16,1,.3,1),box-shadow .3s cubic-bezier(.16,1,.3,1)" style-hover="transform:translateY(-3px);box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 20px 40px -16px rgba(16,21,27,.28)">
+            <div style="position:relative;height:128px;border-radius:8px;overflow:hidden"><div style="{{ fmain.art }}"></div><span style="position:absolute;left:8px;top:8px;background:rgba(255,255,255,.92);border-radius:99px;padding:4px 9px;font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.14em;color:#00417A">FEATURED PROJECT</span></div>
+            <div style="padding:12px 4px 0">
+              <div style="font-size:16px;font-weight:700;letter-spacing:-.015em;color:#10151B">{{ fmain.title }}</div>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:5px"><span style="font-size:12.5px;color:#3D4855">{{ fmain.author.name }} · {{ fmain.cat }}</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#A83B15">↑ {{ fmain.votes }}</span></div>
+            </div>
+          </button></div></div>
+          <div style="position:absolute;left:17%;top:474px;width:0;display:flex;justify-content:center"><div data-reveal="" style="flex:none"><button sc-camel-on-click="{{ ecoShip.open }}" aria-label="Open recently shipped project LabQueue" style="background:rgba(255,255,255,.78);backdrop-filter:blur(12px) saturate(1.2);-webkit-backdrop-filter:blur(12px) saturate(1.2);border:1px solid rgba(16,21,27,.09);border-radius:12px;box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 14px 34px -16px rgba(16,21,27,.22);font:inherit;color:inherit;cursor:pointer;text-align:left;display:block;padding:11px 16px 11px 11px;display:flex;align-items:center;gap:12px;transition:transform .3s cubic-bezier(.16,1,.3,1),box-shadow .3s cubic-bezier(.16,1,.3,1)" style-hover="transform:translateY(-3px);box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 20px 40px -16px rgba(16,21,27,.28)">
+            <span style="width:32px;height:32px;border-radius:8px;background:#FDEFE9;display:grid;place-items:center;flex:none"><svg width="14" height="14" sc-camel-view-box="0 0 16 16" fill="none" stroke="#E2572A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5 6.5 12 13 4.5"></path></svg></span>
+            <span><span style="display:block;font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.14em;color:#3D4855">RECENTLY SHIPPED · #124</span><span style="display:block;font-size:13.5px;font-weight:700;color:#10151B;margin-top:2px">LabQueue v1.0</span></span>
+          </button></div></div>
+          <div style="position:absolute;left:50%;top:176px;width:0;display:flex;justify-content:center"><div data-reveal="" style="flex:none"><button sc-camel-on-click="{{ goStudents }}" aria-label="Browse builders" style="background:rgba(255,255,255,.78);backdrop-filter:blur(12px) saturate(1.2);-webkit-backdrop-filter:blur(12px) saturate(1.2);border:1px solid rgba(16,21,27,.09);border-radius:12px;box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 14px 34px -16px rgba(16,21,27,.22);font:inherit;color:inherit;cursor:pointer;text-align:left;display:block;border-radius:99px;padding:7px 18px 7px 7px;display:flex;align-items:center;gap:12px;transition:transform .3s cubic-bezier(.16,1,.3,1),box-shadow .3s cubic-bezier(.16,1,.3,1)" style-hover="transform:translateY(-3px);box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 20px 40px -16px rgba(16,21,27,.28)">
+            <span style="display:flex"><span style="width:30px;height:30px;border-radius:99px;border:2px solid #fff;background:#00417A;color:#fff;font-size:10px;font-weight:700;display:grid;place-items:center;flex:none">AR</span><span style="width:30px;height:30px;border-radius:99px;border:2px solid #fff;background:#E2572A;color:#fff;font-size:10px;font-weight:700;display:grid;place-items:center;flex:none;margin-left:-9px">MO</span><span style="width:30px;height:30px;border-radius:99px;border:2px solid #fff;background:#10151B;color:#fff;font-size:10px;font-weight:700;display:grid;place-items:center;flex:none;margin-left:-9px">PN</span><span style="width:30px;height:30px;border-radius:99px;border:2px solid #fff;background:#CFE0EF;color:#00417A;font-size:10px;font-weight:700;display:grid;place-items:center;flex:none;margin-left:-9px">DK</span></span>
+            <span><span style="display:block;font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.14em;color:#3D4855">BUILDING THIS TERM</span><span style="display:block;font-size:13px;font-weight:700;color:#10151B;margin-top:2px">Aisha, Marcus &amp; 385 others</span></span>
+          </button></div></div>
+          <div style="position:absolute;left:50%;top:246px;width:0;display:flex;justify-content:center"><div data-reveal="" style="flex:none"><div style="background:rgba(255,255,255,.78);backdrop-filter:blur(12px) saturate(1.2);-webkit-backdrop-filter:blur(12px) saturate(1.2);border:1px solid rgba(16,21,27,.09);border-radius:12px;box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 14px 34px -16px rgba(16,21,27,.22);width:292px;padding:12px 15px 6px;text-align:left">
+            <div style="display:flex;align-items:center;justify-content:space-between;font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.14em;color:#3D4855;padding-bottom:8px;border-bottom:1px solid rgba(16,21,27,.07)"><span>ACTIVE BUILDERS</span><span style="display:flex;align-items:center;gap:6px;color:#1F7A4D"><span style="width:6px;height:6px;border-radius:99px;background:#1F9D5C;animation:otuPulseG 2s ease-out infinite"></span>LIVE</span></div>
+            <div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid rgba(16,21,27,.06)"><span style="width:24px;height:24px;border-radius:99px;border:2px solid #fff;background:#E2572A;color:#fff;font-size:9px;font-weight:700;display:grid;place-items:center;flex:none">PN</span><span style="flex:1;font-size:12.5px;line-height:1.35;color:#3D4855"><b style="color:#10151B">Priya N.</b> shipped v1.0 of LabQueue</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#5A6470">2M</span></div>
+            <div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid rgba(16,21,27,.06)"><span style="width:24px;height:24px;border-radius:99px;border:2px solid #fff;background:#00417A;color:#fff;font-size:9px;font-weight:700;display:grid;place-items:center;flex:none">MO</span><span style="flex:1;font-size:12.5px;line-height:1.35;color:#3D4855"><b style="color:#10151B">Marcus O.</b> upvoted Campus Nav AR</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#5A6470">9M</span></div>
+            <div style="display:flex;align-items:center;gap:10px;padding:9px 0"><span style="width:24px;height:24px;border-radius:99px;border:2px solid #fff;background:#10151B;color:#fff;font-size:9px;font-weight:700;display:grid;place-items:center;flex:none">DK</span><span style="flex:1;font-size:12.5px;line-height:1.35;color:#3D4855"><b style="color:#10151B">Daniel K.</b> joined Sprint 16</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#5A6470">14M</span></div>
+          </div></div></div>
+          <div style="position:absolute;left:50%;top:474px;width:0;display:flex;justify-content:center"><div data-reveal="" style="flex:none"><div style="background:rgba(255,255,255,.78);backdrop-filter:blur(12px) saturate(1.2);-webkit-backdrop-filter:blur(12px) saturate(1.2);border:1px solid rgba(16,21,27,.09);border-radius:12px;box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 14px 34px -16px rgba(16,21,27,.22);border-radius:99px;padding:6px 16px 6px 6px;display:flex;align-items:center;gap:10px">
+            <span style="display:flex;align-items:center"><span style="width:24px;height:24px;border-radius:99px;border:2px solid #fff;background:#E2572A;color:#fff;font-size:9px;font-weight:700;display:grid;place-items:center;flex:none">PN</span><span style="width:18px;border-top:1px dashed #00417A"></span><span style="width:24px;height:24px;border-radius:99px;border:2px solid #fff;background:#10151B;color:#fff;font-size:9px;font-weight:700;display:grid;place-items:center;flex:none">DK</span></span>
+            <span style="font-size:12.5px;color:#3D4855"><b style="color:#10151B">Collaborating</b> on LabQueue</span>
+          </div></div></div>
+          <div style="position:absolute;left:83%;top:176px;width:0;display:flex;justify-content:center"><div data-reveal="" style="flex:none"><button sc-camel-on-click="{{ goSprints }}" aria-label="Open Sprint 16" style="background:rgba(255,255,255,.78);backdrop-filter:blur(12px) saturate(1.2);-webkit-backdrop-filter:blur(12px) saturate(1.2);border:1px solid rgba(16,21,27,.09);border-radius:12px;box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 14px 34px -16px rgba(16,21,27,.22);font:inherit;color:inherit;cursor:pointer;text-align:left;display:block;width:248px;padding:14px 15px 15px;transition:transform .3s cubic-bezier(.16,1,.3,1),box-shadow .3s cubic-bezier(.16,1,.3,1)" style-hover="transform:translateY(-3px);box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 20px 40px -16px rgba(16,21,27,.28)">
+            <span style="display:flex;align-items:center;justify-content:space-between;gap:10px"><span style="display:flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.14em;color:#3D4855"><span style="width:7px;height:7px;border-radius:99px;background:#E2572A;animation:otuPulse 2s ease-out infinite"></span>SPRINT 16 · LIVE</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#A83B15">{{ sprintLeft }}</span></span>
+            <span style="display:block;font-size:15.5px;font-weight:700;letter-spacing:-.015em;color:#10151B;margin-top:9px">Build for Campus</span>
+            <span style="display:block;height:3px;background:#EAE7E0;border-radius:99px;margin-top:12px;overflow:hidden"><span style="display:block;width:62%;height:100%;background:#00417A;border-radius:99px"></span></span>
+            <span style="display:block;font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;color:#55606C;margin-top:8px">38 TEAMS REGISTERED</span>
+          </button></div></div>
+          <div style="position:absolute;left:83%;top:322px;width:0;display:flex;justify-content:center"><div data-reveal="" style="flex:none"><button sc-camel-on-click="{{ ecoGrid.open }}" aria-label="Open GridWatch" style="background:rgba(255,255,255,.78);backdrop-filter:blur(12px) saturate(1.2);-webkit-backdrop-filter:blur(12px) saturate(1.2);border:1px solid rgba(16,21,27,.09);border-radius:12px;box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 14px 34px -16px rgba(16,21,27,.22);font:inherit;color:inherit;cursor:pointer;text-align:left;display:block;width:250px;padding:9px 14px 9px 9px;display:flex;align-items:center;gap:12px;transition:transform .3s cubic-bezier(.16,1,.3,1),box-shadow .3s cubic-bezier(.16,1,.3,1)" style-hover="transform:translateY(-3px);box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 20px 40px -16px rgba(16,21,27,.28)">
+            <span style="position:relative;width:50px;height:50px;border-radius:7px;overflow:hidden;flex:none;display:block"><span style="{{ ecoGrid.art }}"></span></span>
+            <span><span style="display:block;font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.12em;color:#55606C">IN SPRINT 16</span><span style="display:block;font-size:14.5px;font-weight:700;color:#10151B;margin-top:1px">{{ ecoGrid.title }}</span><span style="display:block;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#A83B15;margin-top:2px">↑ {{ ecoGrid.votes }}</span></span>
+          </button></div></div>
+          <div style="position:absolute;left:83%;top:474px;width:0;display:flex;justify-content:center"><div data-reveal="" style="flex:none"><div style="background:rgba(255,255,255,.78);backdrop-filter:blur(12px) saturate(1.2);-webkit-backdrop-filter:blur(12px) saturate(1.2);border:1px solid rgba(16,21,27,.09);border-radius:12px;box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 14px 34px -16px rgba(16,21,27,.22);border-radius:99px;padding:9px 16px;display:flex;align-items:center;gap:9px;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;color:#10151B;white-space:nowrap"><span style="width:7px;height:7px;border-radius:99px;background:#E2572A;animation:otuPulse 2s ease-out infinite"></span>LIVE · SUBMISSIONS CLOSE OCT 4</div></div></div>
+          <span aria-hidden="true" style="position:absolute;left:30%;top:270px;font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.08em;color:#5A6470;white-space:nowrap">COMMIT a41f9e · 2M AGO</span><span aria-hidden="true" style="position:absolute;left:66.5%;top:446px;font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.08em;color:#5A6470;white-space:nowrap">PR #38 MERGED</span><span aria-hidden="true" style="position:absolute;left:4%;top:560px;font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.08em;color:#5A6470;white-space:nowrap">43.9448° N</span><span aria-hidden="true" style="position:absolute;left:88%;top:560px;font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.08em;color:#5A6470;white-space:nowrap">78.8964° W</span>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ heroEcoFlow }}" hint-placeholder-val="{{ false }}">
+        <div style="position:relative;max-width:1000px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:28px">
+          <div style="display:flex;align-items:center;gap:10px;background:#10151B;color:#fff;border-radius:99px;padding:9px 18px 9px 10px"><span style="width:24px;height:24px;border-radius:6px;background:#00417A;display:grid;place-items:center"><span style="width:8px;height:8px;background:#E2572A"></span></span><span style="font-size:14px;font-weight:800">LaunchPad</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.14em;color:#B9C2CC">FALL 2026</span></div>
+          <div style="width:100%;display:flex;flex-wrap:wrap;justify-content:center;gap:24px 20px;align-items:flex-start">
+            <div data-reveal="" style="flex:1 1 260px;max-width:320px;display:flex;flex-direction:column;align-items:center;gap:14px"><span style="display:inline-flex;align-items:center;gap:8px;background:#FAFAF8;border:1px solid #D5D2CA;border-radius:99px;padding:5px 12px 5px 10px;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.16em;color:#10151B;white-space:nowrap"><span style="width:6px;height:6px;background:#00417A"></span>PROJECTS</span><button sc-camel-on-click="{{ fmain.open }}" aria-label="Open featured project Campus Nav AR" style="background:rgba(255,255,255,.78);backdrop-filter:blur(12px) saturate(1.2);-webkit-backdrop-filter:blur(12px) saturate(1.2);border:1px solid rgba(16,21,27,.09);border-radius:12px;box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 14px 34px -16px rgba(16,21,27,.22);font:inherit;color:inherit;cursor:pointer;text-align:left;display:block;width:min(100%,320px);padding:10px 10px 14px;transition:transform .3s cubic-bezier(.16,1,.3,1),box-shadow .3s cubic-bezier(.16,1,.3,1)" style-hover="transform:translateY(-3px);box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 20px 40px -16px rgba(16,21,27,.28)">
+            <div style="position:relative;height:128px;border-radius:8px;overflow:hidden"><div style="{{ fmain.art }}"></div><span style="position:absolute;left:8px;top:8px;background:rgba(255,255,255,.92);border-radius:99px;padding:4px 9px;font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.14em;color:#00417A">FEATURED PROJECT</span></div>
+            <div style="padding:12px 4px 0">
+              <div style="font-size:16px;font-weight:700;letter-spacing:-.015em;color:#10151B">{{ fmain.title }}</div>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:5px"><span style="font-size:12.5px;color:#3D4855">{{ fmain.author.name }} · {{ fmain.cat }}</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#A83B15">↑ {{ fmain.votes }}</span></div>
+            </div>
+          </button></div>
+            <sc-if value="{{ heroSide }}" hint-placeholder-val="{{ true }}">
+              <div data-reveal="" style="flex:1 1 260px;max-width:320px;display:flex;flex-direction:column;align-items:center;gap:14px"><span style="display:inline-flex;align-items:center;gap:8px;background:#FAFAF8;border:1px solid #D5D2CA;border-radius:99px;padding:5px 12px 5px 10px;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.16em;color:#10151B;white-space:nowrap"><span style="width:6px;height:6px;background:#10151B"></span>BUILDERS</span><div style="background:rgba(255,255,255,.78);backdrop-filter:blur(12px) saturate(1.2);-webkit-backdrop-filter:blur(12px) saturate(1.2);border:1px solid rgba(16,21,27,.09);border-radius:12px;box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 14px 34px -16px rgba(16,21,27,.22);width:min(100%,320px);padding:12px 15px 6px;text-align:left">
+            <div style="display:flex;align-items:center;justify-content:space-between;font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.14em;color:#3D4855;padding-bottom:8px;border-bottom:1px solid rgba(16,21,27,.07)"><span>ACTIVE BUILDERS</span><span style="display:flex;align-items:center;gap:6px;color:#1F7A4D"><span style="width:6px;height:6px;border-radius:99px;background:#1F9D5C;animation:otuPulseG 2s ease-out infinite"></span>LIVE</span></div>
+            <div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid rgba(16,21,27,.06)"><span style="width:24px;height:24px;border-radius:99px;border:2px solid #fff;background:#E2572A;color:#fff;font-size:9px;font-weight:700;display:grid;place-items:center;flex:none">PN</span><span style="flex:1;font-size:12.5px;line-height:1.35;color:#3D4855"><b style="color:#10151B">Priya N.</b> shipped v1.0 of LabQueue</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#5A6470">2M</span></div>
+            <div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid rgba(16,21,27,.06)"><span style="width:24px;height:24px;border-radius:99px;border:2px solid #fff;background:#00417A;color:#fff;font-size:9px;font-weight:700;display:grid;place-items:center;flex:none">MO</span><span style="flex:1;font-size:12.5px;line-height:1.35;color:#3D4855"><b style="color:#10151B">Marcus O.</b> upvoted Campus Nav AR</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#5A6470">9M</span></div>
+            <div style="display:flex;align-items:center;gap:10px;padding:9px 0"><span style="width:24px;height:24px;border-radius:99px;border:2px solid #fff;background:#10151B;color:#fff;font-size:9px;font-weight:700;display:grid;place-items:center;flex:none">DK</span><span style="flex:1;font-size:12.5px;line-height:1.35;color:#3D4855"><b style="color:#10151B">Daniel K.</b> joined Sprint 16</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#5A6470">14M</span></div>
+          </div></div>
+            </sc-if>
+            <div data-reveal="" style="flex:1 1 260px;max-width:320px;display:flex;flex-direction:column;align-items:center;gap:14px"><span style="display:inline-flex;align-items:center;gap:8px;background:#FAFAF8;border:1px solid #D5D2CA;border-radius:99px;padding:5px 12px 5px 10px;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.16em;color:#10151B;white-space:nowrap"><span style="width:6px;height:6px;background:#E2572A"></span>SPRINTS</span><button sc-camel-on-click="{{ goSprints }}" aria-label="Open Sprint 16" style="background:rgba(255,255,255,.78);backdrop-filter:blur(12px) saturate(1.2);-webkit-backdrop-filter:blur(12px) saturate(1.2);border:1px solid rgba(16,21,27,.09);border-radius:12px;box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 14px 34px -16px rgba(16,21,27,.22);font:inherit;color:inherit;cursor:pointer;text-align:left;display:block;width:min(100%,320px);padding:14px 15px 15px;transition:transform .3s cubic-bezier(.16,1,.3,1),box-shadow .3s cubic-bezier(.16,1,.3,1)" style-hover="transform:translateY(-3px);box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 20px 40px -16px rgba(16,21,27,.28)">
+            <span style="display:flex;align-items:center;justify-content:space-between;gap:10px"><span style="display:flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.14em;color:#3D4855"><span style="width:7px;height:7px;border-radius:99px;background:#E2572A;animation:otuPulse 2s ease-out infinite"></span>SPRINT 16 · LIVE</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#A83B15">{{ sprintLeft }}</span></span>
+            <span style="display:block;font-size:15.5px;font-weight:700;letter-spacing:-.015em;color:#10151B;margin-top:9px">Build for Campus</span>
+            <span style="display:block;height:3px;background:#EAE7E0;border-radius:99px;margin-top:12px;overflow:hidden"><span style="display:block;width:62%;height:100%;background:#00417A;border-radius:99px"></span></span>
+            <span style="display:block;font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;color:#55606C;margin-top:8px">38 TEAMS REGISTERED</span>
+          </button></div>
+          </div>
+        </div>
+      </sc-if>
+
+      <button sc-camel-on-click="{{ scrollHero }}" aria-label="Scroll to explore projects" style="position:relative;display:flex;flex-direction:column;align-items:center;gap:10px;margin:0 auto;background:none;border:0;padding:14px 10px 6px;cursor:pointer" style-hover="opacity:.75">
+        <span style="position:relative;width:1px;height:34px;background:#D5D2CA;overflow:hidden"><span style="position:absolute;left:0;top:0;width:1px;height:10px;background:#E2572A;animation:otuScroll 2.2s cubic-bezier(.16,1,.3,1) infinite"></span></span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.22em;color:#3D4855">SCROLL TO EXPLORE</span>
+        <svg aria-hidden="true" width="11" height="7" sc-camel-view-box="0 0 11 7" fill="none" stroke="#E2572A" stroke-width="1.5"><path d="M1 1l4.5 4.5L10 1"></path></svg>
+      </button>
+    </div>
+  </section>
+
+  <section aria-labelledby="otu-feat-title" style="position:relative;background:#fff;border-top:1px solid #E6E4DE;overflow:hidden">
+    <div aria-hidden="true" style="position:absolute;left:0;right:0;top:0;height:320px;background-image:linear-gradient(rgba(0,65,122,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(0,65,122,.045) 1px,transparent 1px);background-size:24px 24px;-webkit-mask-image:linear-gradient(180deg,#000,transparent);mask-image:linear-gradient(180deg,#000,transparent)"></div>
+    <div style="position:relative;max-width:1340px;margin:0 auto;padding:clamp(64px,8vw,112px) clamp(20px,4vw,44px) clamp(72px,9vw,128px)">
+      <div data-reveal="" style="display:flex;align-items:center;gap:14px">
+        <span style="width:7px;height:7px;background:#E2572A;flex:none"></span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.18em;color:#00417A;white-space:nowrap">FEATURED PROJECTS</span>
+        <span aria-hidden="true" style="flex:1;height:1px;background:repeating-linear-gradient(90deg,#9FB3C6 0 3px,transparent 3px 8px)"></span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.14em;color:#55606C;white-space:nowrap">FALL 2026 · 06</span>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:24px 56px;margin-top:clamp(24px,3vw,36px)">
+        <h2 id="otu-feat-title" data-reveal="" style="flex:1 1 560px;margin:0;max-width:15ch;font-size:clamp(38px,5vw,72px);line-height:.98;letter-spacing:-.04em;font-weight:800;color:#10151B;text-wrap:balance">What <span style="color:#00417A">Ontario Tech</span> students are building<span style="color:#E2572A">.</span></h2>
+        <div data-reveal="" style="flex:0 1 380px">
+          <p style="margin:0;font-size:17px;line-height:1.6;color:#3D4855;text-wrap:pretty">Outstanding projects voted and approved by the OTU CS community, and the students who built them.</p>
+          <button sc-camel-on-click="{{ goProjects }}" style="display:inline-flex;align-items:center;gap:10px;margin-top:18px;background:none;border:0;border-bottom:1px solid #10151B;padding:0 0 4px;font-size:15px;font-weight:700;color:#10151B;cursor:pointer;transition:color .2s,border-color .2s" style-hover="color:#00417A;border-color:#00417A">Browse all 124 projects<span aria-hidden="true" style="color:#E2572A">→</span></button>
+        </div>
+      </div>
+
+      <article data-reveal="" sc-camel-on-click="{{ fp.nav.open }}" sc-camel-on-mouse-enter="{{ fp.nav.enter }}" sc-camel-on-mouse-leave="{{ fp.nav.leave }}" style="display:flex;flex-wrap:wrap;margin-top:clamp(40px,5vw,64px);background:#fff;border:1px solid {{ fp.nav.bd }};border-radius:6px;overflow:hidden;cursor:pointer;box-shadow:{{ fp.nav.sh }};transition:border-color .3s cubic-bezier(.16,1,.3,1),box-shadow .4s cubic-bezier(.16,1,.3,1)">
+        <div style="position:relative;flex:1.4 1 560px;min-height:clamp(320px,34vw,500px);overflow:hidden;background:#F2F5F8;border-right:1px solid #EAE7E0"><div style="position:absolute;inset:0;transform:{{ fp.nav.imgT }};transition:transform .9s cubic-bezier(.16,1,.3,1)">
+            <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(0,65,122,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(0,65,122,.06) 1px,transparent 1px);background-size:24px 24px"></div>
+            <div style="position:absolute;left:6%;top:12%;width:26%;height:30%;border:1.5px solid #9FB3C6;background:rgba(255,255,255,.7)"><span style="position:absolute;left:8px;top:6px;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#3D4855">UA 1120</span></div>
+            <div style="position:absolute;left:6%;top:52%;width:17%;height:36%;border:1.5px solid #9FB3C6;background:rgba(255,255,255,.7)"><span style="position:absolute;left:8px;top:6px;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#3D4855">LIB</span></div>
+            <div style="position:absolute;left:38%;top:12%;width:18%;height:22%;border:1.5px solid #9FB3C6;background:rgba(255,255,255,.7)"><span style="position:absolute;left:8px;top:6px;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#3D4855">CAFÉ</span></div>
+            <div style="position:absolute;left:31%;top:62%;width:26%;height:26%;border:1.5px solid #00417A;background:rgba(0,65,122,.06)"><span style="position:absolute;left:8px;top:6px;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#00417A">UA 1350</span></div>
+            <svg aria-hidden="true" sc-camel-view-box="0 0 100 100" sc-camel-preserve-aspect-ratio="none" style="position:absolute;inset:0;width:100%;height:100%" fill="none"><path vector-effect="non-scaling-stroke" d="M13 47H34V53H44V62" stroke="#E2572A" stroke-width="2.5" stroke-linejoin="round"></path></svg>
+            <span style="position:absolute;left:13%;top:47%;width:12px;height:12px;margin:-6px 0 0 -6px;border-radius:99px;background:#00417A;box-shadow:0 0 0 5px rgba(0,65,122,.18)"></span>
+            <span style="position:absolute;left:44%;top:62%;width:10px;height:10px;margin:-5px 0 0 -5px;background:#E2572A"></span>
+            <span style="position:absolute;left:6%;bottom:5%;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.08em;color:#55606C">FLOOR 1 · NORTH OSHAWA · 43.9448° N</span>
+            <span style="position:absolute;left:5%;top:5%;display:inline-flex;align-items:center;gap:7px;background:#fff;border:1px solid #DCE3EA;border-radius:4px;padding:5px 9px;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;color:#10151B"><span style="width:6px;height:6px;border-radius:99px;background:#1F9D5C"></span>LIVE BUILD · iOS</span>
+            <div style="position:absolute;right:7%;top:9%;width:clamp(150px,30%,212px);aspect-ratio:9/18.5;border-radius:28px;background:#10151B;padding:7px;box-shadow:0 30px 60px -20px rgba(16,21,27,.45)">
+              <div style="position:relative;width:100%;height:100%;border-radius:22px;overflow:hidden;background:linear-gradient(180deg,#3A4652 0%,#5D6A76 48%,#8C969F 100%)">
+                <div style="position:absolute;left:50%;bottom:0;width:170%;height:55%;transform:translateX(-50%);background:linear-gradient(180deg,#76818B,#A8B0B7);clip-path:polygon(40% 0,60% 0,100% 100%,0 100%)"></div>
+                <div style="position:absolute;left:0;top:18%;width:22%;height:52%;background:#4B5661;clip-path:polygon(0 0,100% 30%,100% 80%,0 100%)"></div>
+                <div style="position:absolute;right:0;top:18%;width:22%;height:52%;background:#4B5661;clip-path:polygon(0 30%,100% 0,100% 100%,0 80%)"></div>
+                <div style="position:absolute;left:50%;top:10%;transform:translateX(-50%);white-space:nowrap;background:rgba(255,255,255,.94);border-radius:99px;padding:5px 10px;font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#10151B">UA 1350 · 42 m</div>
+                <div style="position:absolute;left:50%;top:56%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:3px;color:#E2572A;font-size:22px;font-weight:800;line-height:.6"><span style="opacity:.45">^</span><span style="opacity:.7">^</span><span>^</span></div>
+                <div style="position:absolute;left:8%;right:8%;bottom:6%;background:rgba(16,21,27,.82);border-radius:10px;padding:8px 10px;color:#fff;font-size:11px;font-weight:600">Turn left in 12 m<div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#B9C2CC;margin-top:2px;font-weight:400">ARRIVE 10:42</div></div>
+              </div>
+            </div>
+        </div></div>
+        <div style="flex:1 1 360px;min-width:0;display:flex;flex-direction:column;padding:clamp(24px,3vw,44px)">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px"><span style="display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.16em;color:#A83B15"><span style="width:6px;height:6px;background:#E2572A"></span>FEATURED PROJECT</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.14em;color:{{ fp.nav.metaC }};transition:color .3s">PROJECT / {{ fp.nav.id }}</span></div>
+          <h3 style="margin:clamp(18px,2vw,28px) 0 0;font-size:clamp(36px,3.6vw,56px);line-height:1.08;letter-spacing:-.03em;font-weight:800"><button sc-camel-on-click="{{ fp.nav.open }}" style="background:none;border:0;padding:0;font:inherit;color:#10151B;cursor:pointer;text-align:left;display:inline-block;transform:{{ fp.nav.ttlT }};transition:transform .4s cubic-bezier(.16,1,.3,1)">{{ fp.nav.title }}</button></h3>
+          <div style="margin-top:12px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;letter-spacing:.14em;color:#00417A">{{ fp.nav.tagLine }}</div>
+          <p style="margin:18px 0 0;max-width:44ch;font-size:17px;line-height:1.6;color:#3D4855;text-wrap:pretty">{{ fp.nav.blurb }}</p>
+          <div style="flex:1;min-height:28px"></div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.16em;color:#55606C">BUILT BY · {{ fp.nav.teamCount }} BUILDERS</div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px">
+            <sc-for list="{{ fp.nav.people }}" as="b" hint-placeholder-count="3">
+              <button sc-camel-on-click="{{ b.open }}" aria-label="{{ b.label }}" style="display:flex;align-items:center;gap:9px;text-align:left;background:#FAFAF8;border:1px solid #E3E0D8;border-radius:99px;padding:4px 14px 4px 4px;cursor:pointer;transition:border-color .2s" style-hover="border-color:#00417A"><span style="width:30px;height:30px;border-radius:99px;background:{{ b.bg }};color:{{ b.fg }};font-size:10.5px;font-weight:700;display:grid;place-items:center">{{ b.i }}</span><span style="font-size:13.5px;font-weight:600;color:#10151B;white-space:nowrap">{{ b.name }}</span></button>
+            </sc-for>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px;margin-top:24px;padding-top:18px;border-top:1px dashed #DAD6CC">
+            <div style="display:flex;flex-wrap:wrap;gap:6px 18px;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.12em;color:#55606C"><span><b style="font-weight:500;color:#10151B">{{ fp.nav.votes }}</b> UPVOTES</span><span><b style="font-weight:500;color:#10151B">{{ fp.nav.comments }}</b> DISCUSSIONS</span></div>
+            <button sc-camel-on-click="{{ fp.nav.open }}" style="display:inline-flex;align-items:center;gap:8px;background:#00417A;color:#fff;border:0;border-radius:8px;padding:11px 18px;font-size:14px;font-weight:700;cursor:pointer" style-hover="background:#003566">Open project<span aria-hidden="true" style="display:inline-block;transform:{{ fp.nav.btnT }};transition:transform .4s cubic-bezier(.16,1,.3,1)">→</span></button>
+          </div>
+        </div>
+      </article>
+
+      <div style="display:flex;flex-wrap:wrap;gap:20px 32px;margin-top:20px;align-items:stretch">
+        <div data-reveal="" style="flex:2 1 640px;min-width:0;display:flex;flex-wrap:wrap;gap:20px">
+          
+            <article sc-camel-on-click="{{ fp.medi.open }}" sc-camel-on-mouse-enter="{{ fp.medi.enter }}" sc-camel-on-mouse-leave="{{ fp.medi.leave }}" style="flex:1 1 300px;min-width:0;display:flex;flex-direction:column;background:#fff;border:1px solid {{ fp.medi.bd }};border-radius:6px;overflow:hidden;cursor:pointer;box-shadow:{{ fp.medi.sh }};transition:border-color .3s cubic-bezier(.16,1,.3,1),box-shadow .4s cubic-bezier(.16,1,.3,1)">
+              <div style="position:relative;height:clamp(210px,19vw,250px);overflow:hidden;background:#0E141B;border-bottom:1px solid #EAE7E0"><div style="position:absolute;inset:0;transform:{{ fp.medi.imgT }};transition:transform .9s cubic-bezier(.16,1,.3,1)">
+            <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);background-size:20px 20px"></div>
+            <div style="position:absolute;left:24%;top:14%;width:22%;height:72%;border-radius:48% 40% 30% 50%;background:radial-gradient(ellipse at 60% 45%,rgba(214,226,238,.42),rgba(214,226,238,.08) 70%,transparent)"></div>
+            <div style="position:absolute;left:50%;top:14%;width:22%;height:72%;border-radius:40% 48% 50% 30%;background:radial-gradient(ellipse at 40% 45%,rgba(214,226,238,.42),rgba(214,226,238,.08) 70%,transparent)"></div>
+            <div style="position:absolute;left:47%;top:10%;width:5%;height:80%;background:linear-gradient(180deg,rgba(214,226,238,.5),rgba(214,226,238,.15))"></div>
+            <div style="position:absolute;left:55%;top:40%;width:14%;height:22%;border:1.5px dashed #E2572A"><span style="position:absolute;left:-1.5px;bottom:100%;margin-bottom:4px;white-space:nowrap;background:#E2572A;color:#fff;padding:2px 6px;font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.08em">ANOMALY 0.87</span></div>
+            <div style="position:absolute;right:5%;top:10%;display:flex;flex-direction:column;align-items:flex-end;gap:5px;white-space:nowrap;font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;color:#8FA0B2"><span>SCAN 04/12</span><span>MODEL v2.3</span></div>
+            <div style="position:absolute;left:5%;bottom:9%;display:flex;align-items:flex-end;gap:4px;height:34px"><span style="width:5px;height:40%;background:#3E5467"></span><span style="width:5px;height:65%;background:#3E5467"></span><span style="width:5px;height:30%;background:#3E5467"></span><span style="width:5px;height:88%;background:#E2572A"></span><span style="width:5px;height:50%;background:#3E5467"></span></div></div></div>
+              <div style="flex:1;display:flex;flex-direction:column;padding:20px 22px 20px">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.14em;color:{{ fp.medi.metaC }};transition:color .3s"><span>PROJECT / {{ fp.medi.id }} · {{ fp.medi.cat }}</span><span aria-hidden="true" style="color:#E2572A;opacity:{{ fp.medi.arrO }};transform:{{ fp.medi.arrT }};transition:opacity .3s,transform .4s cubic-bezier(.16,1,.3,1)">→</span></div>
+                <h3 style="margin:10px 0 0;font-size:clamp(22px,2vw,26px);line-height:1.08;letter-spacing:-.03em;font-weight:800"><button sc-camel-on-click="{{ fp.medi.open }}" style="background:none;border:0;padding:0;font:inherit;color:#10151B;cursor:pointer;text-align:left;display:inline-block;transform:{{ fp.medi.ttlT }};transition:transform .4s cubic-bezier(.16,1,.3,1)">{{ fp.medi.title }}</button></h3>
+                <div style="margin-top:8px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.12em;color:#00417A">{{ fp.medi.tagLine }}</div>
+                <p style="flex:1;margin:12px 0 0;font-size:14.5px;line-height:1.55;color:#3D4855;text-wrap:pretty">{{ fp.medi.blurb }}</p>
+                <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin-top:18px;padding-top:14px;border-top:1px dashed #DAD6CC"><div style="display:flex;flex-wrap:wrap;gap:6px 18px;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.12em;color:#55606C"><span><b style="font-weight:500;color:#10151B">{{ fp.medi.votes }}</b> UPVOTES</span><span><b style="font-weight:500;color:#10151B">{{ fp.medi.comments }}</b> DISCUSSIONS</span></div><div style="display:flex;align-items:center;gap:10px"><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.14em;color:#55606C;white-space:nowrap">BUILT BY</span><span style="display:flex"><sc-for list="{{ fp.medi.team }}" as="m" hint-placeholder-count="3"><span style="position:relative;z-index:{{ m.z }};width:26px;height:26px;margin-left:{{ m.ml }};border-radius:99px;border:2px solid #fff;background:{{ m.bg }};color:{{ m.fg }};font-size:10px;font-weight:700;display:grid;place-items:center">{{ m.i }}</span></sc-for></span></div></div>
+              </div>
+            </article>
+          
+            <article sc-camel-on-click="{{ fp.cloud.open }}" sc-camel-on-mouse-enter="{{ fp.cloud.enter }}" sc-camel-on-mouse-leave="{{ fp.cloud.leave }}" style="flex:1 1 300px;min-width:0;display:flex;flex-direction:column;background:#fff;border:1px solid {{ fp.cloud.bd }};border-radius:6px;overflow:hidden;cursor:pointer;box-shadow:{{ fp.cloud.sh }};transition:border-color .3s cubic-bezier(.16,1,.3,1),box-shadow .4s cubic-bezier(.16,1,.3,1)">
+              <div style="position:relative;height:clamp(210px,19vw,250px);overflow:hidden;background:#fff;border-bottom:1px solid #EAE7E0"><div style="position:absolute;inset:0;transform:{{ fp.cloud.imgT }};transition:transform .9s cubic-bezier(.16,1,.3,1)">
+            <div style="position:absolute;left:0;right:0;top:0;height:34px;display:flex;align-items:center;gap:0;border-bottom:1px solid #EAE7E0;background:#F6F5F1;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#55606C"><span style="height:100%;display:flex;align-items:center;padding:0 14px;background:#fff;border-right:1px solid #EAE7E0;color:#10151B">notes.md</span><span style="padding:0 14px">PREVIEW</span><span style="flex:1"></span><span style="display:flex;padding-right:12px"><span style="width:18px;height:18px;border-radius:99px;background:#E2572A;border:2px solid #F6F5F1"></span><span style="width:18px;height:18px;border-radius:99px;background:#00417A;border:2px solid #F6F5F1;margin-left:-5px"></span></span></div>
+            <div style="position:absolute;left:0;top:34px;bottom:0;width:54%;padding:16px 18px;border-right:1px solid #EAE7E0;font-family:'IBM Plex Mono',monospace;font-size:11px;line-height:1.9;color:#3D4855">
+              <div><span style="color:#00417A">#</span> Project Notes</div>
+              <div><span style="color:#E2572A">-</span> [x] Research CRDTs</div>
+              <div style="white-space:nowrap"><span style="color:#E2572A">-</span> [ ] Peer sync<span style="position:relative;display:inline-block;width:1.5px;height:13px;background:#E2572A;vertical-align:-2px;margin-left:1px"><span style="position:absolute;bottom:100%;left:0;background:#E2572A;color:#fff;font-size:8.5px;padding:0 4px;line-height:13px;white-space:nowrap">PN</span></span></div>
+              <div style="white-space:nowrap"><span style="color:#8A939C">&gt;</span> merge<span style="position:relative;display:inline-block;width:1.5px;height:13px;background:#00417A;vertical-align:-2px;margin-left:1px"><span style="position:absolute;bottom:100%;left:0;background:#00417A;color:#fff;font-size:8.5px;padding:0 4px;line-height:13px;white-space:nowrap">DK</span></span> on reconnect</div>
+            </div>
+            <div style="position:absolute;left:54%;right:0;top:34px;bottom:0;padding:16px 18px">
+              <div style="font-size:15px;font-weight:800;letter-spacing:-.02em;color:#10151B">Project Notes</div>
+              <div style="display:flex;align-items:center;gap:7px;margin-top:10px;font-size:12px;color:#3D4855"><span style="width:12px;height:12px;border-radius:3px;background:#00417A"></span>Research CRDTs</div>
+              <div style="display:flex;align-items:center;gap:7px;margin-top:7px;font-size:12px;color:#3D4855"><span style="width:12px;height:12px;border-radius:3px;border:1.5px solid #9AA3AC"></span>Peer sync</div>
+            </div></div></div>
+              <div style="flex:1;display:flex;flex-direction:column;padding:20px 22px 20px">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.14em;color:{{ fp.cloud.metaC }};transition:color .3s"><span>PROJECT / {{ fp.cloud.id }} · {{ fp.cloud.cat }}</span><span aria-hidden="true" style="color:#E2572A;opacity:{{ fp.cloud.arrO }};transform:{{ fp.cloud.arrT }};transition:opacity .3s,transform .4s cubic-bezier(.16,1,.3,1)">→</span></div>
+                <h3 style="margin:10px 0 0;font-size:clamp(22px,2vw,26px);line-height:1.08;letter-spacing:-.03em;font-weight:800"><button sc-camel-on-click="{{ fp.cloud.open }}" style="background:none;border:0;padding:0;font:inherit;color:#10151B;cursor:pointer;text-align:left;display:inline-block;transform:{{ fp.cloud.ttlT }};transition:transform .4s cubic-bezier(.16,1,.3,1)">{{ fp.cloud.title }}</button></h3>
+                <div style="margin-top:8px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.12em;color:#00417A">{{ fp.cloud.tagLine }}</div>
+                <p style="flex:1;margin:12px 0 0;font-size:14.5px;line-height:1.55;color:#3D4855;text-wrap:pretty">{{ fp.cloud.blurb }}</p>
+                <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin-top:18px;padding-top:14px;border-top:1px dashed #DAD6CC"><div style="display:flex;flex-wrap:wrap;gap:6px 18px;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.12em;color:#55606C"><span><b style="font-weight:500;color:#10151B">{{ fp.cloud.votes }}</b> UPVOTES</span><span><b style="font-weight:500;color:#10151B">{{ fp.cloud.comments }}</b> DISCUSSIONS</span></div><div style="display:flex;align-items:center;gap:10px"><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.14em;color:#55606C;white-space:nowrap">BUILT BY</span><span style="display:flex"><sc-for list="{{ fp.cloud.team }}" as="m" hint-placeholder-count="3"><span style="position:relative;z-index:{{ m.z }};width:26px;height:26px;margin-left:{{ m.ml }};border-radius:99px;border:2px solid #fff;background:{{ m.bg }};color:{{ m.fg }};font-size:10px;font-weight:700;display:grid;place-items:center">{{ m.i }}</span></sc-for></span></div></div>
+              </div>
+            </article>
+        </div>
+        <div data-reveal="" style="flex:1 1 320px;min-width:0;display:flex;flex-direction:column">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 0 14px;border-bottom:1px solid #10151B;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.16em;color:#10151B"><span>ALSO SHIPPING</span><span style="color:#55606C">03</span></div>
+          
+            <article sc-camel-on-click="{{ fp.study.open }}" sc-camel-on-mouse-enter="{{ fp.study.enter }}" sc-camel-on-mouse-leave="{{ fp.study.leave }}" style="display:grid;grid-template-columns:72px minmax(0,1fr) auto;gap:18px;align-items:center;padding:20px 0;border-bottom:1px solid #E3E0D8;cursor:pointer">
+              <div style="position:relative;width:72px;height:72px;border:1px solid #E3E0D8;border-radius:5px;overflow:hidden;background:#F4F7FA"><div style="position:absolute;inset:0;transform:{{ fp.study.imgT }};transition:transform .9s cubic-bezier(.16,1,.3,1)"><span style="position:absolute;inset:8px;display:grid;grid-template-columns:repeat(5,1fr);grid-template-rows:repeat(4,1fr);gap:3px"><span style="background:#DCE6F0"></span><span style="background:#00417A"></span><span style="background:#DCE6F0"></span><span style="background:#DCE6F0"></span><span style="background:#DCE6F0"></span><span style="background:#DCE6F0"></span><span style="background:#DCE6F0"></span><span style="background:#E2572A"></span><span style="background:#DCE6F0"></span><span style="background:#00417A"></span><span style="background:#DCE6F0"></span><span style="background:#00417A"></span><span style="background:#DCE6F0"></span><span style="background:#DCE6F0"></span><span style="background:#DCE6F0"></span><span style="background:#DCE6F0"></span><span style="background:#DCE6F0"></span><span style="background:#DCE6F0"></span><span style="background:#00417A"></span><span style="background:#DCE6F0"></span></span></div></div>
+              <div style="min-width:0">
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.14em;color:{{ fp.study.metaC }};transition:color .3s">{{ fp.study.id }} · {{ fp.study.cat }}</div>
+                <h3 style="margin:4px 0 0;font-size:19px;line-height:1.15;letter-spacing:-.02em;font-weight:800"><button sc-camel-on-click="{{ fp.study.open }}" style="background:none;border:0;padding:0;font:inherit;color:#10151B;cursor:pointer;text-align:left;display:inline-block;transform:{{ fp.study.ttlT }};transition:transform .4s cubic-bezier(.16,1,.3,1)">{{ fp.study.title }}</button></h3>
+                <div style="margin-top:4px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.1em;color:#00417A;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ fp.study.tagLine }}</div>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#55606C"><span><b style="font-weight:500;color:#10151B">{{ fp.study.votes }}</b> ↑</span><span aria-hidden="true" style="color:#E2572A;opacity:{{ fp.study.arrO }};transform:{{ fp.study.arrT }};transition:opacity .3s,transform .4s cubic-bezier(.16,1,.3,1)">→</span></div>
+            </article>
+          
+            <article sc-camel-on-click="{{ fp.eco.open }}" sc-camel-on-mouse-enter="{{ fp.eco.enter }}" sc-camel-on-mouse-leave="{{ fp.eco.leave }}" style="display:grid;grid-template-columns:72px minmax(0,1fr) auto;gap:18px;align-items:center;padding:20px 0;border-bottom:1px solid #E3E0D8;cursor:pointer">
+              <div style="position:relative;width:72px;height:72px;border:1px solid #E3E0D8;border-radius:5px;overflow:hidden;background:#F4F7FA"><div style="position:absolute;inset:0;transform:{{ fp.eco.imgT }};transition:transform .9s cubic-bezier(.16,1,.3,1)"><span style="position:absolute;left:9px;right:9px;bottom:10px;top:14px;display:flex;align-items:flex-end;gap:4px;border-bottom:1px solid #9FB3C6"><span style="flex:1;height:45%;background:#9FB3C6"></span><span style="flex:1;height:62%;background:#9FB3C6"></span><span style="flex:1;height:38%;background:#9FB3C6"></span><span style="flex:1;height:74%;background:#00417A"></span><span style="flex:1;height:56%;background:#9FB3C6"></span><span style="flex:1;height:90%;background:#E2572A"></span></span></div></div>
+              <div style="min-width:0">
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.14em;color:{{ fp.eco.metaC }};transition:color .3s">{{ fp.eco.id }} · {{ fp.eco.cat }}</div>
+                <h3 style="margin:4px 0 0;font-size:19px;line-height:1.15;letter-spacing:-.02em;font-weight:800"><button sc-camel-on-click="{{ fp.eco.open }}" style="background:none;border:0;padding:0;font:inherit;color:#10151B;cursor:pointer;text-align:left;display:inline-block;transform:{{ fp.eco.ttlT }};transition:transform .4s cubic-bezier(.16,1,.3,1)">{{ fp.eco.title }}</button></h3>
+                <div style="margin-top:4px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.1em;color:#00417A;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ fp.eco.tagLine }}</div>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#55606C"><span><b style="font-weight:500;color:#10151B">{{ fp.eco.votes }}</b> ↑</span><span aria-hidden="true" style="color:#E2572A;opacity:{{ fp.eco.arrO }};transform:{{ fp.eco.arrT }};transition:opacity .3s,transform .4s cubic-bezier(.16,1,.3,1)">→</span></div>
+            </article>
+          
+            <article sc-camel-on-click="{{ fp.game.open }}" sc-camel-on-mouse-enter="{{ fp.game.enter }}" sc-camel-on-mouse-leave="{{ fp.game.leave }}" style="display:grid;grid-template-columns:72px minmax(0,1fr) auto;gap:18px;align-items:center;padding:20px 0;cursor:pointer">
+              <div style="position:relative;width:72px;height:72px;border:1px solid #E3E0D8;border-radius:5px;overflow:hidden;background:#10151B"><div style="position:absolute;inset:0;transform:{{ fp.game.imgT }};transition:transform .9s cubic-bezier(.16,1,.3,1)"><span style="position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.07) 1px,transparent 1px);background-size:8px 8px"></span><span style="position:absolute;left:16px;top:24px;width:8px;height:8px;background:#E2572A"></span><span style="position:absolute;left:24px;top:24px;width:8px;height:8px;background:#E2572A"></span><span style="position:absolute;left:24px;top:16px;width:8px;height:8px;background:#E2572A"></span><span style="position:absolute;left:8px;bottom:8px;right:8px;height:8px;background:#3E7CB1"></span><span style="position:absolute;left:40px;top:32px;width:8px;height:8px;background:#F2C14E"></span></div></div>
+              <div style="min-width:0">
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.14em;color:{{ fp.game.metaC }};transition:color .3s">{{ fp.game.id }} · {{ fp.game.cat }}</div>
+                <h3 style="margin:4px 0 0;font-size:19px;line-height:1.15;letter-spacing:-.02em;font-weight:800"><button sc-camel-on-click="{{ fp.game.open }}" style="background:none;border:0;padding:0;font:inherit;color:#10151B;cursor:pointer;text-align:left;display:inline-block;transform:{{ fp.game.ttlT }};transition:transform .4s cubic-bezier(.16,1,.3,1)">{{ fp.game.title }}</button></h3>
+                <div style="margin-top:4px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.1em;color:#00417A;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ fp.game.tagLine }}</div>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#55606C"><span><b style="font-weight:500;color:#10151B">{{ fp.game.votes }}</b> ↑</span><span aria-hidden="true" style="color:#E2572A;opacity:{{ fp.game.arrO }};transform:{{ fp.game.arrT }};transition:opacity .3s,transform .4s cubic-bezier(.16,1,.3,1)">→</span></div>
+            </article>
+          <div style="flex:1"></div>
+          <button sc-camel-on-click="{{ goProjects }}" style="display:flex;align-items:center;justify-content:space-between;margin-top:16px;background:#FAFAF8;border:1px solid #E3E0D8;border-radius:6px;padding:16px 18px;font-size:14.5px;font-weight:700;color:#10151B;cursor:pointer;transition:border-color .2s,background .2s" style-hover="border-color:#10151B;background:#fff">Explore every project<span aria-hidden="true" style="color:#E2572A">→</span></button>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+</main>
+
+<footer style="border-top:1px solid #E6E4DE;background:#F3F2ED">
+  <div style="max-width:1340px;margin:0 auto;padding:60px clamp(24px,4vw,44px) 44px;display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:40px">
+    <div>
+      <div style="font-size:18px;font-weight:800;letter-spacing:-.02em"><span style="color:#00417A">OTU</span> <span style="color:#E2572A">Launch</span><span style="color:#10151B">Pad.</span></div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#55606C;margin-top:10px">Build. Share. Launch.</div>
+    </div>
+    <sc-for list="{{ footerCols }}" as="c" hint-placeholder-count="3">
+      <div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.09em;color:#55606C">{{ c.title }}</div>
+        <div style="display:flex;flex-direction:column;gap:10px;margin-top:14px;align-items:flex-start">
+          <sc-for list="{{ c.links }}" as="l" hint-placeholder-count="4">
+            <button sc-camel-on-click="{{ l.go }}" style="background:none;border:0;padding:0;cursor:pointer;font-size:14px;font-weight:600;color:#3D4855" style-hover="color:#00417A">{{ l.label }}</button>
+          </sc-for>
+        </div>
+      </div>
+    </sc-for>
+  </div>
+  <div style="max-width:1340px;margin:0 auto;padding:0 clamp(24px,4vw,44px) 40px;display:flex;flex-direction:column;gap:8px">
+    <div style="font-size:13px;line-height:1.55;color:#3D4855;max-width:72ch">An independent project by a student club. Not affiliated with, endorsed by, or an official service of Ontario Tech University.</div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:#5A6470">© 2026 GDG ON CAMPUS, ONTARIO TECH UNIVERSITY · BUILT BY STUDENTS IN OSHAWA</div>
+  </div>
+</footer>
+
+<sc-if value="{{ toastVisible }}" hint-placeholder-val="{{ false }}">
+  <div role="status" style="position:fixed;left:50%;bottom:28px;transform:translateX(-50%);z-index:95;background:#10151B;color:#fff;border-radius:10px;padding:13px 20px;font-size:14.5px;font-weight:600;box-shadow:0 14px 34px rgba(16,21,27,.28);animation:otuRise .2s ease-out">{{ toast }}</div>
+</sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script="">
+class Component extends DCLogic {
+  state = OTU.state({ ctaHover: false, fh: null })
+  componentDidMount() { OTU.mount(this) }
+  componentDidUpdate() { OTU.motion(this) }
+  componentWillUnmount() { OTU.unmount(this) }
+
+  featData(s) {
+    const pal = [['#00417A', '#fff'], ['#E2572A', '#fff'], ['#10151B', '#fff']]
+    const src = {
+      nav: { id: '0142', cat: 'MOBILE', title: 'Campus Nav AR', tags: ['Swift', 'ARKit', 'CoreML'], blurb: 'Augmented reality navigation app for the North Oshawa campus, mapping indoor corridors, classrooms, and food spots.', votes: 142, comments: 28, team: ['AR', 'MO', 'PN'], slug: 'campus-nav-ar' },
+      study: { id: '0156', cat: 'WEB', title: 'StudySync', tags: ['React', 'Node.js', 'Socket.io'], blurb: 'A collaborative real-time study-group finder and resource aggregator tuned specifically for OTU course structures.', votes: 98, comments: 12, team: ['JL', 'SK', 'TW'] },
+      eco: { id: '0161', cat: 'DATA', title: 'EcoTrack Dashboard', tags: ['Python', 'AWS', 'Grafana'], blurb: 'IoT energy tracking system integrated with regional power grids to monitor and optimize institutional carbon footprints.', votes: 114, comments: 19, team: ['DK', 'EM', 'RS'] },
+      medi: { id: '0170', cat: 'ML', title: 'MediCheck AI', tags: ['TensorFlow', 'FastAPI', 'Next.js'], blurb: 'Computer vision diagnosis helper that scans radiography scans for preliminary micro-anomaly detection.', votes: 215, comments: 42, team: ['NA', 'OB', 'LC'] },
+      game: { id: '0177', cat: 'GRAPHICS', title: 'GameForge Engine', tags: ['C++', 'WebAssembly', 'Rust'], blurb: 'Lightweight 2D graphics engine compiled in WebAssembly, built for game dev courses to run seamlessly on low-spec hardware.', votes: 87, comments: 7, team: ['MV', 'KP', 'AH'] },
+      cloud: { id: '0183', cat: 'SYSTEMS', title: 'CloudNotes', tags: ['Rust', 'CRDT', 'WebRTC'], blurb: 'A markdown-based peer-to-peer note-sharing protocol for engineering students, featuring real-time collaborative editing.', votes: 133, comments: 31, team: ['FZ', 'GT', 'YI'] },
+    }
+    const people = { AR: ['Aisha Rahman', 'aisha-rahman'], MO: ['Marcus Oyelaran', 'marcus-oyelaran'], PN: ['Priya Nandakumar', 'priya-nandakumar'] }
+    const stop = (e) => { if (e && e.stopPropagation) e.stopPropagation() }
+    const out = {}
+    Object.keys(src).forEach((k) => {
+      const p = src[k]
+      const on = s.fh === k
+      out[k] = Object.assign({}, p, {
+        tagLine: p.tags.join(' · ').toUpperCase(),
+        teamCount: p.team.length,
+        team: p.team.map((i, n) => ({ i, bg: pal[n][0], fg: pal[n][1], z: 3 - n, ml: n ? '-6px' : '0' })),
+        people: p.team.map((i, n) => {
+          const pp = people[i] || [i, null]
+          return { i, name: pp[0], bg: pal[n][0], fg: pal[n][1], label: 'View ' + pp[0] + "'s profile", open: (e) => { stop(e); pp[1] ? OTU.go('profile', { student: pp[1] }) : OTU.go('students') } }
+        }),
+        open: (e) => { stop(e); p.slug ? OTU.go('detail', { slug: p.slug }) : OTU.go('projects') },
+        enter: () => this.setState({ fh: k }),
+        leave: () => this.setState({ fh: null }),
+        imgT: on ? 'scale(1.035)' : 'scale(1)',
+        ttlT: on ? 'translateX(4px)' : 'translateX(0)',
+        arrO: on ? 1 : 0,
+        arrT: on ? 'translateX(0)' : 'translateX(-6px)',
+        btnT: on ? 'translateX(4px)' : 'translateX(0)',
+        metaC: on ? '#10151B' : '#55606C',
+        bd: on ? '#BDB8AC' : '#E3E0D8',
+        sh: on ? '0 24px 48px -28px rgba(16,21,27,.28)' : '0 1px 0 rgba(16,21,27,.03)',
+      })
+    })
+    return out
+  }
+
+  renderVals() {
+    const s = this.state
+    const find = (slug) => OTU.decorate(this, OTU.PROJECTS.find((p) => p.slug === slug))
+    return Object.assign(OTU.chrome(this, 'home'), {
+      heroFull: s.heroTier === 'full',
+      heroSide: s.heroTier !== 'mob',
+      heroEcoFlow: s.heroTier !== 'full',
+      fp: this.featData(s),
+      fmain: find('campus-nav-ar'),
+      ecoGrid: find('gridwatch'),
+      ecoShip: find('labqueue'),
+      ctaArrow: s.ctaHover ? 'translateX(4px)' : 'translateX(0)',
+      ctaEnter: () => this.setState({ ctaHover: true }),
+      ctaLeave: () => this.setState({ ctaHover: false }),
+      sprintLeft: OTU.sprintLeft(s.now),
+      scrollHero: () => {
+        const el = document.getElementById('otu-hero')
+        if (el) window.scrollTo({ top: el.offsetTop + el.offsetHeight - 64, behavior: 'smooth' })
+      },
+    })
+  }
+}
+</script>
+</body>
+</html>

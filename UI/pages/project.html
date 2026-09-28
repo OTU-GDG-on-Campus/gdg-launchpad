@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<!-- Project detail page. Reads ?slug= and includes the report dialog. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Project · OTU LaunchPad</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 10 10%27%3E%3Crect width=%2710%27 height=%2710%27 rx=%272%27 fill=%27%2300417A%27/%3E%3Crect x=%274%27 y=%274%27 width=%272%27 height=%272%27 fill=%27%23E2572A%27/%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/otu.css">
+<script src="assets/otu.js"></script>
+<script src="assets/vendor/react.production.min.js"></script>
+<script src="assets/vendor/react-dom.production.min.js"></script>
+<script src="assets/vendor/dc-runtime.js"></script>
+</head>
+<body>
+<x-dc>
+<div style="min-height:100vh;display:flex;flex-direction:column;background:#FBFBF9">
+
+<a href="#otu-main" style="position:absolute;left:-9999px;top:8px;z-index:100;background:#00417A;color:#fff;padding:11px 18px;border-radius:8px;font-size:14px;font-weight:700" style-focus="left:16px">Skip to content</a>
+
+<header style="position:sticky;top:0;z-index:60;background:rgba(251,251,249,.94);border-bottom:1px solid #E6E4DE">
+  <div style="max-width:1340px;margin:0 auto;padding:0 clamp(24px,4vw,44px);height:64px;display:flex;align-items:center;gap:clamp(12px,3vw,36px)">
+    <button sc-camel-on-click="{{ goHome }}" aria-label="OTU LaunchPad home" style="background:none;border:0;padding:0;cursor:pointer;font-size:19px;font-weight:800;letter-spacing:-.02em;color:#10151B">
+      <span style="color:#00417A">OTU</span> <span style="color:#E2572A">Launch</span><span style="color:#10151B">Pad.</span>
+    </button>
+    <sc-if value="{{ desktopNav }}" hint-placeholder-val="{{ true }}">
+    <nav aria-label="Primary" style="display:flex;align-items:center;gap:4px;margin-left:8px">
+      <sc-for list="{{ navItems }}" as="n" hint-placeholder-count="4">
+        <button sc-camel-on-click="{{ n.go }}" aria-current="{{ n.current }}" style="background:none;border:0;cursor:pointer;padding:9px 11px 6px;font-size:14.5px;font-weight:600;color:{{ n.fg }};transition:color .18s" style-hover="color:#00417A">
+          <span style="display:block">{{ n.label }}</span>
+          <span style="{{ n.bar }}"></span>
+        </button>
+      </sc-for>
+    </nav>
+    </sc-if>
+    <div style="flex:1"></div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <sc-if value="{{ mobileNav }}" hint-placeholder-val="{{ false }}">
+        <button sc-camel-on-click="{{ toggleSheet }}" aria-label="{{ sheetAria }}" aria-expanded="{{ sheetOpen }}" style="width:40px;height:40px;display:grid;place-items:center;background:none;border:1px solid #E6E4DE;border-radius:8px;cursor:pointer" style-hover="border-color:#00417A">
+          <svg width="18" height="18" sc-camel-view-box="0 0 18 18" fill="none" stroke="#10151B" stroke-width="1.7" stroke-linecap="round"><path d="{{ sheetIcon }}"></path></svg>
+        </button>
+      </sc-if>
+      <button sc-camel-on-click="{{ focusSearch }}" aria-label="Search projects" style="width:36px;height:36px;display:grid;place-items:center;background:none;border:1px solid #E6E4DE;border-radius:8px;cursor:pointer" style-hover="border-color:#00417A">
+        <svg width="16" height="16" sc-camel-view-box="0 0 16 16" fill="none" stroke="#3D4855" stroke-width="1.6"><circle cx="7" cy="7" r="4.6"></circle><path d="M10.5 10.5 14 14"></path></svg>
+      </button>
+      <sc-if value="{{ loggedOut }}" hint-placeholder-val="{{ true }}">
+        <button sc-camel-on-click="{{ openLogin }}" style="background:#00417A;color:#fff;border:0;border-radius:8px;padding:9px 18px;font-size:14px;font-weight:700;cursor:pointer" style-hover="background:#002C52">Login</button>
+      </sc-if>
+      <sc-if value="{{ loggedIn }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;align-items:center;gap:10px;position:relative">
+          <button sc-camel-on-click="{{ toggleNotifs }}" aria-label="Notifications" style="position:relative;width:36px;height:36px;display:grid;place-items:center;background:none;border:1px solid #E6E4DE;border-radius:8px;cursor:pointer" style-hover="border-color:#00417A">
+            <svg width="16" height="16" sc-camel-view-box="0 0 16 16" fill="none" stroke="#3D4855" stroke-width="1.6"><path d="M4 6.5a4 4 0 1 1 8 0c0 3 1 4 1 4H3s1-1 1-4Z"></path><path d="M6.6 13a1.6 1.6 0 0 0 2.8 0"></path></svg>
+            <span style="position:absolute;top:-4px;right:-4px;min-width:16px;height:16px;padding:0 4px;background:#E2572A;color:#fff;border-radius:99px;font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:500;display:grid;place-items:center">{{ notifCount }}</span>
+          </button>
+          <button sc-camel-on-click="{{ toggleMenu }}" aria-label="Account menu" style="display:flex;align-items:center;gap:8px;background:none;border:1px solid #E6E4DE;border-radius:99px;padding:3px 10px 3px 3px;cursor:pointer" style-hover="border-color:#00417A">
+            <span style="width:28px;height:28px;border-radius:99px;background:#00417A;color:#fff;font-size:11.5px;font-weight:700;display:grid;place-items:center">{{ meInitials }}</span>
+            <sc-if value="{{ desktopNav }}" hint-placeholder-val="{{ true }}"><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#3D4855">{{ meRole }}</span></sc-if>
+          </button>
+          <sc-if value="{{ notifsOpen }}" hint-placeholder-val="{{ false }}">
+            <div role="dialog" aria-label="Notifications" style="position:absolute;top:46px;right:0;width:340px;background:#fff;border:1px solid #E6E4DE;border-radius:12px;box-shadow:0 18px 40px rgba(16,21,27,.13);overflow:hidden;z-index:70">
+              <div style="padding:13px 16px;border-bottom:1px solid #EFEDE7;font-size:13px;font-weight:700">Notifications</div>
+              <sc-for list="{{ notifications }}" as="nt" hint-placeholder-count="3">
+                <div style="display:flex;gap:11px;padding:13px 16px;border-bottom:1px solid #F3F1EB">
+                  <span style="width:7px;height:7px;border-radius:99px;background:#E2572A;margin-top:6px;flex:none"></span>
+                  <div>
+                    <div style="font-size:13.5px;font-weight:600;color:#10151B">{{ nt.title }}</div>
+                    <div style="font-size:12.5px;color:#55606C;margin-top:2px">{{ nt.body }}</div>
+                    <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#5A6470;margin-top:5px">{{ nt.when }}</div>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+          <sc-if value="{{ menuOpen }}" hint-placeholder-val="{{ false }}">
+            <div role="menu" style="position:absolute;top:46px;right:0;width:230px;background:#fff;border:1px solid #E6E4DE;border-radius:12px;box-shadow:0 18px 40px rgba(16,21,27,.13);padding:6px;z-index:70">
+              <sc-for list="{{ menuItems }}" as="m" hint-placeholder-count="4">
+                <button sc-camel-on-click="{{ m.go }}" role="menuitem" style="display:block;width:100%;text-align:left;background:none;border:0;padding:9px 11px;border-radius:8px;font-size:13.5px;font-weight:600;color:#3D4855;cursor:pointer" style-hover="background:#F1EFE9;color:#00417A">{{ m.label }}</button>
+              </sc-for>
+              <div style="height:1px;background:#EFEDE7;margin:6px 4px"></div>
+              <button sc-camel-on-click="{{ signOut }}" role="menuitem" style="display:block;width:100%;text-align:left;background:none;border:0;padding:9px 11px;border-radius:8px;font-size:13.5px;font-weight:600;color:#A83B15;cursor:pointer" style-hover="background:#F1EFE9">Sign out</button>
+            </div>
+          </sc-if>
+        </div>
+      </sc-if>
+    </div>
+  </div>
+</header>
+
+<sc-if value="{{ sheetVisible }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;inset:64px 0 0 0;z-index:55;background:rgba(16,21,27,.32)" sc-camel-on-click="{{ closeSheet }}"></div>
+  <nav aria-label="Primary" style="position:fixed;top:64px;left:0;right:0;z-index:56;background:#FDFDFC;border-bottom:1px solid #E6E4DE;box-shadow:0 24px 48px rgba(16,21,27,.14);padding:10px clamp(24px,4vw,44px) 18px;animation:otuRise .22s cubic-bezier(.16,1,.3,1)">
+    <sc-for list="{{ navItems }}" as="n" hint-placeholder-count="4">
+      <button sc-camel-on-click="{{ n.go }}" aria-current="{{ n.current }}" style="display:flex;align-items:center;justify-content:space-between;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid #EFEDE7;padding:16px 4px;font-size:18px;font-weight:700;letter-spacing:-.015em;color:{{ n.fg }};cursor:pointer">{{ n.label }}<span style="color:#E2572A">→</span></button>
+    </sc-for>
+    <div style="display:flex;gap:10px;margin-top:16px">
+      <button sc-camel-on-click="{{ goProjects }}" style="flex:1;background:#00417A;color:#fff;border:0;border-radius:9px;padding:14px;font-size:15px;font-weight:700;cursor:pointer">Explore Projects</button>
+      <button sc-camel-on-click="{{ goSubmit }}" style="flex:1;background:#fff;color:#10151B;border:1px solid #D2CEC4;border-radius:9px;padding:14px;font-size:15px;font-weight:700;cursor:pointer">Launch a Project</button>
+    </div>
+  </nav>
+</sc-if>
+
+<main id="otu-main" style="flex:1">
+<div>
+  <div style="max-width:1160px;margin:0 auto;padding:28px clamp(24px,4vw,44px) 0">
+    <button sc-camel-on-click="{{ goProjects }}" style="background:none;border:0;padding:0;cursor:pointer;font-size:14px;font-weight:600;color:#3D4855" style-hover="color:#00417A">← Back to Projects</button>
+  </div>
+  <section style="max-width:1160px;margin:0 auto;padding:30px clamp(24px,4vw,44px) 0">
+    <div style="display:flex;flex-wrap:wrap;gap:clamp(28px,4vw,56px);align-items:flex-start">
+      <div style="flex:1 1 480px;min-width:0">
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.14em;color:#00417A">{{ d.catMono }}</span>
+          <sc-if value="{{ d.openToContrib }}" hint-placeholder-val="{{ true }}">
+            <span style="display:inline-flex;align-items:center;gap:6px;background:#FDEFE9;color:#A83B15;border-radius:6px;padding:4px 10px;font-size:12px;font-weight:700">Open to Contributors</span>
+          </sc-if>
+        </div>
+        <h1 style="margin:16px 0 0;font-size:clamp(38px,5.4vw,68px);letter-spacing:-.04em;font-weight:800;line-height:.98;text-wrap:balance">{{ d.title }}</h1>
+        <p style="margin:20px 0 0;max-width:58ch;font-size:clamp(17px,1.3vw,20px);line-height:1.55;color:#3D4855;text-wrap:pretty">{{ d.summary }}</p>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:28px">
+          <button sc-camel-on-click="{{ d.vote }}" aria-pressed="{{ d.voted }}" style="display:flex;align-items:center;gap:8px;background:{{ d.voteBg }};color:{{ d.voteFg }};border:1px solid {{ d.voteBorder }};border-radius:9px;padding:13px 20px;font-size:15px;font-weight:700;cursor:pointer;transition:all .18s" style-hover="border-color:#E2572A">
+            <span style="{{ d.voteAnim }}">↑</span> {{ d.voteText }}
+          </button>
+          <a href="#" style="display:inline-flex;align-items:center;gap:8px;background:#00417A;color:#fff;border-radius:9px;padding:14px 22px;font-size:15px;font-weight:700;transition:background .18s" style-hover="background:#002C52;color:#fff">Live demo ↗</a>
+          <button sc-camel-on-click="{{ openReport }}" aria-label="Project options" style="width:46px;height:46px;border:1px solid #D9D6CE;background:#fff;border-radius:9px;cursor:pointer;font-size:17px;color:#3D4855" style-hover="border-color:#00417A">⋯</button>
+        </div>
+      </div>
+
+      <aside style="flex:0 1 320px;min-width:260px;border:1px solid #E1DFD8;border-radius:12px;background:#fff;padding:22px 22px 20px">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.14em;color:#55606C">BUILT BY</div>
+        <div style="display:flex;align-items:center;gap:13px;margin-top:12px">
+          <span style="width:46px;height:46px;border-radius:99px;background:#00417A;color:#fff;font-size:15px;font-weight:700;display:grid;place-items:center;flex:none">{{ d.author.initials }}</span>
+          <div style="min-width:0">
+            <button sc-camel-on-click="{{ d.openAuthor }}" style="background:none;border:0;padding:0;cursor:pointer;font-size:16.5px;font-weight:700;color:#10151B;display:block;text-align:left" style-hover="color:#00417A">{{ d.author.name }}</button>
+            <div style="font-size:13px;color:#3D4855;margin-top:2px">{{ d.author.program }} · Year {{ d.author.year }}</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:14px">
+          <sc-for list="{{ d.links }}" as="l" hint-placeholder-count="3">
+            <a href="{{ l.href }}" style="border:1px solid #D9D6CE;border-radius:7px;padding:7px 12px;font-size:12.5px;font-weight:600;color:#3D4855" style-hover="border-color:#00417A;color:#00417A">{{ l.label }}</a>
+          </sc-for>
+        </div>
+        <div style="height:1px;background:#EFEDE7;margin:18px 0 16px"></div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.14em;color:#55606C">STACK</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px">
+          <sc-for list="{{ d.tags }}" as="t" hint-placeholder-count="3">
+            <span style="border:1px solid #D9E3EE;background:#F2F7FC;color:#00417A;border-radius:6px;padding:5px 10px;font-family:'IBM Plex Mono',monospace;font-size:11.5px">{{ t }}</span>
+          </sc-for>
+        </div>
+        <div style="height:1px;background:#EFEDE7;margin:18px 0 14px"></div>
+        <div style="display:flex;justify-content:space-between;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#55606C"><span>SHIPPED</span><span style="color:#10151B">{{ d.sem }}</span></div>
+        <div style="display:flex;justify-content:space-between;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#55606C;margin-top:8px"><span>UPVOTES</span><span style="color:#10151B">{{ d.votes }}</span></div>
+      </aside>
+    </div>
+
+    <div style="margin-top:clamp(30px,4vw,44px);border:1px solid #E1DFD8;border-radius:14px;overflow:hidden;background:#fff">
+      <div style="position:relative;aspect-ratio:2/1">
+        <div style="{{ d.art }}"></div>
+        <span style="position:absolute;left:22px;bottom:18px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.07em;color:rgba(255,255,255,.9)">{{ d.artLabel }}</span>
+      </div>
+    </div>
+  </section>
+
+  <section style="max-width:1160px;margin:0 auto;padding:16px clamp(24px,4vw,44px) 40px">
+    <sc-for list="{{ d.sections }}" as="s" hint-placeholder-count="6">
+      <div id="{{ s.id }}" style="{{ secGrid }};padding:38px 0;border-bottom:1px solid #EFEDE7;scroll-margin-top:96px">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.09em;color:#00417A;padding-top:5px;position:sticky;top:88px;align-self:start">{{ s.label }}</div>
+        <div>
+          <sc-if value="{{ s.isText }}" hint-placeholder-val="{{ true }}">
+            <p style="margin:0;font-size:17px;line-height:1.66;color:#22303D;max-width:68ch;text-wrap:pretty">{{ s.body }}</p>
+          </sc-if>
+          <sc-if value="{{ s.isTags }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-wrap:wrap;gap:9px">
+              <sc-for list="{{ s.items }}" as="t" hint-placeholder-count="5">
+                <span style="border:1px solid #D9E3EE;background:#F2F7FC;color:#00417A;border-radius:7px;padding:7px 13px;font-family:'IBM Plex Mono',monospace;font-size:12.5px">{{ t }}</span>
+              </sc-for>
+            </div>
+          </sc-if>
+          <sc-if value="{{ s.isList }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <sc-for list="{{ s.items }}" as="t" hint-placeholder-count="3">
+                <div style="display:flex;gap:12px;align-items:flex-start">
+                  <span style="width:6px;height:6px;border-radius:99px;background:#E2572A;margin-top:9px;flex:none"></span>
+                  <span style="font-size:16.5px;line-height:1.6;color:#22303D">{{ t }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+          <sc-if value="{{ s.isShots }}" hint-placeholder-val="{{ false }}">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px">
+              <sc-for list="{{ s.shots }}" as="sh" hint-placeholder-count="3">
+                <div style="border:1px solid #E6E4DE;border-radius:10px;overflow:hidden;background:#fff">
+                  <div style="position:relative;aspect-ratio:4/3"><div style="{{ sh.art }}"></div></div>
+                  <div style="padding:10px 12px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#55606C">{{ sh.caption }}</div>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+          <sc-if value="{{ s.isPeople }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-wrap:wrap;gap:12px">
+              <sc-for list="{{ s.people }}" as="pe" hint-placeholder-count="3">
+                <div style="display:flex;align-items:center;gap:10px;border:1px solid #E6E4DE;border-radius:99px;padding:6px 16px 6px 6px;background:#fff">
+                  <span style="width:30px;height:30px;border-radius:99px;background:#EAF0F6;color:#00417A;font-size:11.5px;font-weight:700;display:grid;place-items:center">{{ pe.initials }}</span>
+                  <div>
+                    <div style="font-size:13.5px;font-weight:700">{{ pe.name }}</div>
+                    <div style="font-size:11.5px;color:#55606C">{{ pe.role }}</div>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+          <sc-if value="{{ s.isDiscussion }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:16px">
+              <sc-for list="{{ s.comments }}" as="c" hint-placeholder-count="2">
+                <div style="display:flex;gap:12px">
+                  <span style="width:34px;height:34px;border-radius:99px;background:#F1EFE9;color:#3D4855;font-size:12px;font-weight:700;display:grid;place-items:center;flex:none">{{ c.initials }}</span>
+                  <div style="border:1px solid #E6E4DE;border-radius:10px;padding:13px 15px;background:#fff;flex:1">
+                    <div style="font-size:13.5px;font-weight:700">{{ c.name }} <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:400;color:#5A6470;margin-left:6px">{{ c.when }}</span></div>
+                    <p style="margin:6px 0 0;font-size:15px;line-height:1.55;color:#22303D">{{ c.body }}</p>
+                  </div>
+                </div>
+              </sc-for>
+              <div style="display:flex;gap:10px;margin-top:4px">
+                <input placeholder="Add to the discussion..." aria-label="Add a comment" style="flex:1;border:1px solid #D9D6CE;border-radius:9px;padding:12px 14px;font-size:14.5px;outline:none">
+                <button style="background:#00417A;color:#fff;border:0;border-radius:9px;padding:12px 20px;font-size:14px;font-weight:700;cursor:pointer">Post</button>
+              </div>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+    </sc-for>
+  </section>
+</div>
+</main>
+
+<footer style="border-top:1px solid #E6E4DE;background:#F3F2ED">
+  <div style="max-width:1340px;margin:0 auto;padding:60px clamp(24px,4vw,44px) 44px;display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:40px">
+    <div>
+      <div style="font-size:18px;font-weight:800;letter-spacing:-.02em"><span style="color:#00417A">OTU</span> <span style="color:#E2572A">Launch</span><span style="color:#10151B">Pad.</span></div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#55606C;margin-top:10px">Build. Share. Launch.</div>
+    </div>
+    <sc-for list="{{ footerCols }}" as="c" hint-placeholder-count="3">
+      <div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.09em;color:#55606C">{{ c.title }}</div>
+        <div style="display:flex;flex-direction:column;gap:10px;margin-top:14px;align-items:flex-start">
+          <sc-for list="{{ c.links }}" as="l" hint-placeholder-count="4">
+            <button sc-camel-on-click="{{ l.go }}" style="background:none;border:0;padding:0;cursor:pointer;font-size:14px;font-weight:600;color:#3D4855" style-hover="color:#00417A">{{ l.label }}</button>
+          </sc-for>
+        </div>
+      </div>
+    </sc-for>
+  </div>
+  <div style="max-width:1340px;margin:0 auto;padding:0 clamp(24px,4vw,44px) 40px;display:flex;flex-direction:column;gap:8px">
+    <div style="font-size:13px;line-height:1.55;color:#3D4855;max-width:72ch">An independent project by a student club. Not affiliated with, endorsed by, or an official service of Ontario Tech University.</div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:#5A6470">© 2026 GDG ON CAMPUS, ONTARIO TECH UNIVERSITY · BUILT BY STUDENTS IN OSHAWA</div>
+  </div>
+</footer>
+
+<sc-if value="{{ reportOpen }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;inset:0;z-index:90;background:rgba(16,21,27,.42);display:grid;place-items:center;padding:24px">
+    <div role="dialog" aria-modal="true" aria-label="Report project" style="width:100%;max-width:440px;background:#fff;border:1px solid #E6E4DE;border-radius:14px;padding:30px;animation:otuRise .22s ease-out">
+      <h2 style="margin:0;font-size:22px;font-weight:800;letter-spacing:-.025em">Report this project</h2>
+      <p style="margin:9px 0 0;font-size:14px;color:#3D4855">Reports go to the moderation queue. Pick a reason.</p>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:20px">
+        <sc-for list="{{ reportReasons }}" as="r" hint-placeholder-count="6">
+          <button sc-camel-on-click="{{ r.pick }}" style="text-align:left;background:{{ r.bg }};border:1px solid {{ r.border }};border-radius:9px;padding:12px 15px;font-size:14.5px;font-weight:600;color:#22303D;cursor:pointer" style-hover="border-color:#00417A">{{ r.label }}</button>
+        </sc-for>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:22px">
+        <button sc-camel-on-click="{{ closeReport }}" style="flex:1;background:#fff;border:1px solid #D9D6CE;border-radius:9px;padding:12px;font-size:14.5px;font-weight:700;cursor:pointer">Cancel</button>
+        <button sc-camel-on-click="{{ submitReport }}" style="flex:1;background:#E2572A;color:#fff;border:0;border-radius:9px;padding:12px;font-size:14.5px;font-weight:700;cursor:pointer">Submit report</button>
+      </div>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{ toastVisible }}" hint-placeholder-val="{{ false }}">
+  <div role="status" style="position:fixed;left:50%;bottom:28px;transform:translateX(-50%);z-index:95;background:#10151B;color:#fff;border-radius:10px;padding:13px 20px;font-size:14.5px;font-weight:600;box-shadow:0 14px 34px rgba(16,21,27,.28);animation:otuRise .2s ease-out">{{ toast }}</div>
+</sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script="">
+const DETAIL = {
+  'campus-nav-ar': {
+    about: 'Campus Nav AR turns a phone camera into a wayfinding tool for the Ontario Tech north and downtown campuses. Point the camera down a hallway and the route to your next class is drawn onto the floor, with door numbers anchored to the actual doors.',
+    why: 'I missed a midterm in my first year because I went to the wrong building. The campus maps that exist are floor plans as PDFs, which are useless while you are walking. I wanted something that worked at eye level, in a hallway, on a phone with one bar of signal.',
+    learned: 'Indoor positioning without GPS is the whole problem. I went through three approaches before settling on a hybrid of visual markers at stairwells and dead reckoning between them. I also learned that AR interfaces need to show less than you think, because anything on screen competes with the actual hallway.',
+    stack: ['React Native', 'ARKit', 'ARCore', 'Python', 'FastAPI', 'PostGIS'],
+    implementation: 'The client handles tracking and rendering. A FastAPI service holds the campus graph in PostGIS and returns route geometry in a local coordinate frame. Markers at known locations correct accumulated drift, and the phone interpolates between them using the IMU.',
+    architecture: 'Three pieces: a mobile client, a routing service, and a marker registry. The registry is a plain table of QR anchors with surveyed positions, which turned out to be the most important and least interesting part of the system.',
+    inspiration: 'Airport wayfinding signage and the way transit apps show the next turn rather than the whole route.',
+    future: ['Accessible routing that avoids stairs', 'Crowd-sourced marker registration', 'Offline campus bundles'],
+    shots: [{ caption: 'Route overlay, hallway view', kind: 'nodes' }, { caption: 'Destination picker', kind: 'stack' }, { caption: 'Marker calibration mode', kind: 'orbit' }],
+    contributors: [{ name: 'Priya Nandakumar', role: 'Routing service', initials: 'PN' }, { name: 'Daniel Kovac', role: 'IMU drift correction', initials: 'DK' }],
+    comments: [
+      { name: 'Marcus Oyelaran', initials: 'MO', when: '4 DAYS AGO', body: 'Does the drift correction hold up in the ERC basement? Signal is bad down there and the hallways all look identical.' },
+      { name: 'Aisha Rahman', initials: 'AR', when: '3 DAYS AGO', body: 'Holds for about 40m between markers, then it starts sliding. That basement is exactly why the marker registry exists.' },
+    ],
+  },
+}
+const REPORT_REASONS = ['Spam', 'Inappropriate content', 'Copied work', 'Misleading information', 'Broken link', 'Other']
+
+class Component extends DCLogic {
+  state = OTU.state({ reportOpen: false, reportPick: null })
+  componentDidMount() { OTU.mount(this) }
+  componentDidUpdate() { OTU.motion(this) }
+  componentWillUnmount() { OTU.unmount(this) }
+
+  renderVals() {
+    const s = this.state
+    const cur = OTU.PROJECTS.find((p) => p.slug === OTU.param('slug')) || OTU.PROJECTS[0]
+    // ponytail: only Campus Nav AR has a written story, so other projects reuse it, as the design did.
+    const dx = DETAIL[cur.slug] || DETAIL['campus-nav-ar']
+    const dd = OTU.decorate(this, cur)
+    const d = Object.assign({}, dd, {
+      summary: cur.slug === 'campus-nav-ar' ? 'An augmented-reality navigation system designed to make navigating the OTU campus easier.' : cur.blurb,
+      catMono: (cur.cat + ' · ' + cur.sem).toUpperCase(),
+      openToContrib: cur.open,
+      voteText: (dd.voted ? 'Upvoted · ' : 'Upvote · ') + dd.votes,
+      links: [{ label: 'GitHub', href: '#' }, { label: 'Live demo', href: '#' }, { label: 'Portfolio', href: '#' }],
+      sections: [
+        { label: 'ABOUT', isText: true, body: dx.about },
+        { label: 'WHY I BUILT THIS', isText: true, body: dx.why },
+        { label: 'WHAT I LEARNED', isText: true, body: dx.learned },
+        { label: 'TECH STACK', isTags: true, items: dx.stack },
+        { label: 'IMPLEMENTATION', isText: true, body: dx.implementation },
+        { label: 'ARCHITECTURE', isText: true, body: dx.architecture },
+        { label: 'SCREENSHOTS', isShots: true, shots: dx.shots.map((sh) => ({ caption: sh.caption, art: OTU.art(cur.a, cur.b, sh.kind) })) },
+        { label: 'INSPIRATION', isText: true, body: dx.inspiration },
+        { label: 'FUTURE PLANS', isList: true, items: dx.future },
+        { label: 'CONTRIBUTORS', isPeople: true, people: dx.contributors },
+        { label: 'STUDENT DISCUSSION', isDiscussion: true, comments: dx.comments },
+      ].map((x) => Object.assign({ id: 'sec-' + x.label.toLowerCase().replace(/[^a-z0-9]+/g, '-') }, x)),
+    })
+
+    return Object.assign(OTU.chrome(this, 'detail'), {
+      d,
+      openReport: () => this.setState({ reportOpen: true }),
+      closeReport: () => this.setState({ reportOpen: false, reportPick: null }),
+      reportOpen: s.reportOpen,
+      reportReasons: REPORT_REASONS.map((r) => ({
+        label: r,
+        pick: () => this.setState({ reportPick: r }),
+        bg: s.reportPick === r ? '#F2F7FC' : '#fff',
+        border: s.reportPick === r ? '#00417A' : '#E6E4DE',
+      })),
+      submitReport: () => {
+        this.setState({ reportOpen: false, reportPick: null })
+        OTU.flash(this, 'Report sent to moderators')
+      },
+    })
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<!-- Semester Sprints landing: live countdown, how it works and sprint history. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Semester Sprints · OTU LaunchPad</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 10 10%27%3E%3Crect width=%2710%27 height=%2710%27 rx=%272%27 fill=%27%2300417A%27/%3E%3Crect x=%274%27 y=%274%27 width=%272%27 height=%272%27 fill=%27%23E2572A%27/%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/otu.css">
+<script src="assets/otu.js"></script>
+<script src="assets/vendor/react.production.min.js"></script>
+<script src="assets/vendor/react-dom.production.min.js"></script>
+<script src="assets/vendor/dc-runtime.js"></script>
+</head>
+<body>
+<x-dc>
+<div style="min-height:100vh;display:flex;flex-direction:column;background:#FBFBF9">
+
+<a href="#otu-main" style="position:absolute;left:-9999px;top:8px;z-index:100;background:#00417A;color:#fff;padding:11px 18px;border-radius:8px;font-size:14px;font-weight:700" style-focus="left:16px">Skip to content</a>
+
+<header style="position:sticky;top:0;z-index:60;background:rgba(251,251,249,.94);border-bottom:1px solid #E6E4DE">
+  <div style="max-width:1340px;margin:0 auto;padding:0 clamp(24px,4vw,44px);height:64px;display:flex;align-items:center;gap:clamp(12px,3vw,36px)">
+    <button sc-camel-on-click="{{ goHome }}" aria-label="OTU LaunchPad home" style="background:none;border:0;padding:0;cursor:pointer;font-size:19px;font-weight:800;letter-spacing:-.02em;color:#10151B">
+      <span style="color:#00417A">OTU</span> <span style="color:#E2572A">Launch</span><span style="color:#10151B">Pad.</span>
+    </button>
+    <sc-if value="{{ desktopNav }}" hint-placeholder-val="{{ true }}">
+    <nav aria-label="Primary" style="display:flex;align-items:center;gap:4px;margin-left:8px">
+      <sc-for list="{{ navItems }}" as="n" hint-placeholder-count="4">
+        <button sc-camel-on-click="{{ n.go }}" aria-current="{{ n.current }}" style="background:none;border:0;cursor:pointer;padding:9px 11px 6px;font-size:14.5px;font-weight:600;color:{{ n.fg }};transition:color .18s" style-hover="color:#00417A">
+          <span style="display:block">{{ n.label }}</span>
+          <span style="{{ n.bar }}"></span>
+        </button>
+      </sc-for>
+    </nav>
+    </sc-if>
+    <div style="flex:1"></div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <sc-if value="{{ mobileNav }}" hint-placeholder-val="{{ false }}">
+        <button sc-camel-on-click="{{ toggleSheet }}" aria-label="{{ sheetAria }}" aria-expanded="{{ sheetOpen }}" style="width:40px;height:40px;display:grid;place-items:center;background:none;border:1px solid #E6E4DE;border-radius:8px;cursor:pointer" style-hover="border-color:#00417A">
+          <svg width="18" height="18" sc-camel-view-box="0 0 18 18" fill="none" stroke="#10151B" stroke-width="1.7" stroke-linecap="round"><path d="{{ sheetIcon }}"></path></svg>
+        </button>
+      </sc-if>
+      <button sc-camel-on-click="{{ focusSearch }}" aria-label="Search projects" style="width:36px;height:36px;display:grid;place-items:center;background:none;border:1px solid #E6E4DE;border-radius:8px;cursor:pointer" style-hover="border-color:#00417A">
+        <svg width="16" height="16" sc-camel-view-box="0 0 16 16" fill="none" stroke="#3D4855" stroke-width="1.6"><circle cx="7" cy="7" r="4.6"></circle><path d="M10.5 10.5 14 14"></path></svg>
+      </button>
+      <sc-if value="{{ loggedOut }}" hint-placeholder-val="{{ true }}">
+        <button sc-camel-on-click="{{ openLogin }}" style="background:#00417A;color:#fff;border:0;border-radius:8px;padding:9px 18px;font-size:14px;font-weight:700;cursor:pointer" style-hover="background:#002C52">Login</button>
+      </sc-if>
+      <sc-if value="{{ loggedIn }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;align-items:center;gap:10px;position:relative">
+          <button sc-camel-on-click="{{ toggleNotifs }}" aria-label="Notifications" style="position:relative;width:36px;height:36px;display:grid;place-items:center;background:none;border:1px solid #E6E4DE;border-radius:8px;cursor:pointer" style-hover="border-color:#00417A">
+            <svg width="16" height="16" sc-camel-view-box="0 0 16 16" fill="none" stroke="#3D4855" stroke-width="1.6"><path d="M4 6.5a4 4 0 1 1 8 0c0 3 1 4 1 4H3s1-1 1-4Z"></path><path d="M6.6 13a1.6 1.6 0 0 0 2.8 0"></path></svg>
+            <span style="position:absolute;top:-4px;right:-4px;min-width:16px;height:16px;padding:0 4px;background:#E2572A;color:#fff;border-radius:99px;font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:500;display:grid;place-items:center">{{ notifCount }}</span>
+          </button>
+          <button sc-camel-on-click="{{ toggleMenu }}" aria-label="Account menu" style="display:flex;align-items:center;gap:8px;background:none;border:1px solid #E6E4DE;border-radius:99px;padding:3px 10px 3px 3px;cursor:pointer" style-hover="border-color:#00417A">
+            <span style="width:28px;height:28px;border-radius:99px;background:#00417A;color:#fff;font-size:11.5px;font-weight:700;display:grid;place-items:center">{{ meInitials }}</span>
+            <sc-if value="{{ desktopNav }}" hint-placeholder-val="{{ true }}"><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#3D4855">{{ meRole }}</span></sc-if>
+          </button>
+          <sc-if value="{{ notifsOpen }}" hint-placeholder-val="{{ false }}">
+            <div role="dialog" aria-label="Notifications" style="position:absolute;top:46px;right:0;width:340px;background:#fff;border:1px solid #E6E4DE;border-radius:12px;box-shadow:0 18px 40px rgba(16,21,27,.13);overflow:hidden;z-index:70">
+              <div style="padding:13px 16px;border-bottom:1px solid #EFEDE7;font-size:13px;font-weight:700">Notifications</div>
+              <sc-for list="{{ notifications }}" as="nt" hint-placeholder-count="3">
+                <div style="display:flex;gap:11px;padding:13px 16px;border-bottom:1px solid #F3F1EB">
+                  <span style="width:7px;height:7px;border-radius:99px;background:#E2572A;margin-top:6px;flex:none"></span>
+                  <div>
+                    <div style="font-size:13.5px;font-weight:600;color:#10151B">{{ nt.title }}</div>
+                    <div style="font-size:12.5px;color:#55606C;margin-top:2px">{{ nt.body }}</div>
+                    <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#5A6470;margin-top:5px">{{ nt.when }}</div>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+          <sc-if value="{{ menuOpen }}" hint-placeholder-val="{{ false }}">
+            <div role="menu" style="position:absolute;top:46px;right:0;width:230px;background:#fff;border:1px solid #E6E4DE;border-radius:12px;box-shadow:0 18px 40px rgba(16,21,27,.13);padding:6px;z-index:70">
+              <sc-for list="{{ menuItems }}" as="m" hint-placeholder-count="4">
+                <button sc-camel-on-click="{{ m.go }}" role="menuitem" style="display:block;width:100%;text-align:left;background:none;border:0;padding:9px 11px;border-radius:8px;font-size:13.5px;font-weight:600;color:#3D4855;cursor:pointer" style-hover="background:#F1EFE9;color:#00417A">{{ m.label }}</button>
+              </sc-for>
+              <div style="height:1px;background:#EFEDE7;margin:6px 4px"></div>
+              <button sc-camel-on-click="{{ signOut }}" role="menuitem" style="display:block;width:100%;text-align:left;background:none;border:0;padding:9px 11px;border-radius:8px;font-size:13.5px;font-weight:600;color:#A83B15;cursor:pointer" style-hover="background:#F1EFE9">Sign out</button>
+            </div>
+          </sc-if>
+        </div>
+      </sc-if>
+    </div>
+  </div>
+</header>
+
+<sc-if value="{{ sheetVisible }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;inset:64px 0 0 0;z-index:55;background:rgba(16,21,27,.32)" sc-camel-on-click="{{ closeSheet }}"></div>
+  <nav aria-label="Primary" style="position:fixed;top:64px;left:0;right:0;z-index:56;background:#FDFDFC;border-bottom:1px solid #E6E4DE;box-shadow:0 24px 48px rgba(16,21,27,.14);padding:10px clamp(24px,4vw,44px) 18px;animation:otuRise .22s cubic-bezier(.16,1,.3,1)">
+    <sc-for list="{{ navItems }}" as="n" hint-placeholder-count="4">
+      <button sc-camel-on-click="{{ n.go }}" aria-current="{{ n.current }}" style="display:flex;align-items:center;justify-content:space-between;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid #EFEDE7;padding:16px 4px;font-size:18px;font-weight:700;letter-spacing:-.015em;color:{{ n.fg }};cursor:pointer">{{ n.label }}<span style="color:#E2572A">→</span></button>
+    </sc-for>
+    <div style="display:flex;gap:10px;margin-top:16px">
+      <button sc-camel-on-click="{{ goProjects }}" style="flex:1;background:#00417A;color:#fff;border:0;border-radius:9px;padding:14px;font-size:15px;font-weight:700;cursor:pointer">Explore Projects</button>
+      <button sc-camel-on-click="{{ goSubmit }}" style="flex:1;background:#fff;color:#10151B;border:1px solid #D2CEC4;border-radius:9px;padding:14px;font-size:15px;font-weight:700;cursor:pointer">Launch a Project</button>
+    </div>
+  </nav>
+</sc-if>
+
+<main id="otu-main" style="flex:1">
+<div>
+  <section style="position:relative;overflow:hidden;border-bottom:1px solid #E6E4DE;background-color:#FDFDFC;background-image:linear-gradient(rgba(0,65,122,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(0,65,122,.05) 1px,transparent 1px),linear-gradient(rgba(0,65,122,.085) 1px,transparent 1px),linear-gradient(90deg,rgba(0,65,122,.085) 1px,transparent 1px);background-size:24px 24px,24px 24px,120px 120px,120px 120px">
+    <svg aria-hidden="true" width="200" height="200" sc-camel-view-box="0 0 100 100" fill="none" stroke="#E2572A" stroke-width="1.2" style="position:absolute;right:6%;top:48px;opacity:.3">
+      <path d="M50 12c9 10 13 22 13 33l7 9v10l-11-5H41l-11 5V54l7-9c0-11 4-23 13-33Z"></path><circle cx="50" cy="40" r="5"></circle><path d="M44 74l-4 12M56 74l4 12M50 76v14"></path>
+    </svg>
+    <div style="position:relative;max-width:1340px;margin:0 auto;padding:72px clamp(24px,4vw,44px) 60px">
+      <h1 style="margin:0;font-size:clamp(38px,5vw,64px);letter-spacing:-.035em;font-weight:800;max-width:15ch">Build something this semester.</h1>
+      <p style="margin:18px 0 0;max-width:54ch;font-size:18.5px;line-height:1.55;color:#3D4855">Turn your ideas into software, side-by-side with your peers.</p>
+    </div>
+  </section>
+  <section style="max-width:1340px;margin:0 auto;padding:44px clamp(24px,4vw,44px) 0">
+    <div style="border:1px solid #E6E4DE;border-radius:14px;overflow:hidden;background:#00417A;color:#fff">
+      <div style="padding:46px 44px;background-image:linear-gradient(rgba(255,255,255,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.07) 1px,transparent 1px);background-size:30px 30px">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.12em;color:#FFB893">FALL 2026</div>
+        <h2 style="margin:14px 0 0;font-size:clamp(34px,5vw,60px);letter-spacing:-.04em;font-weight:800">Build for Campus</h2>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:13px;letter-spacing:.06em;color:rgba(255,255,255,.82);margin-top:18px">14 DAYS · 87 BUILDERS · 31 PROJECTS</div>
+        <div style="display:flex;gap:14px;flex-wrap:wrap;margin-top:30px">
+          <sc-for list="{{ countdown }}" as="c" hint-placeholder-count="4">
+            <div style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:10px;padding:14px 20px;min-width:92px;text-align:center">
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:30px;font-weight:500">{{ c.value }}</div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.1em;color:rgba(255,255,255,.7);margin-top:4px">{{ c.label }}</div>
+            </div>
+          </sc-for>
+        </div>
+        <button sc-camel-on-click="{{ joinSprint }}" style="margin-top:32px;background:#E2572A;color:#fff;border:0;border-radius:9px;padding:15px 30px;font-size:15.5px;font-weight:700;cursor:pointer" style-hover="background:#C4461D">{{ joinLabel }}</button>
+      </div>
+    </div>
+  </section>
+  <section style="max-width:1340px;margin:0 auto;padding:80px clamp(24px,4vw,44px) 0">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:48px">
+      <div>
+        <h2 style="margin:0;font-size:32px;font-weight:800;letter-spacing:-.03em">What are Semester Sprints?</h2>
+        <p style="margin:16px 0 0;font-size:17px;line-height:1.65;color:#22303D">Two weeks, one theme, and as many students as want to join. Sprints are student-run: you form an idea, build it alongside peers in the same room or the same Discord, and demo it at the end. Nothing is graded and nothing is submitted to a professor.</p>
+      </div>
+      <div>
+        <h2 style="margin:0;font-size:32px;font-weight:800;letter-spacing:-.03em">Why join one?</h2>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:20px">
+          <sc-for list="{{ sprintWhy }}" as="w" hint-placeholder-count="4">
+            <div style="border:1px solid #E6E4DE;border-radius:10px;background:#fff;padding:18px">
+              <div style="font-size:15.5px;font-weight:700">{{ w.title }}</div>
+              <div style="font-size:13.5px;color:#3D4855;margin-top:6px;line-height:1.5">{{ w.body }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section style="max-width:1340px;margin:0 auto;padding:72px clamp(24px,4vw,44px) 0">
+    <h2 style="margin:0 0 28px;font-size:32px;font-weight:800;letter-spacing:-.03em">How sprints work</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:2px;background:#E6E4DE;border:1px solid #E6E4DE;border-radius:12px;overflow:hidden">
+      <sc-for list="{{ sprintSteps }}" as="s" hint-placeholder-count="4">
+        <div style="background:#fff;padding:28px 26px">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#E2572A">{{ s.num }}</div>
+          <div style="font-size:19px;font-weight:700;margin-top:12px;letter-spacing:-.02em">{{ s.title }}</div>
+          <div style="font-size:14.5px;color:#3D4855;margin-top:8px;line-height:1.55">{{ s.body }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+  <section style="max-width:1340px;margin:0 auto;padding:72px clamp(24px,4vw,44px) 96px">
+    <h2 style="margin:0 0 24px;font-size:32px;font-weight:800;letter-spacing:-.03em">Sprint history</h2>
+    <div style="border:1px solid #E6E4DE;border-radius:12px;overflow:hidden;background:#fff">
+      <sc-for list="{{ sprintHistory }}" as="h" hint-placeholder-count="4">
+        <button sc-camel-on-click="{{ h.open }}" style="display:flex;align-items:center;gap:20px;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid #F1EFE9;padding:22px 26px;cursor:pointer" style-hover="background:#FAF9F5">
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#00417A;width:110px;flex:none">{{ h.term }}</span>
+          <span style="font-size:17px;font-weight:700;flex:1">{{ h.theme }}</span>
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#55606C">{{ h.meta }}</span>
+          <span style="color:#3D4855">→</span>
+        </button>
+      </sc-for>
+    </div>
+  </section>
+</div>
+</main>
+
+<footer style="border-top:1px solid #E6E4DE;background:#F3F2ED">
+  <div style="max-width:1340px;margin:0 auto;padding:60px clamp(24px,4vw,44px) 44px;display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:40px">
+    <div>
+      <div style="font-size:18px;font-weight:800;letter-spacing:-.02em"><span style="color:#00417A">OTU</span> <span style="color:#E2572A">Launch</span><span style="color:#10151B">Pad.</span></div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#55606C;margin-top:10px">Build. Share. Launch.</div>
+    </div>
+    <sc-for list="{{ footerCols }}" as="c" hint-placeholder-count="3">
+      <div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.09em;color:#55606C">{{ c.title }}</div>
+        <div style="display:flex;flex-direction:column;gap:10px;margin-top:14px;align-items:flex-start">
+          <sc-for list="{{ c.links }}" as="l" hint-placeholder-count="4">
+            <button sc-camel-on-click="{{ l.go }}" style="background:none;border:0;padding:0;cursor:pointer;font-size:14px;font-weight:600;color:#3D4855" style-hover="color:#00417A">{{ l.label }}</button>
+          </sc-for>
+        </div>
+      </div>
+    </sc-for>
+  </div>
+  <div style="max-width:1340px;margin:0 auto;padding:0 clamp(24px,4vw,44px) 40px;display:flex;flex-direction:column;gap:8px">
+    <div style="font-size:13px;line-height:1.55;color:#3D4855;max-width:72ch">An independent project by a student club. Not affiliated with, endorsed by, or an official service of Ontario Tech University.</div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:#5A6470">© 2026 GDG ON CAMPUS, ONTARIO TECH UNIVERSITY · BUILT BY STUDENTS IN OSHAWA</div>
+  </div>
+</footer>
+
+<sc-if value="{{ toastVisible }}" hint-placeholder-val="{{ false }}">
+  <div role="status" style="position:fixed;left:50%;bottom:28px;transform:translateX(-50%);z-index:95;background:#10151B;color:#fff;border-radius:10px;padding:13px 20px;font-size:14.5px;font-weight:600;box-shadow:0 14px 34px rgba(16,21,27,.28);animation:otuRise .2s ease-out">{{ toast }}</div>
+</sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script="">
+const SPRINT_WHY = [
+  { title: 'Student-led', body: 'Organized by students, no faculty grading anything.' },
+  { title: 'Community', body: 'Build in the same room as people solving similar problems.' },
+  { title: 'Hands-on learning', body: 'Ship a real thing in two weeks, not a term.' },
+  { title: 'Portfolio experience', body: 'Everything you build stays on your profile.' },
+]
+const SPRINT_STEPS = [
+  { num: '01', title: 'Form an idea', body: 'Pitch night on day one. Solo or team, both fine.' },
+  { num: '02', title: 'Build', body: 'Ten working days, with two checkpoints and open lab hours.' },
+  { num: '03', title: 'Polish & demo', body: 'Demo day in the ERC atrium, five minutes each.' },
+  { num: '04', title: 'Launch', body: 'Publish to LaunchPad and keep going if you want to.' },
+]
+const SPRINT_HISTORY = [
+  ['Fall 2026', 'Build for Campus', '87 BUILDERS · 31 PROJECTS'],
+  ['Spring 2026', 'Tools for Students', '64 BUILDERS · 24 PROJECTS'],
+  ['Fall 2025', 'Hardware Weekend', '52 BUILDERS · 19 PROJECTS'],
+  ['Spring 2025', 'First Sprint', '38 BUILDERS · 14 PROJECTS'],
+]
+
+class Component extends DCLogic {
+  state = OTU.state({ joined: false })
+  componentDidMount() { OTU.mount(this, { tick: true }) }
+  componentDidUpdate() { OTU.motion(this) }
+  componentWillUnmount() { OTU.unmount(this) }
+
+  renderVals() {
+    const s = this.state
+    const left = Math.max(0, OTU.SPRINT_DEADLINE - s.now)
+    const cd = [['DAYS', Math.floor(left / 864e5)], ['HOURS', Math.floor(left / 36e5) % 24], ['MINUTES', Math.floor(left / 6e4) % 60], ['SECONDS', Math.floor(left / 1000) % 60]]
+    return Object.assign(OTU.chrome(this, 'sprints'), {
+      countdown: cd.map(([label, value]) => ({ label, value: String(value).padStart(2, '0') })),
+      joinSprint: () => {
+        if (!OTU.session()) return OTU.requireLogin()
+        this.setState({ joined: true })
+        OTU.flash(this, 'You’re in. Kickoff details sent to your inbox.')
+      },
+      joinLabel: s.joined ? 'You’re registered ✓' : 'Join Sprint',
+      sprintWhy: SPRINT_WHY,
+      sprintSteps: SPRINT_STEPS,
+      sprintHistory: SPRINT_HISTORY.map(([term, theme, meta]) => ({ term, theme, meta, open: () => OTU.go('projects') })),
+    })
+  }
+}
+</script>
+</body>
+</html>

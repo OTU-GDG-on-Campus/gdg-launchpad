@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<!-- Settings for every role. Moderation and admin sections render only for those roles. Signed-in users only. Guests are sent to the sign-in page before anything renders. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Settings · OTU LaunchPad</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 10 10%27%3E%3Crect width=%2710%27 height=%2710%27 rx=%272%27 fill=%27%2300417A%27/%3E%3Crect x=%274%27 y=%274%27 width=%272%27 height=%272%27 fill=%27%23E2572A%27/%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/otu.css">
+<script src="assets/otu.js"></script>
+<script>OTU.guard('auth')</script>
+<script src="assets/vendor/react.production.min.js"></script>
+<script src="assets/vendor/react-dom.production.min.js"></script>
+<script src="assets/vendor/dc-runtime.js"></script>
+</head>
+<body>
+<x-dc>
+<div style="min-height:100vh;display:flex;flex-direction:column;background:#FBFBF9">
+
+<a href="#otu-main" style="position:absolute;left:-9999px;top:8px;z-index:100;background:#00417A;color:#fff;padding:11px 18px;border-radius:8px;font-size:14px;font-weight:700" style-focus="left:16px">Skip to content</a>
+
+<header style="position:sticky;top:0;z-index:60;background:rgba(251,251,249,.94);border-bottom:1px solid #E6E4DE">
+  <div style="max-width:1340px;margin:0 auto;padding:0 clamp(24px,4vw,44px);height:64px;display:flex;align-items:center;gap:clamp(12px,3vw,36px)">
+    <button sc-camel-on-click="{{ goHome }}" aria-label="OTU LaunchPad home" style="background:none;border:0;padding:0;cursor:pointer;font-size:19px;font-weight:800;letter-spacing:-.02em;color:#10151B">
+      <span style="color:#00417A">OTU</span> <span style="color:#E2572A">Launch</span><span style="color:#10151B">Pad.</span>
+    </button>
+    <sc-if value="{{ desktopNav }}" hint-placeholder-val="{{ true }}">
+    <nav aria-label="Primary" style="display:flex;align-items:center;gap:4px;margin-left:8px">
+      <sc-for list="{{ navItems }}" as="n" hint-placeholder-count="4">
+        <button sc-camel-on-click="{{ n.go }}" aria-current="{{ n.current }}" style="background:none;border:0;cursor:pointer;padding:9px 11px 6px;font-size:14.5px;font-weight:600;color:{{ n.fg }};transition:color .18s" style-hover="color:#00417A">
+          <span style="display:block">{{ n.label }}</span>
+          <span style="{{ n.bar }}"></span>
+        </button>
+      </sc-for>
+    </nav>
+    </sc-if>
+    <div style="flex:1"></div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <sc-if value="{{ mobileNav }}" hint-placeholder-val="{{ false }}">
+        <button sc-camel-on-click="{{ toggleSheet }}" aria-label="{{ sheetAria }}" aria-expanded="{{ sheetOpen }}" style="width:40px;height:40px;display:grid;place-items:center;background:none;border:1px solid #E6E4DE;border-radius:8px;cursor:pointer" style-hover="border-color:#00417A">
+          <svg width="18" height="18" sc-camel-view-box="0 0 18 18" fill="none" stroke="#10151B" stroke-width="1.7" stroke-linecap="round"><path d="{{ sheetIcon }}"></path></svg>
+        </button>
+      </sc-if>
+      <button sc-camel-on-click="{{ focusSearch }}" aria-label="Search projects" style="width:36px;height:36px;display:grid;place-items:center;background:none;border:1px solid #E6E4DE;border-radius:8px;cursor:pointer" style-hover="border-color:#00417A">
+        <svg width="16" height="16" sc-camel-view-box="0 0 16 16" fill="none" stroke="#3D4855" stroke-width="1.6"><circle cx="7" cy="7" r="4.6"></circle><path d="M10.5 10.5 14 14"></path></svg>
+      </button>
+      <sc-if value="{{ loggedOut }}" hint-placeholder-val="{{ true }}">
+        <button sc-camel-on-click="{{ openLogin }}" style="background:#00417A;color:#fff;border:0;border-radius:8px;padding:9px 18px;font-size:14px;font-weight:700;cursor:pointer" style-hover="background:#002C52">Login</button>
+      </sc-if>
+      <sc-if value="{{ loggedIn }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;align-items:center;gap:10px;position:relative">
+          <button sc-camel-on-click="{{ toggleNotifs }}" aria-label="Notifications" style="position:relative;width:36px;height:36px;display:grid;place-items:center;background:none;border:1px solid #E6E4DE;border-radius:8px;cursor:pointer" style-hover="border-color:#00417A">
+            <svg width="16" height="16" sc-camel-view-box="0 0 16 16" fill="none" stroke="#3D4855" stroke-width="1.6"><path d="M4 6.5a4 4 0 1 1 8 0c0 3 1 4 1 4H3s1-1 1-4Z"></path><path d="M6.6 13a1.6 1.6 0 0 0 2.8 0"></path></svg>
+            <span style="position:absolute;top:-4px;right:-4px;min-width:16px;height:16px;padding:0 4px;background:#E2572A;color:#fff;border-radius:99px;font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:500;display:grid;place-items:center">{{ notifCount }}</span>
+          </button>
+          <button sc-camel-on-click="{{ toggleMenu }}" aria-label="Account menu" style="display:flex;align-items:center;gap:8px;background:none;border:1px solid #E6E4DE;border-radius:99px;padding:3px 10px 3px 3px;cursor:pointer" style-hover="border-color:#00417A">
+            <span style="width:28px;height:28px;border-radius:99px;background:#00417A;color:#fff;font-size:11.5px;font-weight:700;display:grid;place-items:center">{{ meInitials }}</span>
+            <sc-if value="{{ desktopNav }}" hint-placeholder-val="{{ true }}"><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#3D4855">{{ meRole }}</span></sc-if>
+          </button>
+          <sc-if value="{{ notifsOpen }}" hint-placeholder-val="{{ false }}">
+            <div role="dialog" aria-label="Notifications" style="position:absolute;top:46px;right:0;width:340px;background:#fff;border:1px solid #E6E4DE;border-radius:12px;box-shadow:0 18px 40px rgba(16,21,27,.13);overflow:hidden;z-index:70">
+              <div style="padding:13px 16px;border-bottom:1px solid #EFEDE7;font-size:13px;font-weight:700">Notifications</div>
+              <sc-for list="{{ notifications }}" as="nt" hint-placeholder-count="3">
+                <div style="display:flex;gap:11px;padding:13px 16px;border-bottom:1px solid #F3F1EB">
+                  <span style="width:7px;height:7px;border-radius:99px;background:#E2572A;margin-top:6px;flex:none"></span>
+                  <div>
+                    <div style="font-size:13.5px;font-weight:600;color:#10151B">{{ nt.title }}</div>
+                    <div style="font-size:12.5px;color:#55606C;margin-top:2px">{{ nt.body }}</div>
+                    <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#5A6470;margin-top:5px">{{ nt.when }}</div>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+          <sc-if value="{{ menuOpen }}" hint-placeholder-val="{{ false }}">
+            <div role="menu" style="position:absolute;top:46px;right:0;width:230px;background:#fff;border:1px solid #E6E4DE;border-radius:12px;box-shadow:0 18px 40px rgba(16,21,27,.13);padding:6px;z-index:70">
+              <sc-for list="{{ menuItems }}" as="m" hint-placeholder-count="4">
+                <button sc-camel-on-click="{{ m.go }}" role="menuitem" style="display:block;width:100%;text-align:left;background:none;border:0;padding:9px 11px;border-radius:8px;font-size:13.5px;font-weight:600;color:#3D4855;cursor:pointer" style-hover="background:#F1EFE9;color:#00417A">{{ m.label }}</button>
+              </sc-for>
+              <div style="height:1px;background:#EFEDE7;margin:6px 4px"></div>
+              <button sc-camel-on-click="{{ signOut }}" role="menuitem" style="display:block;width:100%;text-align:left;background:none;border:0;padding:9px 11px;border-radius:8px;font-size:13.5px;font-weight:600;color:#A83B15;cursor:pointer" style-hover="background:#F1EFE9">Sign out</button>
+            </div>
+          </sc-if>
+        </div>
+      </sc-if>
+    </div>
+  </div>
+</header>
+
+<sc-if value="{{ sheetVisible }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;inset:64px 0 0 0;z-index:55;background:rgba(16,21,27,.32)" sc-camel-on-click="{{ closeSheet }}"></div>
+  <nav aria-label="Primary" style="position:fixed;top:64px;left:0;right:0;z-index:56;background:#FDFDFC;border-bottom:1px solid #E6E4DE;box-shadow:0 24px 48px rgba(16,21,27,.14);padding:10px clamp(24px,4vw,44px) 18px;animation:otuRise .22s cubic-bezier(.16,1,.3,1)">
+    <sc-for list="{{ navItems }}" as="n" hint-placeholder-count="4">
+      <button sc-camel-on-click="{{ n.go }}" aria-current="{{ n.current }}" style="display:flex;align-items:center;justify-content:space-between;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid #EFEDE7;padding:16px 4px;font-size:18px;font-weight:700;letter-spacing:-.015em;color:{{ n.fg }};cursor:pointer">{{ n.label }}<span style="color:#E2572A">→</span></button>
+    </sc-for>
+    <div style="display:flex;gap:10px;margin-top:16px">
+      <button sc-camel-on-click="{{ goProjects }}" style="flex:1;background:#00417A;color:#fff;border:0;border-radius:9px;padding:14px;font-size:15px;font-weight:700;cursor:pointer">Explore Projects</button>
+      <button sc-camel-on-click="{{ goSubmit }}" style="flex:1;background:#fff;color:#10151B;border:1px solid #D2CEC4;border-radius:9px;padding:14px;font-size:15px;font-weight:700;cursor:pointer">Launch a Project</button>
+    </div>
+  </nav>
+</sc-if>
+
+<main id="otu-main" style="flex:1">
+<div style="max-width:1160px;margin:0 auto;padding:52px clamp(24px,4vw,44px) 96px">
+  <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+    <h1 style="margin:0;font-size:clamp(32px,4.2vw,46px);letter-spacing:-.035em;font-weight:800">Settings</h1>
+    <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.08em;background:#F1EFE9;color:#3D4855;border-radius:6px;padding:5px 9px">{{ meRole }}</span>
+  </div>
+  <p style="margin:12px 0 0;font-size:16px;color:#3D4855;max-width:66ch">{{ intro }}</p>
+
+  <div style="display:flex;gap:32px;align-items:flex-start;flex-wrap:wrap;margin-top:32px">
+    <nav aria-label="Settings sections" style="{{ navStyle }}">
+      <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="5">
+        <button sc-camel-on-click="{{ t.go }}" aria-current="{{ t.current }}" style="display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;text-align:left;background:{{ t.bg }};color:{{ t.fg }};border:0;border-radius:8px;padding:10px 12px;font-size:14.5px;font-weight:600;cursor:pointer;white-space:nowrap" style-hover="color:#00417A">{{ t.label }}<span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;color:#A83B15">{{ t.scope }}</span></button>
+      </sc-for>
+    </nav>
+
+    <div style="flex:1 1 520px;min-width:0">
+      <div style="border:1px solid #E6E4DE;border-radius:14px;background:#fff;padding:clamp(22px,3vw,34px)">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.12em;color:#55606C">{{ panel.scope }}</div>
+        <h2 style="margin:8px 0 0;font-size:26px;font-weight:800;letter-spacing:-.025em">{{ panel.title }}</h2>
+        <p style="margin:8px 0 0;font-size:14.5px;line-height:1.55;color:#3D4855">{{ panel.intro }}</p>
+
+        <sc-if value="{{ panel.hasFields }}" hint-placeholder-val="{{ true }}">
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:0 20px;margin-top:26px">
+            <sc-for list="{{ panel.fields }}" as="f" hint-placeholder-count="4">
+              <div style="margin-bottom:20px;{{ f.span }}">
+                <label style="display:block;font-size:14px;font-weight:700;margin-bottom:8px">{{ f.label }}</label>
+                <sc-if value="{{ f.isInput }}" hint-placeholder-val="{{ true }}">
+                  <input value="{{ f.value }}" sc-camel-on-change="{{ f.set }}" placeholder="{{ f.placeholder }}" aria-label="{{ f.label }}" style="width:100%;border:1px solid #D9D6CE;border-radius:9px;padding:12px 14px;font-size:15px;outline:none;background:#FCFCFA" style-focus="border-color:#00417A">
+                </sc-if>
+                <sc-if value="{{ f.isArea }}" hint-placeholder-val="{{ false }}">
+                  <textarea value="{{ f.value }}" sc-camel-on-change="{{ f.set }}" placeholder="{{ f.placeholder }}" aria-label="{{ f.label }}" rows="3" style="width:100%;border:1px solid #D9D6CE;border-radius:9px;padding:12px 14px;font-size:15px;outline:none;background:#FCFCFA;resize:vertical;line-height:1.55" style-focus="border-color:#00417A"></textarea>
+                </sc-if>
+                <sc-if value="{{ f.isSelect }}" hint-placeholder-val="{{ false }}">
+                  <sc-raw-select value="{{ f.value }}" sc-camel-on-change="{{ f.set }}" aria-label="{{ f.label }}" style="width:100%;border:1px solid #D9D6CE;border-radius:9px;padding:12px 14px;font-size:15px;background:#FCFCFA;cursor:pointer">
+                    <sc-for list="{{ f.options }}" as="o" hint-placeholder-count="3">
+                      <option value="{{ o }}">{{ o }}</option>
+                    </sc-for>
+                  </sc-raw-select>
+                </sc-if>
+                <sc-if value="{{ f.isReadonly }}" hint-placeholder-val="{{ false }}">
+                  <div style="border:1px solid #E6E4DE;border-radius:9px;padding:12px 14px;font-size:15px;background:#F6F5F1;color:#3D4855">{{ f.value }}</div>
+                </sc-if>
+                <sc-if value="{{ f.hasHint }}" hint-placeholder-val="{{ false }}">
+                  <div style="font-size:13px;color:#55606C;margin-top:7px">{{ f.hint }}</div>
+                </sc-if>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ panel.hasSwitches }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:18px">
+            <sc-for list="{{ panel.switches }}" as="w" hint-placeholder-count="4">
+              <div style="display:flex;gap:18px;align-items:center;padding:16px 0;border-top:1px solid #F1EFE9">
+                <div style="flex:1;min-width:0">
+                  <div style="font-size:15px;font-weight:700">{{ w.label }}</div>
+                  <div style="font-size:13.5px;color:#55606C;margin-top:3px;line-height:1.5">{{ w.hint }}</div>
+                </div>
+                <button sc-camel-on-click="{{ w.toggle }}" role="switch" aria-checked="{{ w.on }}" aria-label="{{ w.label }}" style="position:relative;width:44px;height:26px;flex:none;border:0;border-radius:99px;background:{{ w.track }};cursor:pointer;transition:background .18s">
+                  <span style="position:absolute;top:3px;left:{{ w.knob }};width:20px;height:20px;border-radius:99px;background:#fff;box-shadow:0 1px 3px rgba(16,21,27,.25);transition:left .18s"></span>
+                </button>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ panel.isUsers }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:26px">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.12em;color:#55606C;margin-bottom:10px">USERS AND ROLES</div>
+            <div style="border:1px solid #E6E4DE;border-radius:12px;overflow:hidden">
+              <sc-for list="{{ users }}" as="u" hint-placeholder-count="5">
+                <div style="display:flex;align-items:center;gap:14px;padding:14px 16px;border-bottom:1px solid #F1EFE9;flex-wrap:wrap">
+                  <span style="width:36px;height:36px;border-radius:99px;background:{{ u.bg }};color:#fff;font-size:12px;font-weight:700;display:grid;place-items:center;flex:none">{{ u.initials }}</span>
+                  <div style="flex:1;min-width:180px">
+                    <div style="font-size:15px;font-weight:700">{{ u.name }}</div>
+                    <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#55606C;margin-top:2px">{{ u.email }}</div>
+                  </div>
+                  <sc-if value="{{ u.isMe }}" hint-placeholder-val="{{ false }}">
+                    <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.08em;color:#3D4855;padding:9px 11px">{{ u.role }} · YOU</span>
+                  </sc-if>
+                  <sc-if value="{{ u.canEdit }}" hint-placeholder-val="{{ true }}">
+                    <sc-raw-select value="{{ u.role }}" sc-camel-on-change="{{ u.setRole }}" aria-label="{{ u.roleLabel }}" style="border:1px solid #D9D6CE;background:#fff;border-radius:8px;padding:9px 11px;font-size:13.5px;font-weight:600;color:#3D4855;cursor:pointer">
+                      <sc-for list="{{ roleChoices }}" as="o" hint-placeholder-count="3">
+                        <option value="{{ o }}">{{ o }}</option>
+                      </sc-for>
+                    </sc-raw-select>
+                  </sc-if>
+                </div>
+              </sc-for>
+            </div>
+            <div style="font-size:13px;color:#55606C;margin-top:10px">Role changes take effect on the user's next request and are logged to the audit trail.</div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ panel.isAccount }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:10px;border:1px solid #E6C9BC;background:#FDF4F0;border-radius:12px;padding:20px 22px">
+            <div style="font-size:15.5px;font-weight:700;color:#A83B15">Leave LaunchPad</div>
+            <div style="font-size:13.5px;color:#3D4855;margin-top:5px;line-height:1.55">Deleting your account removes your profile and unpublishes your projects. An admin confirms every deletion request.</div>
+            <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
+              <button sc-camel-on-click="{{ signOut }}" style="background:#fff;border:1px solid #D9D6CE;border-radius:8px;padding:10px 16px;font-size:13.5px;font-weight:700;color:#3D4855;cursor:pointer" style-hover="border-color:#00417A">Sign out</button>
+              <button sc-camel-on-click="{{ requestDelete }}" style="background:#fff;border:1px solid #E6C9BC;border-radius:8px;padding:10px 16px;font-size:13.5px;font-weight:700;color:#A83B15;cursor:pointer" style-hover="border-color:#A83B15">Request account deletion</button>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ panel.canSave }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex;gap:10px;align-items:center;margin-top:22px;padding-top:22px;border-top:1px solid #F1EFE9;flex-wrap:wrap">
+            <sc-if value="{{ panel.isProfile }}" hint-placeholder-val="{{ false }}">
+              <button sc-camel-on-click="{{ viewProfile }}" style="background:none;border:0;padding:0;cursor:pointer;font-size:14px;font-weight:700;color:#00417A" style-hover="color:#E2572A">View public profile →</button>
+            </sc-if>
+            <div style="flex:1"></div>
+            <button sc-camel-on-click="{{ discard }}" style="background:none;border:0;padding:13px 16px;font-size:14.5px;font-weight:700;color:#3D4855;cursor:pointer" style-hover="color:#00417A">Discard</button>
+            <button sc-camel-on-click="{{ save }}" style="background:#00417A;color:#fff;border:0;border-radius:9px;padding:13px 26px;font-size:14.5px;font-weight:700;cursor:pointer" style-hover="background:#002C52">Save changes</button>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+  </div>
+</div>
+</main>
+
+<footer style="border-top:1px solid #E6E4DE;background:#F3F2ED">
+  <div style="max-width:1340px;margin:0 auto;padding:60px clamp(24px,4vw,44px) 44px;display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:40px">
+    <div>
+      <div style="font-size:18px;font-weight:800;letter-spacing:-.02em"><span style="color:#00417A">OTU</span> <span style="color:#E2572A">Launch</span><span style="color:#10151B">Pad.</span></div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#55606C;margin-top:10px">Build. Share. Launch.</div>
+    </div>
+    <sc-for list="{{ footerCols }}" as="c" hint-placeholder-count="3">
+      <div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.09em;color:#55606C">{{ c.title }}</div>
+        <div style="display:flex;flex-direction:column;gap:10px;margin-top:14px;align-items:flex-start">
+          <sc-for list="{{ c.links }}" as="l" hint-placeholder-count="4">
+            <button sc-camel-on-click="{{ l.go }}" style="background:none;border:0;padding:0;cursor:pointer;font-size:14px;font-weight:600;color:#3D4855" style-hover="color:#00417A">{{ l.label }}</button>
+          </sc-for>
+        </div>
+      </div>
+    </sc-for>
+  </div>
+  <div style="max-width:1340px;margin:0 auto;padding:0 clamp(24px,4vw,44px) 40px;display:flex;flex-direction:column;gap:8px">
+    <div style="font-size:13px;line-height:1.55;color:#3D4855;max-width:72ch">An independent project by a student club. Not affiliated with, endorsed by, or an official service of Ontario Tech University.</div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:#5A6470">© 2026 GDG ON CAMPUS, ONTARIO TECH UNIVERSITY · BUILT BY STUDENTS IN OSHAWA</div>
+  </div>
+</footer>
+
+<sc-if value="{{ toastVisible }}" hint-placeholder-val="{{ false }}">
+  <div role="status" style="position:fixed;left:50%;bottom:28px;transform:translateX(-50%);z-index:95;background:#10151B;color:#fff;border-radius:10px;padding:13px 20px;font-size:14.5px;font-weight:600;box-shadow:0 14px 34px rgba(16,21,27,.28);animation:otuRise .2s ease-out">{{ toast }}</div>
+</sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script="">
+const PROGRAMS = ['Computer Science', 'Software Engineering', 'Electrical Engineering', 'Mechatronics Engineering', 'Business & IT']
+const YEARS = ['Year 1', 'Year 2', 'Year 3', 'Year 4']
+const ALL = ['student', 'moderator', 'admin']
+const STAFF = ['moderator', 'admin']
+
+const DEFAULTS = {
+  name: 'Aisha Rahman', program: 'Computer Science', year: 'Year 3',
+  bio: 'Third-year CS student working mostly on spatial computing. I like problems where the interface has to understand the room it is in.',
+  building: 'AI-powered course planning platform', github: 'github.com/', linkedin: 'linkedin.com/in/', portfolio: 'https://',
+  nReview: true, nUpvotes: true, nComments: true, nCollab: true, nSprints: true, nDigest: false,
+  visibility: 'Everyone', pDirectory: true, pCollab: true, pProgram: true,
+  queueOrder: 'Oldest first', mQueue: true, mReports: true, mSummary: false,
+  aSubmissions: true, aSprintReg: true, aBanner: false,
+}
+
+// Each tab lists the roles allowed to see it; the admin tab never renders for students or moderators.
+const TABS = [
+  { key: 'profile', label: 'Profile', roles: ALL, title: 'Public profile', intro: 'What other students, recruiters and professors see on your Builders page.',
+    fields: [
+      { key: 'name', label: 'Full name', type: 'input' },
+      { key: 'program', label: 'Program', type: 'select', options: PROGRAMS },
+      { key: 'year', label: 'Year', type: 'select', options: YEARS },
+      { key: 'building', label: 'Currently building', type: 'input', ph: 'Shown in the highlight box on your profile' },
+      { key: 'bio', label: 'Bio', type: 'area', wide: true },
+      { key: 'github', label: 'GitHub', type: 'input' },
+      { key: 'linkedin', label: 'LinkedIn', type: 'input' },
+      { key: 'portfolio', label: 'Portfolio', type: 'input', wide: true },
+    ] },
+  { key: 'account', label: 'Account', roles: ALL, title: 'Account', intro: 'Your sign-in details come from your Ontario Tech Google account.', noSave: true,
+    fields: [
+      { key: 'email', label: 'Email', type: 'readonly' },
+      { key: 'method', label: 'Sign-in method', type: 'readonly' },
+      { key: 'role', label: 'Role', type: 'readonly', hint: 'Roles are assigned by an admin.' },
+    ] },
+  { key: 'notifications', label: 'Notifications', roles: ALL, title: 'Notifications', intro: 'Choose what shows up in your bell and inbox.',
+    switches: [
+      { key: 'nReview', label: 'Project reviews', hint: 'When a moderator approves, rejects, or asks for changes.' },
+      { key: 'nUpvotes', label: 'Upvotes', hint: 'When someone upvotes one of your projects.' },
+      { key: 'nComments', label: 'Discussion', hint: 'New comments on your projects.' },
+      { key: 'nCollab', label: 'Collaboration requests', hint: 'When a student offers to help on a project.' },
+      { key: 'nSprints', label: 'Semester Sprints', hint: 'Registration, checkpoints and demo day reminders.' },
+      { key: 'nDigest', label: 'Weekly email digest', hint: 'A Monday summary instead of individual emails.' },
+    ] },
+  { key: 'privacy', label: 'Privacy', roles: ALL, title: 'Privacy', intro: 'Control who can find you and how.',
+    fields: [{ key: 'visibility', label: 'Profile visibility', type: 'select', options: ['Everyone', 'Signed-in students only'], hint: 'Approved projects stay public either way.' }],
+    switches: [
+      { key: 'pDirectory', label: 'List me in the Builders directory', hint: 'Turn off to be reachable only through your projects.' },
+      { key: 'pCollab', label: 'Accept collaboration requests', hint: 'Lets other students offer to help on your projects.' },
+      { key: 'pProgram', label: 'Show my program and year', hint: 'Shown on your profile and project bylines.' },
+    ] },
+  { key: 'moderation', label: 'Moderation', scope: 'MOD', roles: STAFF, title: 'Moderation', intro: 'Preferences for the review queue. Only moderators and admins see this section.',
+    fields: [{ key: 'queueOrder', label: 'Default queue order', type: 'select', options: ['Oldest first', 'Newest first', 'Most reported'] }],
+    switches: [
+      { key: 'mQueue', label: 'New submissions', hint: 'Notify me when a project enters the review queue.' },
+      { key: 'mReports', label: 'Reports', hint: 'Notify me as soon as a project is reported.' },
+      { key: 'mSummary', label: 'Daily queue summary', hint: 'One email each morning with pending reviews.' },
+    ] },
+  { key: 'admin', label: 'Roles & platform', scope: 'ADMIN', roles: ['admin'], title: 'Roles & platform', intro: 'Grant moderator access and control site-wide switches. Only admins see this section.', users: true,
+    switches: [
+      { key: 'aSubmissions', label: 'Accept new submissions', hint: 'Turn off to pause the submit form, for example between sprints.' },
+      { key: 'aSprintReg', label: 'Sprint registration open', hint: 'Controls the Join Sprint button on the Semester Sprints page.' },
+      { key: 'aBanner', label: 'Maintenance banner', hint: 'Shows a notice at the top of every page.' },
+    ] },
+]
+
+const USERS = [
+  { key: 'aisha-rahman', role: 'admin', bg: '#00417A' },
+  { key: 'priya-nandakumar', role: 'moderator', bg: '#E2572A' },
+  { key: 'marcus-oyelaran', role: 'student', bg: '#10151B' },
+  { key: 'daniel-kovac', role: 'student', bg: '#12395C' },
+  { key: 'lena-fitzgerald', role: 'student', bg: '#2A4A3C' },
+]
+
+class Component extends DCLogic {
+  state = OTU.state({ tab: OTU.param('tab') || 'profile', values: Object.assign({}, DEFAULTS), roles: {} })
+  componentDidMount() { OTU.mount(this) }
+  componentDidUpdate() { OTU.motion(this) }
+  componentWillUnmount() { OTU.unmount(this) }
+
+  renderVals() {
+    const s = this.state
+    const role = OTU.session().role
+    const tabs = TABS.filter((t) => t.roles.includes(role))
+    const tab = tabs.find((t) => t.key === s.tab) || tabs[0]
+    const readonly = { email: OTU.ME.email, method: 'Google · Ontario Tech', role }
+    const setValue = (key, value) => this.setState({ values: Object.assign({}, s.values, { [key]: value }) })
+
+    const fields = (tab.fields || []).map((f) => ({
+      label: f.label,
+      placeholder: f.ph || '',
+      value: f.type === 'readonly' ? readonly[f.key] : s.values[f.key],
+      options: f.options || [],
+      isInput: f.type === 'input',
+      isArea: f.type === 'area',
+      isSelect: f.type === 'select',
+      isReadonly: f.type === 'readonly',
+      hasHint: !!f.hint,
+      hint: f.hint || '',
+      span: f.wide ? 'grid-column:1/-1' : '',
+      set: (e) => setValue(f.key, e.target.value),
+    }))
+    const switches = (tab.switches || []).map((w) => {
+      const on = !!s.values[w.key]
+      return { label: w.label, hint: w.hint, on, toggle: () => setValue(w.key, !on), track: on ? OTU.BLUE : '#C9CED4', knob: on ? '21px' : '3px' }
+    })
+
+    return Object.assign(OTU.chrome(this, 'settings'), {
+      intro: role === 'student' ? 'Manage your profile, notifications and privacy.' : 'Manage your profile and notifications, plus the ' + (role === 'admin' ? 'moderation, role and platform' : 'moderation') + ' settings your role unlocks.',
+      navStyle: s.isMobile
+        ? 'flex:1 1 100%;display:flex;gap:4px;overflow-x:auto;padding-bottom:4px'
+        : 'flex:0 0 220px;display:flex;flex-direction:column;gap:4px;position:sticky;top:88px',
+      tabs: tabs.map((t) => {
+        const on = t.key === tab.key
+        return { label: t.label, scope: t.scope || '', current: on ? 'page' : 'false', bg: on ? '#F2F7FC' : 'transparent', fg: on ? OTU.BLUE : '#3D4855', go: () => this.setState({ tab: t.key }) }
+      }),
+      panel: {
+        scope: scopeLabel(tab.scope),
+        title: tab.title,
+        intro: tab.intro,
+        fields,
+        switches,
+        hasFields: fields.length > 0,
+        hasSwitches: switches.length > 0,
+        isUsers: !!tab.users,
+        isAccount: tab.key === 'account',
+        isProfile: tab.key === 'profile',
+        canSave: !tab.noSave,
+      },
+      roleChoices: ALL,
+      users: USERS.map((u) => {
+        const stu = OTU.STUDENTS[u.key]
+        const isMe = u.key === OTU.ME.key
+        const current = isMe ? role : s.roles[u.key] || u.role
+        return {
+          name: stu.name,
+          initials: OTU.initials(stu.name),
+          email: stu.name.toLowerCase().replace(' ', '.') + '@ontariotechu.net',
+          bg: u.bg,
+          role: current,
+          isMe,
+          canEdit: !isMe,
+          roleLabel: 'Role for ' + stu.name,
+          setRole: (e) => {
+            this.setState({ roles: Object.assign({}, s.roles, { [u.key]: e.target.value }) })
+            OTU.flash(this, stu.name + ' is now ' + e.target.value + ' · logged to audit trail')
+          },
+        }
+      }),
+      viewProfile: () => OTU.go('profile'),
+      requestDelete: () => OTU.flash(this, 'Deletion request sent to the admins'),
+      discard: () => {
+        this.setState({ values: Object.assign({}, DEFAULTS) })
+        OTU.flash(this, 'Changes discarded')
+      },
+      save: () => OTU.flash(this, 'Settings saved'),
+    })
+  }
+}
+
+function scopeLabel(scope) {
+  return scope === 'MOD' ? 'MODERATORS AND ADMINS' : scope === 'ADMIN' ? 'ADMINS ONLY' : 'EVERY ROLE'
+}
+</script>
+</body>
+</html>

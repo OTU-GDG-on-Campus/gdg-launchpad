@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<!-- Contribute page: ways to help, first pull request steps and projects looking for help. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Contribute · OTU LaunchPad</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 10 10%27%3E%3Crect width=%2710%27 height=%2710%27 rx=%272%27 fill=%27%2300417A%27/%3E%3Crect x=%274%27 y=%274%27 width=%272%27 height=%272%27 fill=%27%23E2572A%27/%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/otu.css">
+<script src="assets/otu.js"></script>
+<script src="assets/vendor/react.production.min.js"></script>
+<script src="assets/vendor/react-dom.production.min.js"></script>
+<script src="assets/vendor/dc-runtime.js"></script>
+</head>
+<body>
+<x-dc>
+<div style="min-height:100vh;display:flex;flex-direction:column;background:#FBFBF9">
+
+<a href="#otu-main" style="position:absolute;left:-9999px;top:8px;z-index:100;background:#00417A;color:#fff;padding:11px 18px;border-radius:8px;font-size:14px;font-weight:700" style-focus="left:16px">Skip to content</a>
+
+<header style="position:sticky;top:0;z-index:60;background:rgba(251,251,249,.94);border-bottom:1px solid #E6E4DE">
+  <div style="max-width:1340px;margin:0 auto;padding:0 clamp(24px,4vw,44px);height:64px;display:flex;align-items:center;gap:clamp(12px,3vw,36px)">
+    <button sc-camel-on-click="{{ goHome }}" aria-label="OTU LaunchPad home" style="background:none;border:0;padding:0;cursor:pointer;font-size:19px;font-weight:800;letter-spacing:-.02em;color:#10151B">
+      <span style="color:#00417A">OTU</span> <span style="color:#E2572A">Launch</span><span style="color:#10151B">Pad.</span>
+    </button>
+    <sc-if value="{{ desktopNav }}" hint-placeholder-val="{{ true }}">
+    <nav aria-label="Primary" style="display:flex;align-items:center;gap:4px;margin-left:8px">
+      <sc-for list="{{ navItems }}" as="n" hint-placeholder-count="4">
+        <button sc-camel-on-click="{{ n.go }}" aria-current="{{ n.current }}" style="background:none;border:0;cursor:pointer;padding:9px 11px 6px;font-size:14.5px;font-weight:600;color:{{ n.fg }};transition:color .18s" style-hover="color:#00417A">
+          <span style="display:block">{{ n.label }}</span>
+          <span style="{{ n.bar }}"></span>
+        </button>
+      </sc-for>
+    </nav>
+    </sc-if>
+    <div style="flex:1"></div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <sc-if value="{{ mobileNav }}" hint-placeholder-val="{{ false }}">
+        <button sc-camel-on-click="{{ toggleSheet }}" aria-label="{{ sheetAria }}" aria-expanded="{{ sheetOpen }}" style="width:40px;height:40px;display:grid;place-items:center;background:none;border:1px solid #E6E4DE;border-radius:8px;cursor:pointer" style-hover="border-color:#00417A">
+          <svg width="18" height="18" sc-camel-view-box="0 0 18 18" fill="none" stroke="#10151B" stroke-width="1.7" stroke-linecap="round"><path d="{{ sheetIcon }}"></path></svg>
+        </button>
+      </sc-if>
+      <button sc-camel-on-click="{{ focusSearch }}" aria-label="Search projects" style="width:36px;height:36px;display:grid;place-items:center;background:none;border:1px solid #E6E4DE;border-radius:8px;cursor:pointer" style-hover="border-color:#00417A">
+        <svg width="16" height="16" sc-camel-view-box="0 0 16 16" fill="none" stroke="#3D4855" stroke-width="1.6"><circle cx="7" cy="7" r="4.6"></circle><path d="M10.5 10.5 14 14"></path></svg>
+      </button>
+      <sc-if value="{{ loggedOut }}" hint-placeholder-val="{{ true }}">
+        <button sc-camel-on-click="{{ openLogin }}" style="background:#00417A;color:#fff;border:0;border-radius:8px;padding:9px 18px;font-size:14px;font-weight:700;cursor:pointer" style-hover="background:#002C52">Login</button>
+      </sc-if>
+      <sc-if value="{{ loggedIn }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;align-items:center;gap:10px;position:relative">
+          <button sc-camel-on-click="{{ toggleNotifs }}" aria-label="Notifications" style="position:relative;width:36px;height:36px;display:grid;place-items:center;background:none;border:1px solid #E6E4DE;border-radius:8px;cursor:pointer" style-hover="border-color:#00417A">
+            <svg width="16" height="16" sc-camel-view-box="0 0 16 16" fill="none" stroke="#3D4855" stroke-width="1.6"><path d="M4 6.5a4 4 0 1 1 8 0c0 3 1 4 1 4H3s1-1 1-4Z"></path><path d="M6.6 13a1.6 1.6 0 0 0 2.8 0"></path></svg>
+            <span style="position:absolute;top:-4px;right:-4px;min-width:16px;height:16px;padding:0 4px;background:#E2572A;color:#fff;border-radius:99px;font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:500;display:grid;place-items:center">{{ notifCount }}</span>
+          </button>
+          <button sc-camel-on-click="{{ toggleMenu }}" aria-label="Account menu" style="display:flex;align-items:center;gap:8px;background:none;border:1px solid #E6E4DE;border-radius:99px;padding:3px 10px 3px 3px;cursor:pointer" style-hover="border-color:#00417A">
+            <span style="width:28px;height:28px;border-radius:99px;background:#00417A;color:#fff;font-size:11.5px;font-weight:700;display:grid;place-items:center">{{ meInitials }}</span>
+            <sc-if value="{{ desktopNav }}" hint-placeholder-val="{{ true }}"><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#3D4855">{{ meRole }}</span></sc-if>
+          </button>
+          <sc-if value="{{ notifsOpen }}" hint-placeholder-val="{{ false }}">
+            <div role="dialog" aria-label="Notifications" style="position:absolute;top:46px;right:0;width:340px;background:#fff;border:1px solid #E6E4DE;border-radius:12px;box-shadow:0 18px 40px rgba(16,21,27,.13);overflow:hidden;z-index:70">
+              <div style="padding:13px 16px;border-bottom:1px solid #EFEDE7;font-size:13px;font-weight:700">Notifications</div>
+              <sc-for list="{{ notifications }}" as="nt" hint-placeholder-count="3">
+                <div style="display:flex;gap:11px;padding:13px 16px;border-bottom:1px solid #F3F1EB">
+                  <span style="width:7px;height:7px;border-radius:99px;background:#E2572A;margin-top:6px;flex:none"></span>
+                  <div>
+                    <div style="font-size:13.5px;font-weight:600;color:#10151B">{{ nt.title }}</div>
+                    <div style="font-size:12.5px;color:#55606C;margin-top:2px">{{ nt.body }}</div>
+                    <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#5A6470;margin-top:5px">{{ nt.when }}</div>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+          <sc-if value="{{ menuOpen }}" hint-placeholder-val="{{ false }}">
+            <div role="menu" style="position:absolute;top:46px;right:0;width:230px;background:#fff;border:1px solid #E6E4DE;border-radius:12px;box-shadow:0 18px 40px rgba(16,21,27,.13);padding:6px;z-index:70">
+              <sc-for list="{{ menuItems }}" as="m" hint-placeholder-count="4">
+                <button sc-camel-on-click="{{ m.go }}" role="menuitem" style="display:block;width:100%;text-align:left;background:none;border:0;padding:9px 11px;border-radius:8px;font-size:13.5px;font-weight:600;color:#3D4855;cursor:pointer" style-hover="background:#F1EFE9;color:#00417A">{{ m.label }}</button>
+              </sc-for>
+              <div style="height:1px;background:#EFEDE7;margin:6px 4px"></div>
+              <button sc-camel-on-click="{{ signOut }}" role="menuitem" style="display:block;width:100%;text-align:left;background:none;border:0;padding:9px 11px;border-radius:8px;font-size:13.5px;font-weight:600;color:#A83B15;cursor:pointer" style-hover="background:#F1EFE9">Sign out</button>
+            </div>
+          </sc-if>
+        </div>
+      </sc-if>
+    </div>
+  </div>
+</header>
+
+<sc-if value="{{ sheetVisible }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;inset:64px 0 0 0;z-index:55;background:rgba(16,21,27,.32)" sc-camel-on-click="{{ closeSheet }}"></div>
+  <nav aria-label="Primary" style="position:fixed;top:64px;left:0;right:0;z-index:56;background:#FDFDFC;border-bottom:1px solid #E6E4DE;box-shadow:0 24px 48px rgba(16,21,27,.14);padding:10px clamp(24px,4vw,44px) 18px;animation:otuRise .22s cubic-bezier(.16,1,.3,1)">
+    <sc-for list="{{ navItems }}" as="n" hint-placeholder-count="4">
+      <button sc-camel-on-click="{{ n.go }}" aria-current="{{ n.current }}" style="display:flex;align-items:center;justify-content:space-between;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid #EFEDE7;padding:16px 4px;font-size:18px;font-weight:700;letter-spacing:-.015em;color:{{ n.fg }};cursor:pointer">{{ n.label }}<span style="color:#E2572A">→</span></button>
+    </sc-for>
+    <div style="display:flex;gap:10px;margin-top:16px">
+      <button sc-camel-on-click="{{ goProjects }}" style="flex:1;background:#00417A;color:#fff;border:0;border-radius:9px;padding:14px;font-size:15px;font-weight:700;cursor:pointer">Explore Projects</button>
+      <button sc-camel-on-click="{{ goSubmit }}" style="flex:1;background:#fff;color:#10151B;border:1px solid #D2CEC4;border-radius:9px;padding:14px;font-size:15px;font-weight:700;cursor:pointer">Launch a Project</button>
+    </div>
+  </nav>
+</sc-if>
+
+<main id="otu-main" style="flex:1">
+<div>
+  <section style="border-bottom:1px solid #E6E4DE;background-color:#FDFDFC;background-image:linear-gradient(rgba(0,65,122,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(0,65,122,.05) 1px,transparent 1px),linear-gradient(rgba(0,65,122,.085) 1px,transparent 1px),linear-gradient(90deg,rgba(0,65,122,.085) 1px,transparent 1px);background-size:24px 24px,24px 24px,120px 120px,120px 120px">
+    <div style="max-width:1160px;margin:0 auto;padding:72px clamp(24px,4vw,44px) 60px">
+      <div style="display:inline-flex;align-items:center;gap:10px">
+        <span style="width:7px;height:7px;background:#E2572A"></span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.18em;color:#00417A">CONTRIBUTE</span>
+      </div>
+      <h1 style="margin:18px 0 0;font-size:clamp(38px,5vw,64px);letter-spacing:-.035em;font-weight:800;max-width:15ch">Help build LaunchPad<span style="color:#E2572A">.</span></h1>
+      <p style="margin:18px 0 0;max-width:58ch;font-size:18.5px;line-height:1.55;color:#3D4855">LaunchPad is built and maintained by students in GDG on Campus at Ontario Tech. Design, frontend, backend, moderation, or sprint organizing: there's room, and it's a good place to make a first open source pull request.</p>
+      <div style="display:flex;gap:10px;margin-top:28px;flex-wrap:wrap">
+        <button sc-camel-on-click="{{ openRepo }}" style="background:#00417A;color:#fff;border:0;border-radius:9px;padding:14px 26px;font-size:15px;font-weight:700;cursor:pointer" style-hover="background:#002C52">View the repo</button>
+        <button sc-camel-on-click="{{ openDiscord }}" style="background:#fff;border:1px solid #D9D6CE;border-radius:9px;padding:14px 26px;font-size:15px;font-weight:700;cursor:pointer" style-hover="border-color:#00417A">Say hi on Discord</button>
+      </div>
+    </div>
+  </section>
+
+  <section style="max-width:1160px;margin:0 auto;padding:72px clamp(24px,4vw,44px) 0">
+    <h2 style="margin:0 0 28px;font-size:32px;font-weight:800;letter-spacing:-.03em">Ways to help</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:2px;background:#E6E4DE;border:1px solid #E6E4DE;border-radius:12px;overflow:hidden">
+      <sc-for list="{{ ways }}" as="w" hint-placeholder-count="5">
+        <div style="background:#fff;padding:28px">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.14em;color:#E2572A">{{ w.tag }}</div>
+          <div style="font-size:18px;font-weight:700;letter-spacing:-.02em;margin-top:10px">{{ w.title }}</div>
+          <div style="font-size:14.5px;color:#3D4855;margin-top:9px;line-height:1.6">{{ w.body }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section style="max-width:1160px;margin:0 auto;padding:72px clamp(24px,4vw,44px) 0">
+    <h2 style="margin:0 0 28px;font-size:32px;font-weight:800;letter-spacing:-.03em">How to start</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:2px;background:#E6E4DE;border:1px solid #E6E4DE;border-radius:12px;overflow:hidden">
+      <sc-for list="{{ steps }}" as="s" hint-placeholder-count="4">
+        <div style="background:#fff;padding:28px 26px">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#E2572A">{{ s.num }}</div>
+          <div style="font-size:19px;font-weight:700;margin-top:12px;letter-spacing:-.02em">{{ s.title }}</div>
+          <div style="font-size:14.5px;color:#3D4855;margin-top:8px;line-height:1.55">{{ s.body }}</div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="margin-top:18px;border:1px solid #E6E4DE;border-radius:10px;background:#F6F5F1;padding:16px 18px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;line-height:1.8;color:#22303D">
+      <div>git clone https://github.com/gdg-otu/launchpad.git</div>
+      <div>cd launchpad &amp;&amp; npm install &amp;&amp; npm run dev</div>
+    </div>
+  </section>
+
+  <section style="max-width:1160px;margin:0 auto;padding:72px clamp(24px,4vw,44px) 96px">
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:24px">
+      <div>
+        <h2 style="margin:0;font-size:32px;font-weight:800;letter-spacing:-.03em">Projects looking for contributors</h2>
+        <p style="margin:10px 0 0;font-size:16px;color:#3D4855">Student projects whose builders asked for help. Pitch in on something that isn't LaunchPad.</p>
+      </div>
+      <button sc-camel-on-click="{{ seeOpen }}" style="background:none;border:0;border-bottom:1px solid #D5D2CA;padding:0 0 4px;cursor:pointer;font-size:14.5px;font-weight:700;color:#10151B;display:inline-flex;gap:8px" style-hover="color:#00417A;border-color:#00417A">See all open projects<span aria-hidden="true" style="color:#E2572A">→</span></button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(272px,1fr));gap:22px">
+      <sc-for list="{{ openProjects }}" as="p" hint-placeholder-count="3">
+        <article style="background:#fff;border:1px solid #E6E4DE;border-radius:12px;overflow:hidden;transition:transform .2s,box-shadow .2s" style-hover="transform:translateY(-3px);box-shadow:0 14px 30px rgba(16,21,27,.09)">
+          <button sc-camel-on-click="{{ p.open }}" aria-label="{{ p.openLabel }}" style="display:block;width:100%;border:0;padding:0;background:none;cursor:pointer;text-align:left">
+            <div style="position:relative;aspect-ratio:16/10"><div style="{{ p.art }}"></div></div>
+            <div style="padding:18px">
+              <div style="font-size:17.5px;font-weight:700;letter-spacing:-.015em;color:#10151B">{{ p.title }}</div>
+              <div style="font-size:13.5px;color:#3D4855;margin-top:6px">{{ p.author.name }} · {{ p.author.program }}</div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:#55606C;margin-top:8px">{{ p.tagline }}</div>
+              <div style="margin-top:12px"><span style="display:inline-flex;background:#FDEFE9;color:#A83B15;border-radius:6px;padding:4px 9px;font-size:12px;font-weight:700">Open to Contributors</span></div>
+            </div>
+          </button>
+        </article>
+      </sc-for>
+    </div>
+  </section>
+</div>
+</main>
+
+<footer style="border-top:1px solid #E6E4DE;background:#F3F2ED">
+  <div style="max-width:1340px;margin:0 auto;padding:60px clamp(24px,4vw,44px) 44px;display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:40px">
+    <div>
+      <div style="font-size:18px;font-weight:800;letter-spacing:-.02em"><span style="color:#00417A">OTU</span> <span style="color:#E2572A">Launch</span><span style="color:#10151B">Pad.</span></div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#55606C;margin-top:10px">Build. Share. Launch.</div>
+    </div>
+    <sc-for list="{{ footerCols }}" as="c" hint-placeholder-count="3">
+      <div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.09em;color:#55606C">{{ c.title }}</div>
+        <div style="display:flex;flex-direction:column;gap:10px;margin-top:14px;align-items:flex-start">
+          <sc-for list="{{ c.links }}" as="l" hint-placeholder-count="4">
+            <button sc-camel-on-click="{{ l.go }}" style="background:none;border:0;padding:0;cursor:pointer;font-size:14px;font-weight:600;color:#3D4855" style-hover="color:#00417A">{{ l.label }}</button>
+          </sc-for>
+        </div>
+      </div>
+    </sc-for>
+  </div>
+  <div style="max-width:1340px;margin:0 auto;padding:0 clamp(24px,4vw,44px) 40px;display:flex;flex-direction:column;gap:8px">
+    <div style="font-size:13px;line-height:1.55;color:#3D4855;max-width:72ch">An independent project by a student club. Not affiliated with, endorsed by, or an official service of Ontario Tech University.</div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:#5A6470">© 2026 GDG ON CAMPUS, ONTARIO TECH UNIVERSITY · BUILT BY STUDENTS IN OSHAWA</div>
+  </div>
+</footer>
+
+<sc-if value="{{ toastVisible }}" hint-placeholder-val="{{ false }}">
+  <div role="status" style="position:fixed;left:50%;bottom:28px;transform:translateX(-50%);z-index:95;background:#10151B;color:#fff;border-radius:10px;padding:13px 20px;font-size:14.5px;font-weight:600;box-shadow:0 14px 34px rgba(16,21,27,.28);animation:otuRise .2s ease-out">{{ toast }}</div>
+</sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script="">
+const WAYS = [
+  { tag: 'DESIGN', title: 'Design', body: 'Page layouts, flows and components. The mockups in the repo’s UI folder are the starting point.' },
+  { tag: 'FRONTEND', title: 'Frontend', body: 'React and TypeScript pages. The app runs on mock data, so there is nothing else to configure.' },
+  { tag: 'BACKEND', title: 'Backend', body: 'Supabase and Vercel functions for sign-in, upvotes and moderation. Not started yet, so early help shapes it.' },
+  { tag: 'MODERATION', title: 'Moderation', body: 'Review submissions for spam and accuracy before they go public. Nothing more than that.' },
+  { tag: 'SPRINTS', title: 'Sprint organizing', body: 'Run pitch night, the two checkpoints and demo day for Semester Sprints.' },
+]
+const STEPS = [
+  { num: '01', title: 'Pick an issue', body: 'Good first issues are labelled in the tracker. Proposing something new? Open an issue first so nobody duplicates your work.' },
+  { num: '02', title: 'Set up', body: 'Clone the repo and run it locally. Node 20 or newer, and nothing else to configure.' },
+  { num: '03', title: 'Open a pull request', body: 'Run npm run check, push your branch, and open a PR. Vercel builds a preview for every one.' },
+  { num: '04', title: 'Get a review', body: 'Someone from the tech team reviews each PR. If it stalls for a few days, ping in Discord.' },
+]
+
+class Component extends DCLogic {
+  state = OTU.state()
+  componentDidMount() { OTU.mount(this) }
+  componentDidUpdate() { OTU.motion(this) }
+  componentWillUnmount() { OTU.unmount(this) }
+
+  renderVals() {
+    return Object.assign(OTU.chrome(this, 'contribute'), {
+      ways: WAYS,
+      steps: STEPS,
+      openRepo: OTU.external(OTU.REPO_URL),
+      openDiscord: OTU.external(OTU.DISCORD_URL),
+      seeOpen: () => OTU.go('projects', { open: '1' }),
+      openProjects: OTU.PROJECTS.filter((p) => p.open).slice(0, 3).map((p) => OTU.decorate(this, p)),
+    })
+  }
+}
+</script>
+</body>
+</html>
