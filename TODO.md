@@ -22,11 +22,12 @@ The smallest set that makes the site real. Everything P0 below rolls up here.
 
 - [x] Auth context shape, `useAuth`, `RequireAuth` route guard
 - [x] Client-side domain helper (`isAllowedStudentEmail`)
-- [ ] **P0** Supabase project created, env vars set in Vercel
+- [x] Supabase project created and scaffolded into the repo, see [docs/supabase.md](docs/supabase.md)
+- [x] `profiles` table plus a trigger on `auth.users` rejecting non-OTU domains, written as a migration
+- [ ] **P0** Apply the initial migration, which is syntax checked but has never been run
+- [ ] **P0** Env vars set in Vercel
 - [ ] **P0** Google OAuth client configured, provider enabled in Supabase
-- [ ] **P0** Replace the demo session in `AuthProvider` with real Supabase sign-in (code done,
-      needs a live project to verify)
-- [x] **P0** `profiles` table plus a trigger on `auth.users` rejecting non-OTU domains
+- [ ] **P0** Replace the demo session in `AuthProvider` with real Supabase sign-in
 - [ ] **P0** Verify a personal Gmail account is actually rejected end to end
 - [ ] **P1** Session persistence across reloads and token refresh
 - [ ] **P1** Profile page: your projects, your upvotes, edit display name

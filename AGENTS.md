@@ -48,22 +48,22 @@ are building" are accurate and stay.
 The repository is a working skeleton. The layout, routing, and component structure are real and
 typecheck clean. Data and auth are deliberately stubbed.
 
-| Area                  | State                                                             |
-| --------------------- | ----------------------------------------------------------------- |
-| Routing and layout    | Done                                                              |
-| Home page             | Done: hero, value points, featured grid, closing call to action   |
-| Dark and light themes | Done. Dark is the default, toggle persists to localStorage        |
-| Project listing       | Done: category pills, search, sort, pagination. Filters in memory |
-| Project detail        | Done: cover, tech stack, screenshots slot, discussion, sidebar    |
-| Semester Sprints      | Landing page, sprint cards, and detail page done                  |
-| Comments              | List renders from mock data. No composer, posting is not built    |
-| Upvoting              | UI done, toggles local state only                                 |
-| Auth                  | Supabase Google sign-in wired, not yet verified live. Demo user   |
-|                       | when `VITE_SUPABASE_*` is unset                                   |
-| Submission form       | Placeholder page                                                  |
-| Admin panel           | Placeholder page listing planned sections                         |
-| Project cover art     | Type field exists, every mock row is null so cards show a tint    |
-| Backend               | `profiles` table, sign-up trigger, and RLS in `supabase/`         |
+| Area                  | State                                                                  |
+| --------------------- | ---------------------------------------------------------------------- |
+| Routing and layout    | Done                                                                   |
+| Home page             | Done: hero, value points, featured grid, closing call to action        |
+| Dark and light themes | Done. Dark is the default, toggle persists to localStorage             |
+| Project listing       | Done: category pills, search, sort, pagination. Filters in memory      |
+| Project detail        | Done: cover, tech stack, screenshots slot, discussion, sidebar         |
+| Semester Sprints      | Landing page, sprint cards, and detail page done                       |
+| Comments              | List renders from mock data. No composer, posting is not built         |
+| Upvoting              | UI done, toggles local state only                                      |
+| Auth                  | Stubbed. `signIn()` returns a fixed demo user                          |
+| Submission form       | Placeholder page                                                       |
+| Admin panel           | Placeholder page listing planned sections                              |
+| Project cover art     | Type field exists, every mock row is null so cards show a tint         |
+| Backend               | Supabase project created and scaffolded. Schema written, never applied |
+| Database schema       | `supabase/migrations/` holds the initial schema. Syntax checked only   |
 
 Before starting work, re-read this table and correct it if it has drifted.
 
@@ -90,7 +90,16 @@ npm run format        # prettier --write .
 npm run check         # typecheck + lint + format check, run this before you finish
 npm run build         # production build
 npm run preview       # serve the production build locally
+
+npm run db:start      # local Supabase stack, needs Docker
+npm run db:reset      # replay every migration onto a fresh local database
+npm run db:diff -- <name>   # capture local schema changes as a new migration
+npm run db:push       # apply pending migrations to the hosted project
+npm run db:types      # regenerate src/types/database.ts
 ```
+
+The `db:*` scripts need the CLI linked once with `npm run db:link`. See
+[docs/supabase.md](docs/supabase.md).
 
 `npm run check` must pass before you call a task done. It is the same gate CI runs.
 
@@ -108,6 +117,7 @@ src/
     api/supabase.ts    Supabase browser client, null without env vars. Only client.ts imports it
     api/mock/          Placeholder records, deleted once the DB is live
     auth/              AuthProvider, context, useAuth hook, domain rules
+    supabase/client.ts The configured Supabase browser client
     theme/             ThemeProvider, context, useTheme hook
     cn.ts              Class name joiner
     coverTint.ts       Deterministic gradient for projects with no cover image
@@ -123,8 +133,10 @@ src/
                        ContributorStack, CommentList
     sprints/           SprintCard, SprintGrid
   pages/               One file per route
+
 supabase/
-  migrations/          SQL migrations, applied in filename order
+  config.toml          Local stack config, kept in git. Comments sit inline, after the setting
+  migrations/          Ordered SQL. Never edit one that has already been pushed
 ```
 
 Rule of thumb for placement: if it knows about a domain type it goes in a feature folder, if it
@@ -208,6 +220,13 @@ directly. The whole point of the seam is that wiring the real backend edits one 
 
 When you add a data function, add it to `client.ts` with its real eventual signature, even if the
 body reads a mock array today.
+
+`src/lib/supabase/client.ts` holds the one configured client instance. Only `lib/api/client.ts`
+and `lib/auth/` may import it. A component importing it directly is the seam leaking.
+
+Schema changes are SQL files in `supabase/migrations/`, never edits made in the dashboard and
+left there. A dashboard edit that is not captured with `npm run db:diff` is lost on the next
+`db:reset` and invisible to everyone else. See [docs/supabase.md](docs/supabase.md).
 
 ### Server-side enforcement is not optional
 

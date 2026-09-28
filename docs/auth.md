@@ -63,21 +63,16 @@ the client.** Read them from the verified token or from the database, on the ser
 
 ## Setup checklist
 
-Not done yet. Tracked here so whoever picks this up is not starting from a blank page.
+Step by step setup lives in [supabase.md](supabase.md). This is the summary.
 
-- [ ] Create the Supabase project, save the URL and anon key into Vercel env vars and `.env.local`
+- [x] Create the Supabase project. Ref `eavnzbmsfpslwdgpjfjv`, region `us-west-2`
+- [x] Write the `profiles` table and the `auth.users` trigger enforcing the domain rule
+- [x] Write RLS policies for `projects`, `upvotes`, and `comments`
+- [ ] Apply the initial migration, which has been syntax checked but never run
+- [ ] Save the URL and anon key into Vercel env vars and `.env.local`
 - [ ] Create a Google Cloud OAuth client, add the Supabase callback as an authorized redirect URI
 - [ ] Enable the Google provider in Supabase Auth with that client ID and secret
-- [ ] Disable the Email provider in Supabase Auth. The trigger rejects it anyway, this is defence in
-      depth
-- [ ] Add `http://localhost:5173/**` and the Vercel preview and production URLs to the Supabase
-      redirect allow list
-- [x] Write the `profiles` table and the `auth.users` trigger enforcing the domain rule
-- [ ] Run the migration against the project (SQL editor, or `supabase db push`)
-- [ ] Write RLS policies for `projects`, `upvotes`, and `comments`
-- [x] Replace the `signIn` and `signOut` bodies in `AuthProvider.tsx`
-- [ ] Make the first admin: `update profiles set role = 'admin' where email = '...'` in the SQL
-      editor
-- [ ] Test with an Ontario Tech account and confirm a `profiles` row appears
+- [ ] Replace the `signIn` and `signOut` bodies in `AuthProvider.tsx`
+- [ ] Delete `src/lib/api/mock/users.ts`
 - [ ] Test with a personal Gmail account and confirm it is rejected
 - [ ] Delete `src/lib/api/mock/users.ts` once the demo fallback is no longer wanted
