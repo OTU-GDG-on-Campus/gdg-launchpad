@@ -1,0 +1,29 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "codex-grid-background",
+        "value": "*",
+        "files": ["UI/pages/index.html"],
+        "createdAt": "2026-09-29T02:56:27.709Z",
+        "reason": "user confirmed: hero cleanup brief said 'Keep the existing visual style, engineering/grid aesthetic'"
+      },
+      {
+        "rule": "dark-glow",
+        "value": "*",
+        "files": ["UI/pages/index.html"],
+        "createdAt": "2026-09-29T03:06:59.547Z",
+        "reason": "false positive: pre-existing Explore Projects shadow is a 10px y-offset elevation shadow on the light #fafaf8 hero, not a zero-offset halo or a dark-background glow"
+      },
+      {
+        "rule": "codex-grid-background",
+        "value": "*",
+        "files": ["UI/pages/about.html"],
+        "createdAt": "2026-09-29T03:39:18.854Z",
+        "reason": "user confirmed: About box brief asked for 'a technical blueprint treatment' and 'subtle grid lines'"
+      }
+    ]
+  }
+}

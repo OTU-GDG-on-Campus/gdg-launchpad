@@ -1,7 +1,11 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
   "plugins": ["react", "typescript", "oxc"],
+<<<<<<< HEAD
   "ignorePatterns": ["UI/**"],
+=======
+  "ignorePatterns": ["UI/pages/assets/vendor/**"],
+>>>>>>> 60290c5a9c6d1613bb4cda82bce6071810074eae
   "rules": {
     "react/rules-of-hooks": "error",
     "react/only-export-components": ["warn", { "allowConstantExport": true }]

@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- Landing page: hero, featured projects and the post-your-project call to action. -->
+<!-- Landing page variant with the cleaned-up hero: no decorative pills, eyebrow, or CTA arrow. -->
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -578,7 +578,7 @@
               <div
                 style="
                   position: relative;
-                  min-height: clamp(560px, calc(84vh - 64px), 800px);
+                  min-height: clamp(600px, calc(90vh - 64px), 860px);
                   display: flex;
                   flex-direction: column;
                 "
@@ -778,10 +778,1669 @@
                   </dl>
                 </div>
               </div>
+
+              <div
+                aria-label="What's happening on LaunchPad"
+                role="region"
+                style="position: relative; padding: 0 clamp(20px, 4vw, 44px) clamp(28px, 4vh, 40px)"
+              >
+                <div
+                  aria-hidden="true"
+                  style="
+                    position: absolute;
+                    inset: 0;
+                    background-image:
+                      linear-gradient(rgba(0, 65, 122, 0.05) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(0, 65, 122, 0.05) 1px, transparent 1px),
+                      linear-gradient(rgba(0, 65, 122, 0.085) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(0, 65, 122, 0.085) 1px, transparent 1px);
+                    background-size:
+                      24px 24px,
+                      24px 24px,
+                      120px 120px,
+                      120px 120px;
+                    background-position: center top;
+                    -webkit-mask-image: radial-gradient(
+                      ellipse 60% 70% at 50% 55%,
+                      #000 10%,
+                      transparent 90%
+                    );
+                    mask-image: radial-gradient(
+                      ellipse 60% 70% at 50% 55%,
+                      #000 10%,
+                      transparent 90%
+                    );
+                  "
+                ></div>
+                <div
+                  aria-hidden="true"
+                  style="
+                    position: relative;
+                    width: 1px;
+                    height: 56px;
+                    margin: 0 auto;
+                    background: repeating-linear-gradient(
+                      180deg,
+                      #00417a 0 3px,
+                      transparent 3px 9px
+                    );
+                    opacity: 0.4;
+                  "
+                ></div>
+
+                <sc-if value="{{ heroFull }}" hint-placeholder-val="{{ true }}">
+                  <div
+                    style="
+                      position: relative;
+                      width: min(1240px, 100%);
+                      height: 600px;
+                      margin: 0 auto;
+                    "
+                  >
+                    <svg
+                      aria-hidden="true"
+                      sc-camel-view-box="0 0 1000 600"
+                      sc-camel-preserve-aspect-ratio="none"
+                      style="position: absolute; inset: 0; width: 100%; height: 100%"
+                      fill="none"
+                      stroke="#00417A"
+                      stroke-width="1"
+                      stroke-dasharray="3 6"
+                      opacity=".4"
+                    >
+                      <path
+                        vector-effect="non-scaling-stroke"
+                        style="animation: otuDash 4s linear infinite"
+                        d="M500 44V96M170 96H830M170 96V128M500 96V128M830 96V128"
+                      ></path>
+                      <path
+                        vector-effect="non-scaling-stroke"
+                        style="animation: otuDash 3.6s linear infinite"
+                        d="M170 156V176M170 390V474"
+                      ></path>
+                      <path
+                        vector-effect="non-scaling-stroke"
+                        style="animation: otuDash 4.4s linear infinite"
+                        d="M500 156V176M500 222V246M500 418V474M500 516V600"
+                      ></path>
+                      <path
+                        vector-effect="non-scaling-stroke"
+                        style="animation: otuDash 3.8s linear infinite"
+                        d="M830 156V176M830 296V322M830 392V474"
+                      ></path>
+                    </svg>
+                    <span
+                      style="
+                        position: absolute;
+                        left: 17%;
+                        top: 96px;
+                        width: 5px;
+                        height: 5px;
+                        margin: -2.5px 0 0 -2.5px;
+                        background: #00417a;
+                      "
+                    ></span
+                    ><span
+                      style="
+                        position: absolute;
+                        left: 50%;
+                        top: 96px;
+                        width: 5px;
+                        height: 5px;
+                        margin: -2.5px 0 0 -2.5px;
+                        background: #e2572a;
+                      "
+                    ></span
+                    ><span
+                      style="
+                        position: absolute;
+                        left: 83%;
+                        top: 96px;
+                        width: 5px;
+                        height: 5px;
+                        margin: -2.5px 0 0 -2.5px;
+                        background: #00417a;
+                      "
+                    ></span>
+                    <div
+                      style="
+                        position: absolute;
+                        left: 50%;
+                        top: 0px;
+                        width: 0;
+                        display: flex;
+                        justify-content: center;
+                      "
+                    >
+                      <div style="flex: none">
+                        <div
+                          style="
+                            display: flex;
+                            align-items: center;
+                            gap: 10px;
+                            background: #10151b;
+                            color: #fff;
+                            border-radius: 99px;
+                            padding: 9px 18px 9px 10px;
+                            box-shadow: 0 12px 28px -12px rgba(16, 21, 27, 0.5);
+                          "
+                        >
+                          <span
+                            style="
+                              width: 24px;
+                              height: 24px;
+                              border-radius: 6px;
+                              background: #00417a;
+                              display: grid;
+                              place-items: center;
+                            "
+                            ><span
+                              style="width: 8px; height: 8px; background: #e2572a"
+                            ></span></span
+                          ><span style="font-size: 14px; font-weight: 800; letter-spacing: -0.01em"
+                            >LaunchPad</span
+                          ><span
+                            style="
+                              font-family: 'IBM Plex Mono', monospace;
+                              font-size: 9.5px;
+                              letter-spacing: 0.14em;
+                              color: #b9c2cc;
+                            "
+                            >FALL 2026</span
+                          >
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      style="
+                        position: absolute;
+                        left: 17%;
+                        top: 128px;
+                        width: 0;
+                        display: flex;
+                        justify-content: center;
+                      "
+                    >
+                      <div data-reveal="" style="flex: none">
+                        <span
+                          style="
+                            display: inline-flex;
+                            align-items: center;
+                            gap: 8px;
+                            background: #fafaf8;
+                            border: 1px solid #d5d2ca;
+                            border-radius: 99px;
+                            padding: 5px 12px 5px 10px;
+                            font-family: 'IBM Plex Mono', monospace;
+                            font-size: 10px;
+                            letter-spacing: 0.16em;
+                            color: #10151b;
+                            white-space: nowrap;
+                          "
+                          ><span style="width: 6px; height: 6px; background: #00417a"></span
+                          >PROJECTS</span
+                        >
+                      </div>
+                    </div>
+                    <div
+                      style="
+                        position: absolute;
+                        left: 50%;
+                        top: 128px;
+                        width: 0;
+                        display: flex;
+                        justify-content: center;
+                      "
+                    >
+                      <div data-reveal="" style="flex: none">
+                        <span
+                          style="
+                            display: inline-flex;
+                            align-items: center;
+                            gap: 8px;
+                            background: #fafaf8;
+                            border: 1px solid #d5d2ca;
+                            border-radius: 99px;
+                            padding: 5px 12px 5px 10px;
+                            font-family: 'IBM Plex Mono', monospace;
+                            font-size: 10px;
+                            letter-spacing: 0.16em;
+                            color: #10151b;
+                            white-space: nowrap;
+                          "
+                          ><span style="width: 6px; height: 6px; background: #10151b"></span
+                          >BUILDERS</span
+                        >
+                      </div>
+                    </div>
+                    <div
+                      style="
+                        position: absolute;
+                        left: 83%;
+                        top: 128px;
+                        width: 0;
+                        display: flex;
+                        justify-content: center;
+                      "
+                    >
+                      <div data-reveal="" style="flex: none">
+                        <span
+                          style="
+                            display: inline-flex;
+                            align-items: center;
+                            gap: 8px;
+                            background: #fafaf8;
+                            border: 1px solid #d5d2ca;
+                            border-radius: 99px;
+                            padding: 5px 12px 5px 10px;
+                            font-family: 'IBM Plex Mono', monospace;
+                            font-size: 10px;
+                            letter-spacing: 0.16em;
+                            color: #10151b;
+                            white-space: nowrap;
+                          "
+                          ><span style="width: 6px; height: 6px; background: #e2572a"></span
+                          >SPRINTS</span
+                        >
+                      </div>
+                    </div>
+                    <div
+                      style="
+                        position: absolute;
+                        left: 17%;
+                        top: 176px;
+                        width: 0;
+                        display: flex;
+                        justify-content: center;
+                      "
+                    >
+                      <div data-reveal="" style="flex: none">
+                        <button
+                          sc-camel-on-click="{{ fmain.open }}"
+                          aria-label="Open featured project Campus Nav AR"
+                          style="
+                            background: rgba(255, 255, 255, 0.78);
+                            backdrop-filter: blur(12px) saturate(1.2);
+                            -webkit-backdrop-filter: blur(12px) saturate(1.2);
+                            border: 1px solid rgba(16, 21, 27, 0.09);
+                            border-radius: 12px;
+                            box-shadow:
+                              inset 0 1px 0 rgba(255, 255, 255, 0.9),
+                              0 14px 34px -16px rgba(16, 21, 27, 0.22);
+                            font: inherit;
+                            color: inherit;
+                            cursor: pointer;
+                            text-align: left;
+                            display: block;
+                            width: 288px;
+                            padding: 10px 10px 14px;
+                            transition:
+                              transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+                              box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+                          "
+                          style-hover="transform:translateY(-3px);box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 20px 40px -16px rgba(16,21,27,.28)"
+                        >
+                          <div
+                            style="
+                              position: relative;
+                              height: 128px;
+                              border-radius: 8px;
+                              overflow: hidden;
+                            "
+                          >
+                            <div sc-camel-style="{{ fmain.art }}"></div>
+                            <span
+                              style="
+                                position: absolute;
+                                left: 8px;
+                                top: 8px;
+                                background: rgba(255, 255, 255, 0.92);
+                                border-radius: 99px;
+                                padding: 4px 9px;
+                                font-family: 'IBM Plex Mono', monospace;
+                                font-size: 9.5px;
+                                letter-spacing: 0.14em;
+                                color: #00417a;
+                              "
+                              >FEATURED PROJECT</span
+                            >
+                          </div>
+                          <div style="padding: 12px 4px 0">
+                            <div
+                              style="
+                                font-size: 16px;
+                                font-weight: 700;
+                                letter-spacing: -0.015em;
+                                color: #10151b;
+                              "
+                            >
+                              {{ fmain.title }}
+                            </div>
+                            <div
+                              style="
+                                display: flex;
+                                align-items: center;
+                                justify-content: space-between;
+                                gap: 10px;
+                                margin-top: 5px;
+                              "
+                            >
+                              <span style="font-size: 12.5px; color: #3d4855"
+                                >{{ fmain.author.name }} · {{ fmain.cat }}</span
+                              ><span
+                                style="
+                                  font-family: 'IBM Plex Mono', monospace;
+                                  font-size: 11px;
+                                  color: #a83b15;
+                                "
+                                >↑ {{ fmain.votes }}</span
+                              >
+                            </div>
+                          </div>
+                        </button>
+                      </div>
+                    </div>
+                    <div
+                      style="
+                        position: absolute;
+                        left: 17%;
+                        top: 474px;
+                        width: 0;
+                        display: flex;
+                        justify-content: center;
+                      "
+                    >
+                      <div data-reveal="" style="flex: none">
+                        <button
+                          sc-camel-on-click="{{ ecoShip.open }}"
+                          aria-label="Open recently shipped project LabQueue"
+                          style="
+                            background: rgba(255, 255, 255, 0.78);
+                            backdrop-filter: blur(12px) saturate(1.2);
+                            -webkit-backdrop-filter: blur(12px) saturate(1.2);
+                            border: 1px solid rgba(16, 21, 27, 0.09);
+                            border-radius: 12px;
+                            box-shadow:
+                              inset 0 1px 0 rgba(255, 255, 255, 0.9),
+                              0 14px 34px -16px rgba(16, 21, 27, 0.22);
+                            font: inherit;
+                            color: inherit;
+                            cursor: pointer;
+                            text-align: left;
+                            display: block;
+                            padding: 11px 16px 11px 11px;
+                            display: flex;
+                            align-items: center;
+                            gap: 12px;
+                            transition:
+                              transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+                              box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+                          "
+                          style-hover="transform:translateY(-3px);box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 20px 40px -16px rgba(16,21,27,.28)"
+                        >
+                          <span
+                            style="
+                              width: 32px;
+                              height: 32px;
+                              border-radius: 8px;
+                              background: #fdefe9;
+                              display: grid;
+                              place-items: center;
+                              flex: none;
+                            "
+                            ><svg
+                              width="14"
+                              height="14"
+                              sc-camel-view-box="0 0 16 16"
+                              fill="none"
+                              stroke="#E2572A"
+                              stroke-width="2"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                            >
+                              <path d="M3 8.5 6.5 12 13 4.5"></path></svg
+                          ></span>
+                          <span
+                            ><span
+                              style="
+                                display: block;
+                                font-family: 'IBM Plex Mono', monospace;
+                                font-size: 9.5px;
+                                letter-spacing: 0.14em;
+                                color: #3d4855;
+                              "
+                              >RECENTLY SHIPPED · #124</span
+                            ><span
+                              style="
+                                display: block;
+                                font-size: 13.5px;
+                                font-weight: 700;
+                                color: #10151b;
+                                margin-top: 2px;
+                              "
+                              >LabQueue v1.0</span
+                            ></span
+                          >
+                        </button>
+                      </div>
+                    </div>
+                    <div
+                      style="
+                        position: absolute;
+                        left: 50%;
+                        top: 176px;
+                        width: 0;
+                        display: flex;
+                        justify-content: center;
+                      "
+                    >
+                      <div data-reveal="" style="flex: none">
+                        <button
+                          sc-camel-on-click="{{ goStudents }}"
+                          aria-label="Browse builders"
+                          style="
+                            background: rgba(255, 255, 255, 0.78);
+                            backdrop-filter: blur(12px) saturate(1.2);
+                            -webkit-backdrop-filter: blur(12px) saturate(1.2);
+                            border: 1px solid rgba(16, 21, 27, 0.09);
+                            border-radius: 12px;
+                            box-shadow:
+                              inset 0 1px 0 rgba(255, 255, 255, 0.9),
+                              0 14px 34px -16px rgba(16, 21, 27, 0.22);
+                            font: inherit;
+                            color: inherit;
+                            cursor: pointer;
+                            text-align: left;
+                            display: block;
+                            border-radius: 99px;
+                            padding: 7px 18px 7px 7px;
+                            display: flex;
+                            align-items: center;
+                            gap: 12px;
+                            transition:
+                              transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+                              box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+                          "
+                          style-hover="transform:translateY(-3px);box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 20px 40px -16px rgba(16,21,27,.28)"
+                        >
+                          <span style="display: flex"
+                            ><span
+                              style="
+                                width: 30px;
+                                height: 30px;
+                                border-radius: 99px;
+                                border: 2px solid #fff;
+                                background: #00417a;
+                                color: #fff;
+                                font-size: 10px;
+                                font-weight: 700;
+                                display: grid;
+                                place-items: center;
+                                flex: none;
+                              "
+                              >AR</span
+                            ><span
+                              style="
+                                width: 30px;
+                                height: 30px;
+                                border-radius: 99px;
+                                border: 2px solid #fff;
+                                background: #e2572a;
+                                color: #fff;
+                                font-size: 10px;
+                                font-weight: 700;
+                                display: grid;
+                                place-items: center;
+                                flex: none;
+                                margin-left: -9px;
+                              "
+                              >MO</span
+                            ><span
+                              style="
+                                width: 30px;
+                                height: 30px;
+                                border-radius: 99px;
+                                border: 2px solid #fff;
+                                background: #10151b;
+                                color: #fff;
+                                font-size: 10px;
+                                font-weight: 700;
+                                display: grid;
+                                place-items: center;
+                                flex: none;
+                                margin-left: -9px;
+                              "
+                              >PN</span
+                            ><span
+                              style="
+                                width: 30px;
+                                height: 30px;
+                                border-radius: 99px;
+                                border: 2px solid #fff;
+                                background: #cfe0ef;
+                                color: #00417a;
+                                font-size: 10px;
+                                font-weight: 700;
+                                display: grid;
+                                place-items: center;
+                                flex: none;
+                                margin-left: -9px;
+                              "
+                              >DK</span
+                            ></span
+                          >
+                          <span
+                            ><span
+                              style="
+                                display: block;
+                                font-family: 'IBM Plex Mono', monospace;
+                                font-size: 9.5px;
+                                letter-spacing: 0.14em;
+                                color: #3d4855;
+                              "
+                              >BUILDING THIS TERM</span
+                            ><span
+                              style="
+                                display: block;
+                                font-size: 13px;
+                                font-weight: 700;
+                                color: #10151b;
+                                margin-top: 2px;
+                              "
+                              >Aisha, Marcus &amp; 385 others</span
+                            ></span
+                          >
+                        </button>
+                      </div>
+                    </div>
+                    <div
+                      style="
+                        position: absolute;
+                        left: 50%;
+                        top: 246px;
+                        width: 0;
+                        display: flex;
+                        justify-content: center;
+                      "
+                    >
+                      <div data-reveal="" style="flex: none">
+                        <div
+                          style="
+                            background: rgba(255, 255, 255, 0.78);
+                            backdrop-filter: blur(12px) saturate(1.2);
+                            -webkit-backdrop-filter: blur(12px) saturate(1.2);
+                            border: 1px solid rgba(16, 21, 27, 0.09);
+                            border-radius: 12px;
+                            box-shadow:
+                              inset 0 1px 0 rgba(255, 255, 255, 0.9),
+                              0 14px 34px -16px rgba(16, 21, 27, 0.22);
+                            width: 292px;
+                            padding: 12px 15px 6px;
+                            text-align: left;
+                          "
+                        >
+                          <div
+                            style="
+                              display: flex;
+                              align-items: center;
+                              justify-content: space-between;
+                              font-family: 'IBM Plex Mono', monospace;
+                              font-size: 9.5px;
+                              letter-spacing: 0.14em;
+                              color: #3d4855;
+                              padding-bottom: 8px;
+                              border-bottom: 1px solid rgba(16, 21, 27, 0.07);
+                            "
+                          >
+                            <span>ACTIVE BUILDERS</span
+                            ><span
+                              style="display: flex; align-items: center; gap: 6px; color: #1f7a4d"
+                              ><span
+                                style="
+                                  width: 6px;
+                                  height: 6px;
+                                  border-radius: 99px;
+                                  background: #1f9d5c;
+                                  animation: otuPulseG 2s ease-out infinite;
+                                "
+                              ></span
+                              >LIVE</span
+                            >
+                          </div>
+                          <div
+                            style="
+                              display: flex;
+                              align-items: center;
+                              gap: 10px;
+                              padding: 9px 0;
+                              border-bottom: 1px solid rgba(16, 21, 27, 0.06);
+                            "
+                          >
+                            <span
+                              style="
+                                width: 24px;
+                                height: 24px;
+                                border-radius: 99px;
+                                border: 2px solid #fff;
+                                background: #e2572a;
+                                color: #fff;
+                                font-size: 9px;
+                                font-weight: 700;
+                                display: grid;
+                                place-items: center;
+                                flex: none;
+                              "
+                              >PN</span
+                            ><span
+                              style="flex: 1; font-size: 12.5px; line-height: 1.35; color: #3d4855"
+                              ><b style="color: #10151b">Priya N.</b> shipped v1.0 of LabQueue</span
+                            ><span
+                              style="
+                                font-family: 'IBM Plex Mono', monospace;
+                                font-size: 10px;
+                                color: #5a6470;
+                              "
+                              >2M</span
+                            >
+                          </div>
+                          <div
+                            style="
+                              display: flex;
+                              align-items: center;
+                              gap: 10px;
+                              padding: 9px 0;
+                              border-bottom: 1px solid rgba(16, 21, 27, 0.06);
+                            "
+                          >
+                            <span
+                              style="
+                                width: 24px;
+                                height: 24px;
+                                border-radius: 99px;
+                                border: 2px solid #fff;
+                                background: #00417a;
+                                color: #fff;
+                                font-size: 9px;
+                                font-weight: 700;
+                                display: grid;
+                                place-items: center;
+                                flex: none;
+                              "
+                              >MO</span
+                            ><span
+                              style="flex: 1; font-size: 12.5px; line-height: 1.35; color: #3d4855"
+                              ><b style="color: #10151b">Marcus O.</b> upvoted Campus Nav AR</span
+                            ><span
+                              style="
+                                font-family: 'IBM Plex Mono', monospace;
+                                font-size: 10px;
+                                color: #5a6470;
+                              "
+                              >9M</span
+                            >
+                          </div>
+                          <div
+                            style="display: flex; align-items: center; gap: 10px; padding: 9px 0"
+                          >
+                            <span
+                              style="
+                                width: 24px;
+                                height: 24px;
+                                border-radius: 99px;
+                                border: 2px solid #fff;
+                                background: #10151b;
+                                color: #fff;
+                                font-size: 9px;
+                                font-weight: 700;
+                                display: grid;
+                                place-items: center;
+                                flex: none;
+                              "
+                              >DK</span
+                            ><span
+                              style="flex: 1; font-size: 12.5px; line-height: 1.35; color: #3d4855"
+                              ><b style="color: #10151b">Daniel K.</b> joined Sprint 16</span
+                            ><span
+                              style="
+                                font-family: 'IBM Plex Mono', monospace;
+                                font-size: 10px;
+                                color: #5a6470;
+                              "
+                              >14M</span
+                            >
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      style="
+                        position: absolute;
+                        left: 50%;
+                        top: 474px;
+                        width: 0;
+                        display: flex;
+                        justify-content: center;
+                      "
+                    >
+                      <div data-reveal="" style="flex: none">
+                        <div
+                          style="
+                            background: rgba(255, 255, 255, 0.78);
+                            backdrop-filter: blur(12px) saturate(1.2);
+                            -webkit-backdrop-filter: blur(12px) saturate(1.2);
+                            border: 1px solid rgba(16, 21, 27, 0.09);
+                            border-radius: 12px;
+                            box-shadow:
+                              inset 0 1px 0 rgba(255, 255, 255, 0.9),
+                              0 14px 34px -16px rgba(16, 21, 27, 0.22);
+                            border-radius: 99px;
+                            padding: 6px 16px 6px 6px;
+                            display: flex;
+                            align-items: center;
+                            gap: 10px;
+                          "
+                        >
+                          <span style="display: flex; align-items: center"
+                            ><span
+                              style="
+                                width: 24px;
+                                height: 24px;
+                                border-radius: 99px;
+                                border: 2px solid #fff;
+                                background: #e2572a;
+                                color: #fff;
+                                font-size: 9px;
+                                font-weight: 700;
+                                display: grid;
+                                place-items: center;
+                                flex: none;
+                              "
+                              >PN</span
+                            ><span style="width: 18px; border-top: 1px dashed #00417a"></span
+                            ><span
+                              style="
+                                width: 24px;
+                                height: 24px;
+                                border-radius: 99px;
+                                border: 2px solid #fff;
+                                background: #10151b;
+                                color: #fff;
+                                font-size: 9px;
+                                font-weight: 700;
+                                display: grid;
+                                place-items: center;
+                                flex: none;
+                              "
+                              >DK</span
+                            ></span
+                          >
+                          <span style="font-size: 12.5px; color: #3d4855"
+                            ><b style="color: #10151b">Collaborating</b> on LabQueue</span
+                          >
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      style="
+                        position: absolute;
+                        left: 83%;
+                        top: 176px;
+                        width: 0;
+                        display: flex;
+                        justify-content: center;
+                      "
+                    >
+                      <div data-reveal="" style="flex: none">
+                        <button
+                          sc-camel-on-click="{{ goSprints }}"
+                          aria-label="Open Sprint 16"
+                          style="
+                            background: rgba(255, 255, 255, 0.78);
+                            backdrop-filter: blur(12px) saturate(1.2);
+                            -webkit-backdrop-filter: blur(12px) saturate(1.2);
+                            border: 1px solid rgba(16, 21, 27, 0.09);
+                            border-radius: 12px;
+                            box-shadow:
+                              inset 0 1px 0 rgba(255, 255, 255, 0.9),
+                              0 14px 34px -16px rgba(16, 21, 27, 0.22);
+                            font: inherit;
+                            color: inherit;
+                            cursor: pointer;
+                            text-align: left;
+                            display: block;
+                            width: 248px;
+                            padding: 14px 15px 15px;
+                            transition:
+                              transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+                              box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+                          "
+                          style-hover="transform:translateY(-3px);box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 20px 40px -16px rgba(16,21,27,.28)"
+                        >
+                          <span
+                            style="
+                              display: flex;
+                              align-items: center;
+                              justify-content: space-between;
+                              gap: 10px;
+                            "
+                            ><span
+                              style="
+                                display: flex;
+                                align-items: center;
+                                gap: 8px;
+                                font-family: 'IBM Plex Mono', monospace;
+                                font-size: 9.5px;
+                                letter-spacing: 0.14em;
+                                color: #3d4855;
+                              "
+                              ><span
+                                style="
+                                  width: 7px;
+                                  height: 7px;
+                                  border-radius: 99px;
+                                  background: #e2572a;
+                                  animation: otuPulse 2s ease-out infinite;
+                                "
+                              ></span
+                              >SPRINT 16 · LIVE</span
+                            ><span
+                              style="
+                                font-family: 'IBM Plex Mono', monospace;
+                                font-size: 10px;
+                                color: #a83b15;
+                              "
+                              >{{ sprintLeft }}</span
+                            ></span
+                          >
+                          <span
+                            style="
+                              display: block;
+                              font-size: 15.5px;
+                              font-weight: 700;
+                              letter-spacing: -0.015em;
+                              color: #10151b;
+                              margin-top: 9px;
+                            "
+                            >Build for Campus</span
+                          >
+                          <span
+                            style="
+                              display: block;
+                              height: 3px;
+                              background: #eae7e0;
+                              border-radius: 99px;
+                              margin-top: 12px;
+                              overflow: hidden;
+                            "
+                            ><span
+                              style="
+                                display: block;
+                                width: 62%;
+                                height: 100%;
+                                background: #00417a;
+                                border-radius: 99px;
+                              "
+                            ></span
+                          ></span>
+                          <span
+                            style="
+                              display: block;
+                              font-family: 'IBM Plex Mono', monospace;
+                              font-size: 9.5px;
+                              letter-spacing: 0.1em;
+                              color: #55606c;
+                              margin-top: 8px;
+                            "
+                            >38 TEAMS REGISTERED</span
+                          >
+                        </button>
+                      </div>
+                    </div>
+                    <div
+                      style="
+                        position: absolute;
+                        left: 83%;
+                        top: 322px;
+                        width: 0;
+                        display: flex;
+                        justify-content: center;
+                      "
+                    >
+                      <div data-reveal="" style="flex: none">
+                        <button
+                          sc-camel-on-click="{{ ecoGrid.open }}"
+                          aria-label="Open GridWatch"
+                          style="
+                            background: rgba(255, 255, 255, 0.78);
+                            backdrop-filter: blur(12px) saturate(1.2);
+                            -webkit-backdrop-filter: blur(12px) saturate(1.2);
+                            border: 1px solid rgba(16, 21, 27, 0.09);
+                            border-radius: 12px;
+                            box-shadow:
+                              inset 0 1px 0 rgba(255, 255, 255, 0.9),
+                              0 14px 34px -16px rgba(16, 21, 27, 0.22);
+                            font: inherit;
+                            color: inherit;
+                            cursor: pointer;
+                            text-align: left;
+                            display: block;
+                            width: 250px;
+                            padding: 9px 14px 9px 9px;
+                            display: flex;
+                            align-items: center;
+                            gap: 12px;
+                            transition:
+                              transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+                              box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+                          "
+                          style-hover="transform:translateY(-3px);box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 20px 40px -16px rgba(16,21,27,.28)"
+                        >
+                          <span
+                            style="
+                              position: relative;
+                              width: 50px;
+                              height: 50px;
+                              border-radius: 7px;
+                              overflow: hidden;
+                              flex: none;
+                              display: block;
+                            "
+                            ><span sc-camel-style="{{ ecoGrid.art }}"></span
+                          ></span>
+                          <span
+                            ><span
+                              style="
+                                display: block;
+                                font-family: 'IBM Plex Mono', monospace;
+                                font-size: 9.5px;
+                                letter-spacing: 0.12em;
+                                color: #55606c;
+                              "
+                              >IN SPRINT 16</span
+                            ><span
+                              style="
+                                display: block;
+                                font-size: 14.5px;
+                                font-weight: 700;
+                                color: #10151b;
+                                margin-top: 1px;
+                              "
+                              >{{ ecoGrid.title }}</span
+                            ><span
+                              style="
+                                display: block;
+                                font-family: 'IBM Plex Mono', monospace;
+                                font-size: 10.5px;
+                                color: #a83b15;
+                                margin-top: 2px;
+                              "
+                              >↑ {{ ecoGrid.votes }}</span
+                            ></span
+                          >
+                        </button>
+                      </div>
+                    </div>
+                    <div
+                      style="
+                        position: absolute;
+                        left: 83%;
+                        top: 474px;
+                        width: 0;
+                        display: flex;
+                        justify-content: center;
+                      "
+                    >
+                      <div data-reveal="" style="flex: none">
+                        <div
+                          style="
+                            background: rgba(255, 255, 255, 0.78);
+                            backdrop-filter: blur(12px) saturate(1.2);
+                            -webkit-backdrop-filter: blur(12px) saturate(1.2);
+                            border: 1px solid rgba(16, 21, 27, 0.09);
+                            border-radius: 12px;
+                            box-shadow:
+                              inset 0 1px 0 rgba(255, 255, 255, 0.9),
+                              0 14px 34px -16px rgba(16, 21, 27, 0.22);
+                            border-radius: 99px;
+                            padding: 9px 16px;
+                            display: flex;
+                            align-items: center;
+                            gap: 9px;
+                            font-family: 'IBM Plex Mono', monospace;
+                            font-size: 10px;
+                            letter-spacing: 0.12em;
+                            color: #10151b;
+                            white-space: nowrap;
+                          "
+                        >
+                          <span
+                            style="
+                              width: 7px;
+                              height: 7px;
+                              border-radius: 99px;
+                              background: #e2572a;
+                              animation: otuPulse 2s ease-out infinite;
+                            "
+                          ></span
+                          >LIVE · SUBMISSIONS CLOSE OCT 4
+                        </div>
+                      </div>
+                    </div>
+                    <span
+                      aria-hidden="true"
+                      style="
+                        position: absolute;
+                        left: 30%;
+                        top: 270px;
+                        font-family: 'IBM Plex Mono', monospace;
+                        font-size: 9.5px;
+                        letter-spacing: 0.08em;
+                        color: #5a6470;
+                        white-space: nowrap;
+                      "
+                      >COMMIT a41f9e · 2M AGO</span
+                    ><span
+                      aria-hidden="true"
+                      style="
+                        position: absolute;
+                        left: 66.5%;
+                        top: 446px;
+                        font-family: 'IBM Plex Mono', monospace;
+                        font-size: 9.5px;
+                        letter-spacing: 0.08em;
+                        color: #5a6470;
+                        white-space: nowrap;
+                      "
+                      >PR #38 MERGED</span
+                    ><span
+                      aria-hidden="true"
+                      style="
+                        position: absolute;
+                        left: 4%;
+                        top: 560px;
+                        font-family: 'IBM Plex Mono', monospace;
+                        font-size: 9.5px;
+                        letter-spacing: 0.08em;
+                        color: #5a6470;
+                        white-space: nowrap;
+                      "
+                      >43.9448° N</span
+                    ><span
+                      aria-hidden="true"
+                      style="
+                        position: absolute;
+                        left: 88%;
+                        top: 560px;
+                        font-family: 'IBM Plex Mono', monospace;
+                        font-size: 9.5px;
+                        letter-spacing: 0.08em;
+                        color: #5a6470;
+                        white-space: nowrap;
+                      "
+                      >78.8964° W</span
+                    >
+                  </div>
+                </sc-if>
+
+                <sc-if value="{{ heroEcoFlow }}" hint-placeholder-val="{{ false }}">
+                  <div
+                    style="
+                      position: relative;
+                      max-width: 1000px;
+                      margin: 0 auto;
+                      display: flex;
+                      flex-direction: column;
+                      align-items: center;
+                      gap: 28px;
+                    "
+                  >
+                    <div
+                      style="
+                        display: flex;
+                        align-items: center;
+                        gap: 10px;
+                        background: #10151b;
+                        color: #fff;
+                        border-radius: 99px;
+                        padding: 9px 18px 9px 10px;
+                      "
+                    >
+                      <span
+                        style="
+                          width: 24px;
+                          height: 24px;
+                          border-radius: 6px;
+                          background: #00417a;
+                          display: grid;
+                          place-items: center;
+                        "
+                        ><span style="width: 8px; height: 8px; background: #e2572a"></span></span
+                      ><span style="font-size: 14px; font-weight: 800">LaunchPad</span
+                      ><span
+                        style="
+                          font-family: 'IBM Plex Mono', monospace;
+                          font-size: 9.5px;
+                          letter-spacing: 0.14em;
+                          color: #b9c2cc;
+                        "
+                        >FALL 2026</span
+                      >
+                    </div>
+                    <div
+                      style="
+                        width: 100%;
+                        display: flex;
+                        flex-wrap: wrap;
+                        justify-content: center;
+                        gap: 24px 20px;
+                        align-items: flex-start;
+                      "
+                    >
+                      <div
+                        data-reveal=""
+                        style="
+                          flex: 1 1 260px;
+                          max-width: 320px;
+                          display: flex;
+                          flex-direction: column;
+                          align-items: center;
+                          gap: 14px;
+                        "
+                      >
+                        <span
+                          style="
+                            display: inline-flex;
+                            align-items: center;
+                            gap: 8px;
+                            background: #fafaf8;
+                            border: 1px solid #d5d2ca;
+                            border-radius: 99px;
+                            padding: 5px 12px 5px 10px;
+                            font-family: 'IBM Plex Mono', monospace;
+                            font-size: 10px;
+                            letter-spacing: 0.16em;
+                            color: #10151b;
+                            white-space: nowrap;
+                          "
+                          ><span style="width: 6px; height: 6px; background: #00417a"></span
+                          >PROJECTS</span
+                        ><button
+                          sc-camel-on-click="{{ fmain.open }}"
+                          aria-label="Open featured project Campus Nav AR"
+                          style="
+                            background: rgba(255, 255, 255, 0.78);
+                            backdrop-filter: blur(12px) saturate(1.2);
+                            -webkit-backdrop-filter: blur(12px) saturate(1.2);
+                            border: 1px solid rgba(16, 21, 27, 0.09);
+                            border-radius: 12px;
+                            box-shadow:
+                              inset 0 1px 0 rgba(255, 255, 255, 0.9),
+                              0 14px 34px -16px rgba(16, 21, 27, 0.22);
+                            font: inherit;
+                            color: inherit;
+                            cursor: pointer;
+                            text-align: left;
+                            display: block;
+                            width: min(100%, 320px);
+                            padding: 10px 10px 14px;
+                            transition:
+                              transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+                              box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+                          "
+                          style-hover="transform:translateY(-3px);box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 20px 40px -16px rgba(16,21,27,.28)"
+                        >
+                          <div
+                            style="
+                              position: relative;
+                              height: 128px;
+                              border-radius: 8px;
+                              overflow: hidden;
+                            "
+                          >
+                            <div sc-camel-style="{{ fmain.art }}"></div>
+                            <span
+                              style="
+                                position: absolute;
+                                left: 8px;
+                                top: 8px;
+                                background: rgba(255, 255, 255, 0.92);
+                                border-radius: 99px;
+                                padding: 4px 9px;
+                                font-family: 'IBM Plex Mono', monospace;
+                                font-size: 9.5px;
+                                letter-spacing: 0.14em;
+                                color: #00417a;
+                              "
+                              >FEATURED PROJECT</span
+                            >
+                          </div>
+                          <div style="padding: 12px 4px 0">
+                            <div
+                              style="
+                                font-size: 16px;
+                                font-weight: 700;
+                                letter-spacing: -0.015em;
+                                color: #10151b;
+                              "
+                            >
+                              {{ fmain.title }}
+                            </div>
+                            <div
+                              style="
+                                display: flex;
+                                align-items: center;
+                                justify-content: space-between;
+                                gap: 10px;
+                                margin-top: 5px;
+                              "
+                            >
+                              <span style="font-size: 12.5px; color: #3d4855"
+                                >{{ fmain.author.name }} · {{ fmain.cat }}</span
+                              ><span
+                                style="
+                                  font-family: 'IBM Plex Mono', monospace;
+                                  font-size: 11px;
+                                  color: #a83b15;
+                                "
+                                >↑ {{ fmain.votes }}</span
+                              >
+                            </div>
+                          </div>
+                        </button>
+                      </div>
+                      <sc-if value="{{ heroSide }}" hint-placeholder-val="{{ true }}">
+                        <div
+                          data-reveal=""
+                          style="
+                            flex: 1 1 260px;
+                            max-width: 320px;
+                            display: flex;
+                            flex-direction: column;
+                            align-items: center;
+                            gap: 14px;
+                          "
+                        >
+                          <span
+                            style="
+                              display: inline-flex;
+                              align-items: center;
+                              gap: 8px;
+                              background: #fafaf8;
+                              border: 1px solid #d5d2ca;
+                              border-radius: 99px;
+                              padding: 5px 12px 5px 10px;
+                              font-family: 'IBM Plex Mono', monospace;
+                              font-size: 10px;
+                              letter-spacing: 0.16em;
+                              color: #10151b;
+                              white-space: nowrap;
+                            "
+                            ><span style="width: 6px; height: 6px; background: #10151b"></span
+                            >BUILDERS</span
+                          >
+                          <div
+                            style="
+                              background: rgba(255, 255, 255, 0.78);
+                              backdrop-filter: blur(12px) saturate(1.2);
+                              -webkit-backdrop-filter: blur(12px) saturate(1.2);
+                              border: 1px solid rgba(16, 21, 27, 0.09);
+                              border-radius: 12px;
+                              box-shadow:
+                                inset 0 1px 0 rgba(255, 255, 255, 0.9),
+                                0 14px 34px -16px rgba(16, 21, 27, 0.22);
+                              width: min(100%, 320px);
+                              padding: 12px 15px 6px;
+                              text-align: left;
+                            "
+                          >
+                            <div
+                              style="
+                                display: flex;
+                                align-items: center;
+                                justify-content: space-between;
+                                font-family: 'IBM Plex Mono', monospace;
+                                font-size: 9.5px;
+                                letter-spacing: 0.14em;
+                                color: #3d4855;
+                                padding-bottom: 8px;
+                                border-bottom: 1px solid rgba(16, 21, 27, 0.07);
+                              "
+                            >
+                              <span>ACTIVE BUILDERS</span
+                              ><span
+                                style="display: flex; align-items: center; gap: 6px; color: #1f7a4d"
+                                ><span
+                                  style="
+                                    width: 6px;
+                                    height: 6px;
+                                    border-radius: 99px;
+                                    background: #1f9d5c;
+                                    animation: otuPulseG 2s ease-out infinite;
+                                  "
+                                ></span
+                                >LIVE</span
+                              >
+                            </div>
+                            <div
+                              style="
+                                display: flex;
+                                align-items: center;
+                                gap: 10px;
+                                padding: 9px 0;
+                                border-bottom: 1px solid rgba(16, 21, 27, 0.06);
+                              "
+                            >
+                              <span
+                                style="
+                                  width: 24px;
+                                  height: 24px;
+                                  border-radius: 99px;
+                                  border: 2px solid #fff;
+                                  background: #e2572a;
+                                  color: #fff;
+                                  font-size: 9px;
+                                  font-weight: 700;
+                                  display: grid;
+                                  place-items: center;
+                                  flex: none;
+                                "
+                                >PN</span
+                              ><span
+                                style="
+                                  flex: 1;
+                                  font-size: 12.5px;
+                                  line-height: 1.35;
+                                  color: #3d4855;
+                                "
+                                ><b style="color: #10151b">Priya N.</b> shipped v1.0 of
+                                LabQueue</span
+                              ><span
+                                style="
+                                  font-family: 'IBM Plex Mono', monospace;
+                                  font-size: 10px;
+                                  color: #5a6470;
+                                "
+                                >2M</span
+                              >
+                            </div>
+                            <div
+                              style="
+                                display: flex;
+                                align-items: center;
+                                gap: 10px;
+                                padding: 9px 0;
+                                border-bottom: 1px solid rgba(16, 21, 27, 0.06);
+                              "
+                            >
+                              <span
+                                style="
+                                  width: 24px;
+                                  height: 24px;
+                                  border-radius: 99px;
+                                  border: 2px solid #fff;
+                                  background: #00417a;
+                                  color: #fff;
+                                  font-size: 9px;
+                                  font-weight: 700;
+                                  display: grid;
+                                  place-items: center;
+                                  flex: none;
+                                "
+                                >MO</span
+                              ><span
+                                style="
+                                  flex: 1;
+                                  font-size: 12.5px;
+                                  line-height: 1.35;
+                                  color: #3d4855;
+                                "
+                                ><b style="color: #10151b">Marcus O.</b> upvoted Campus Nav AR</span
+                              ><span
+                                style="
+                                  font-family: 'IBM Plex Mono', monospace;
+                                  font-size: 10px;
+                                  color: #5a6470;
+                                "
+                                >9M</span
+                              >
+                            </div>
+                            <div
+                              style="display: flex; align-items: center; gap: 10px; padding: 9px 0"
+                            >
+                              <span
+                                style="
+                                  width: 24px;
+                                  height: 24px;
+                                  border-radius: 99px;
+                                  border: 2px solid #fff;
+                                  background: #10151b;
+                                  color: #fff;
+                                  font-size: 9px;
+                                  font-weight: 700;
+                                  display: grid;
+                                  place-items: center;
+                                  flex: none;
+                                "
+                                >DK</span
+                              ><span
+                                style="
+                                  flex: 1;
+                                  font-size: 12.5px;
+                                  line-height: 1.35;
+                                  color: #3d4855;
+                                "
+                                ><b style="color: #10151b">Daniel K.</b> joined Sprint 16</span
+                              ><span
+                                style="
+                                  font-family: 'IBM Plex Mono', monospace;
+                                  font-size: 10px;
+                                  color: #5a6470;
+                                "
+                                >14M</span
+                              >
+                            </div>
+                          </div>
+                        </div>
+                      </sc-if>
+                      <div
+                        data-reveal=""
+                        style="
+                          flex: 1 1 260px;
+                          max-width: 320px;
+                          display: flex;
+                          flex-direction: column;
+                          align-items: center;
+                          gap: 14px;
+                        "
+                      >
+                        <span
+                          style="
+                            display: inline-flex;
+                            align-items: center;
+                            gap: 8px;
+                            background: #fafaf8;
+                            border: 1px solid #d5d2ca;
+                            border-radius: 99px;
+                            padding: 5px 12px 5px 10px;
+                            font-family: 'IBM Plex Mono', monospace;
+                            font-size: 10px;
+                            letter-spacing: 0.16em;
+                            color: #10151b;
+                            white-space: nowrap;
+                          "
+                          ><span style="width: 6px; height: 6px; background: #e2572a"></span
+                          >SPRINTS</span
+                        ><button
+                          sc-camel-on-click="{{ goSprints }}"
+                          aria-label="Open Sprint 16"
+                          style="
+                            background: rgba(255, 255, 255, 0.78);
+                            backdrop-filter: blur(12px) saturate(1.2);
+                            -webkit-backdrop-filter: blur(12px) saturate(1.2);
+                            border: 1px solid rgba(16, 21, 27, 0.09);
+                            border-radius: 12px;
+                            box-shadow:
+                              inset 0 1px 0 rgba(255, 255, 255, 0.9),
+                              0 14px 34px -16px rgba(16, 21, 27, 0.22);
+                            font: inherit;
+                            color: inherit;
+                            cursor: pointer;
+                            text-align: left;
+                            display: block;
+                            width: min(100%, 320px);
+                            padding: 14px 15px 15px;
+                            transition:
+                              transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+                              box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+                          "
+                          style-hover="transform:translateY(-3px);box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 20px 40px -16px rgba(16,21,27,.28)"
+                        >
+                          <span
+                            style="
+                              display: flex;
+                              align-items: center;
+                              justify-content: space-between;
+                              gap: 10px;
+                            "
+                            ><span
+                              style="
+                                display: flex;
+                                align-items: center;
+                                gap: 8px;
+                                font-family: 'IBM Plex Mono', monospace;
+                                font-size: 9.5px;
+                                letter-spacing: 0.14em;
+                                color: #3d4855;
+                              "
+                              ><span
+                                style="
+                                  width: 7px;
+                                  height: 7px;
+                                  border-radius: 99px;
+                                  background: #e2572a;
+                                  animation: otuPulse 2s ease-out infinite;
+                                "
+                              ></span
+                              >SPRINT 16 · LIVE</span
+                            ><span
+                              style="
+                                font-family: 'IBM Plex Mono', monospace;
+                                font-size: 10px;
+                                color: #a83b15;
+                              "
+                              >{{ sprintLeft }}</span
+                            ></span
+                          >
+                          <span
+                            style="
+                              display: block;
+                              font-size: 15.5px;
+                              font-weight: 700;
+                              letter-spacing: -0.015em;
+                              color: #10151b;
+                              margin-top: 9px;
+                            "
+                            >Build for Campus</span
+                          >
+                          <span
+                            style="
+                              display: block;
+                              height: 3px;
+                              background: #eae7e0;
+                              border-radius: 99px;
+                              margin-top: 12px;
+                              overflow: hidden;
+                            "
+                            ><span
+                              style="
+                                display: block;
+                                width: 62%;
+                                height: 100%;
+                                background: #00417a;
+                                border-radius: 99px;
+                              "
+                            ></span
+                          ></span>
+                          <span
+                            style="
+                              display: block;
+                              font-family: 'IBM Plex Mono', monospace;
+                              font-size: 9.5px;
+                              letter-spacing: 0.1em;
+                              color: #55606c;
+                              margin-top: 8px;
+                            "
+                            >38 TEAMS REGISTERED</span
+                          >
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </sc-if>
+
+                <button
+                  sc-camel-on-click="{{ scrollHero }}"
+                  aria-label="Scroll to explore projects"
+                  style="
+                    position: relative;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    gap: 10px;
+                    margin: 0 auto;
+                    background: none;
+                    border: 0;
+                    padding: 14px 10px 6px;
+                    cursor: pointer;
+                  "
+                  style-hover="opacity:.75"
+                >
+                  <span
+                    style="
+                      position: relative;
+                      width: 1px;
+                      height: 34px;
+                      background: #d5d2ca;
+                      overflow: hidden;
+                    "
+                    ><span
+                      style="
+                        position: absolute;
+                        left: 0;
+                        top: 0;
+                        width: 1px;
+                        height: 10px;
+                        background: #e2572a;
+                        animation: otuScroll 2.2s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+                      "
+                    ></span
+                  ></span>
+                  <span
+                    style="
+                      font-family: 'IBM Plex Mono', monospace;
+                      font-size: 10.5px;
+                      letter-spacing: 0.22em;
+                      color: #3d4855;
+                    "
+                    >SCROLL TO EXPLORE</span
+                  >
+                  <svg
+                    aria-hidden="true"
+                    width="11"
+                    height="7"
+                    sc-camel-view-box="0 0 11 7"
+                    fill="none"
+                    stroke="#E2572A"
+                    stroke-width="1.5"
+                  >
+                    <path d="M1 1l4.5 4.5L10 1"></path>
+                  </svg>
+                </button>
+              </div>
             </section>
 
             <section
-              aria-label="Featured projects"
+              aria-labelledby="otu-feat-title"
               style="
                 position: relative;
                 background: #fff;
@@ -810,15 +2469,121 @@
                   position: relative;
                   max-width: 1340px;
                   margin: 0 auto;
-                  padding: clamp(40px, 5vw, 72px) clamp(20px, 4vw, 44px) clamp(72px, 9vw, 128px);
+                  padding: clamp(64px, 8vw, 112px) clamp(20px, 4vw, 44px) clamp(72px, 9vw, 128px);
                 "
               >
+                <div data-reveal="" style="display: flex; align-items: center; gap: 14px">
+                  <span style="width: 7px; height: 7px; background: #e2572a; flex: none"></span>
+                  <span
+                    style="
+                      font-family: 'IBM Plex Mono', monospace;
+                      font-size: 11.5px;
+                      letter-spacing: 0.18em;
+                      color: #00417a;
+                      white-space: nowrap;
+                    "
+                    >FEATURED PROJECTS</span
+                  >
+                  <span
+                    aria-hidden="true"
+                    style="
+                      flex: 1;
+                      height: 1px;
+                      background: repeating-linear-gradient(
+                        90deg,
+                        #9fb3c6 0 3px,
+                        transparent 3px 8px
+                      );
+                    "
+                  ></span>
+                  <span
+                    style="
+                      font-family: 'IBM Plex Mono', monospace;
+                      font-size: 11px;
+                      letter-spacing: 0.14em;
+                      color: #55606c;
+                      white-space: nowrap;
+                    "
+                    >FALL 2026 · 06</span
+                  >
+                </div>
+                <div
+                  style="
+                    display: flex;
+                    flex-wrap: wrap;
+                    align-items: flex-end;
+                    justify-content: space-between;
+                    gap: 24px 56px;
+                    margin-top: clamp(24px, 3vw, 36px);
+                  "
+                >
+                  <h2
+                    id="otu-feat-title"
+                    data-reveal=""
+                    style="
+                      flex: 1 1 560px;
+                      margin: 0;
+                      max-width: 15ch;
+                      font-size: clamp(38px, 5vw, 72px);
+                      line-height: 0.98;
+                      letter-spacing: -0.04em;
+                      font-weight: 800;
+                      color: #10151b;
+                      text-wrap: balance;
+                    "
+                  >
+                    What <span style="color: #00417a">Ontario Tech</span> students are building<span
+                      style="color: #e2572a"
+                      >.</span
+                    >
+                  </h2>
+                  <div data-reveal="" style="flex: 0 1 380px">
+                    <p
+                      style="
+                        margin: 0;
+                        font-size: 17px;
+                        line-height: 1.6;
+                        color: #3d4855;
+                        text-wrap: pretty;
+                      "
+                    >
+                      Outstanding projects voted and approved by the OTU CS community, and the
+                      students who built them.
+                    </p>
+                    <button
+                      sc-camel-on-click="{{ goProjects }}"
+                      style="
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 10px;
+                        margin-top: 18px;
+                        background: none;
+                        border: 0;
+                        border-bottom: 1px solid #10151b;
+                        padding: 0 0 4px;
+                        font-size: 15px;
+                        font-weight: 700;
+                        color: #10151b;
+                        cursor: pointer;
+                        transition:
+                          color 0.2s,
+                          border-color 0.2s;
+                      "
+                      style-hover="color:#00417A;border-color:#00417A"
+                    >
+                      Browse all 124 projects<span aria-hidden="true" style="color: #e2572a"
+                        >→</span
+                      >
+                    </button>
+                  </div>
+                </div>
+
                 <article
                   data-reveal=""
                   sc-camel-on-click="{{ fp.nav.open }}"
                   sc-camel-on-mouse-enter="{{ fp.nav.enter }}"
                   sc-camel-on-mouse-leave="{{ fp.nav.leave }}"
-                  sc-camel-style="display:flex;flex-wrap:wrap;background:#fff;border:1px solid {{ fp.nav.bd }};border-radius:6px;overflow:hidden;cursor:pointer;box-shadow:{{ fp.nav.sh }};transition:border-color .3s cubic-bezier(.16,1,.3,1),box-shadow .4s cubic-bezier(.16,1,.3,1)"
+                  sc-camel-style="display:flex;flex-wrap:wrap;margin-top:clamp(40px,5vw,64px);background:#fff;border:1px solid {{ fp.nav.bd }};border-radius:6px;overflow:hidden;cursor:pointer;box-shadow:{{ fp.nav.sh }};transition:border-color .3s cubic-bezier(.16,1,.3,1),box-shadow .4s cubic-bezier(.16,1,.3,1)"
                 >
                   <div
                     style="
@@ -1219,7 +2984,7 @@
                         color: #55606c;
                       "
                     >
-                      BUILT BY {{ fp.nav.teamCount }} STUDENTS
+                      BUILT BY · {{ fp.nav.teamCount }} BUILDERS
                     </div>
                     <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px">
                       <sc-for list="{{ fp.nav.people }}" as="b" hint-placeholder-count="3">
@@ -1917,7 +3682,7 @@
                         color: #10151b;
                       "
                     >
-                      <span>OTHER PROJECTS</span>
+                      <span>ALSO SHIPPING</span><span style="color: #55606c">03</span>
                     </div>
 
                     <article
@@ -2320,116 +4085,9 @@
                       "
                       style-hover="border-color:#10151B;background:#fff"
                     >
-                      {{ exploreLabel }}<span aria-hidden="true" style="color: #e2572a">→</span>
+                      Explore every project<span aria-hidden="true" style="color: #e2572a">→</span>
                     </button>
                   </div>
-                </div>
-              </div>
-            </section>
-
-            <section aria-labelledby="otu-post-title" style="background: #fff">
-              <div
-                style="
-                  max-width: 1340px;
-                  margin: 0 auto;
-                  padding: 0 clamp(20px, 4vw, 44px) clamp(72px, 9vw, 128px);
-                "
-              >
-                <div
-                  data-reveal=""
-                  style="
-                    position: relative;
-                    display: flex;
-                    flex-wrap: wrap;
-                    align-items: flex-end;
-                    justify-content: space-between;
-                    gap: 32px 56px;
-                    padding: clamp(32px, 5vw, 72px);
-                    border: 1.5px dashed #9fb3c6;
-                    border-radius: 6px;
-                    background-color: #fafaf8;
-                    background-image:
-                      linear-gradient(rgba(0, 65, 122, 0.045) 1px, transparent 1px),
-                      linear-gradient(90deg, rgba(0, 65, 122, 0.045) 1px, transparent 1px);
-                    background-size: 24px 24px;
-                  "
-                >
-                  <span
-                    aria-hidden="true"
-                    style="
-                      position: absolute;
-                      left: -4px;
-                      top: -4px;
-                      width: 7px;
-                      height: 7px;
-                      background: #00417a;
-                    "
-                  ></span>
-                  <span
-                    aria-hidden="true"
-                    style="
-                      position: absolute;
-                      right: -4px;
-                      bottom: -4px;
-                      width: 7px;
-                      height: 7px;
-                      background: #e2572a;
-                    "
-                  ></span>
-                  <div style="flex: 1 1 520px; min-width: 0">
-                    <h2
-                      id="otu-post-title"
-                      style="
-                        margin: 0;
-                        max-width: 16ch;
-                        font-size: clamp(36px, 5vw, 72px);
-                        line-height: 0.98;
-                        letter-spacing: -0.04em;
-                        font-weight: 800;
-                        color: #10151b;
-                        text-wrap: balance;
-                      "
-                    >
-                      Built something at <span style="color: #00417a">Ontario Tech</span
-                      ><span style="color: #e2572a">?</span>
-                    </h2>
-                    <p
-                      style="
-                        margin: clamp(16px, 2vw, 24px) 0 0;
-                        font-size: clamp(17px, 1.35vw, 20px);
-                        line-height: 1.6;
-                        color: #3d4855;
-                      "
-                    >
-                      Share it with the community.
-                    </p>
-                  </div>
-                  <button
-                    sc-camel-on-click="{{ goSubmit }}"
-                    style="
-                      flex: none;
-                      background: #00417a;
-                      color: #fff;
-                      border: 0;
-                      border-radius: 10px;
-                      padding: 16px 28px;
-                      font-size: 15.5px;
-                      font-weight: 700;
-                      cursor: pointer;
-                      box-shadow:
-                        inset 0 1px 0 rgba(255, 255, 255, 0.14),
-                        0 1px 0 rgba(0, 44, 82, 0.6),
-                        0 10px 26px -12px rgba(0, 65, 122, 0.6);
-                      transition:
-                        transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
-                        background 0.2s,
-                        box-shadow 0.25s;
-                    "
-                    style-hover="background:#003566;transform:translateY(-2px);box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 1px 0 rgba(0,44,82,.6),0 16px 30px -12px rgba(0,65,122,.6)"
-                    style-active="transform:translateY(0)"
-                  >
-                    Post your project.
-                  </button>
                 </div>
               </div>
             </section>
@@ -2598,10 +4256,20 @@
 
         renderVals() {
           const s = this.state
-          const total = OTU.PROJECTS.length
+          const find = (slug) => OTU.decorate(this, OTU.PROJECTS.find((p) => p.slug === slug))
           return Object.assign(OTU.chrome(this, 'home'), {
+            heroFull: s.heroTier === 'full',
+            heroSide: s.heroTier !== 'mob',
+            heroEcoFlow: s.heroTier !== 'full',
             fp: this.featData(s),
-            exploreLabel: `Explore ${total} ${total === 1 ? 'project' : 'projects'}`,
+            fmain: find('campus-nav-ar'),
+            ecoGrid: find('gridwatch'),
+            ecoShip: find('labqueue'),
+            sprintLeft: OTU.sprintLeft(s.now),
+            scrollHero: () => {
+              const el = document.getElementById('otu-hero')
+              if (el) window.scrollTo({ top: el.offsetTop + el.offsetHeight - 64, behavior: 'smooth' })
+            },
           })
         }
       }

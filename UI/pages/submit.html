@@ -1,293 +1,970 @@
-<!DOCTYPE html>
+<!doctype html>
 <!-- Six-step project submission wizard. Signed-in users only. Signed-in users only. Guests are sent to the sign-in page before anything renders. -->
 <html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Submit a project · OTU LaunchPad</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 10 10%27%3E%3Crect width=%2710%27 height=%2710%27 rx=%272%27 fill=%27%2300417A%27/%3E%3Crect x=%274%27 y=%274%27 width=%272%27 height=%272%27 fill=%27%23E2572A%27/%3E%3C/svg%3E">
-<link rel="stylesheet" href="assets/otu.css">
-<script src="assets/otu.js"></script>
-<script>OTU.guard('auth')</script>
-<script src="assets/vendor/react.production.min.js"></script>
-<script src="assets/vendor/react-dom.production.min.js"></script>
-<script src="assets/vendor/dc-runtime.js"></script>
-</head>
-<body>
-<x-dc>
-<div style="min-height:100vh;display:flex;flex-direction:column;background:#FBFBF9">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Submit a project · OTU LaunchPad</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 10 10%27%3E%3Crect width=%2710%27 height=%2710%27 rx=%272%27 fill=%27%2300417A%27/%3E%3Crect x=%274%27 y=%274%27 width=%272%27 height=%272%27 fill=%27%23E2572A%27/%3E%3C/svg%3E"
+    />
+    <link rel="stylesheet" href="assets/otu.css" />
+    <script src="assets/otu.js"></script>
+    <script>
+      OTU.guard('auth')
+    </script>
+    <script src="assets/vendor/react.production.min.js"></script>
+    <script src="assets/vendor/react-dom.production.min.js"></script>
+    <script src="assets/vendor/dc-runtime.js"></script>
+  </head>
+  <body>
+    <x-dc>
+      <div style="min-height: 100vh; display: flex; flex-direction: column; background: #fbfbf9">
+        <a
+          href="#otu-main"
+          style="
+            position: absolute;
+            left: -9999px;
+            top: 8px;
+            z-index: 100;
+            background: #00417a;
+            color: #fff;
+            padding: 11px 18px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 700;
+          "
+          style-focus="left:16px"
+          >Skip to content</a
+        >
 
-<a href="#otu-main" style="position:absolute;left:-9999px;top:8px;z-index:100;background:#00417A;color:#fff;padding:11px 18px;border-radius:8px;font-size:14px;font-weight:700" style-focus="left:16px">Skip to content</a>
+        <header
+          style="
+            position: sticky;
+            top: 0;
+            z-index: 60;
+            background: rgba(251, 251, 249, 0.94);
+            border-bottom: 1px solid #e6e4de;
+          "
+        >
+          <div
+            style="
+              max-width: 1340px;
+              margin: 0 auto;
+              padding: 0 clamp(24px, 4vw, 44px);
+              height: 64px;
+              display: flex;
+              align-items: center;
+              gap: clamp(12px, 3vw, 36px);
+            "
+          >
+            <button
+              sc-camel-on-click="{{ goHome }}"
+              aria-label="OTU LaunchPad home"
+              style="
+                background: none;
+                border: 0;
+                padding: 0;
+                cursor: pointer;
+                font-size: 19px;
+                font-weight: 800;
+                letter-spacing: -0.02em;
+                color: #10151b;
+              "
+            >
+              <span style="color: #00417a">OTU</span> <span style="color: #e2572a">Launch</span
+              ><span style="color: #10151b">Pad.</span>
+            </button>
+            <sc-if value="{{ desktopNav }}" hint-placeholder-val="{{ true }}">
+              <nav
+                aria-label="Primary"
+                style="display: flex; align-items: center; gap: 4px; margin-left: 8px"
+              >
+                <sc-for list="{{ navItems }}" as="n" hint-placeholder-count="4">
+                  <button
+                    sc-camel-on-click="{{ n.go }}"
+                    aria-current="{{ n.current }}"
+                    sc-camel-style="background:none;border:0;cursor:pointer;padding:9px 11px 6px;font-size:14.5px;font-weight:600;color:{{ n.fg }};transition:color .18s"
+                    style-hover="color:#00417A"
+                  >
+                    <span style="display: block">{{ n.label }}</span>
+                    <span sc-camel-style="{{ n.bar }}"></span>
+                  </button>
+                </sc-for>
+              </nav>
+            </sc-if>
+            <div style="flex: 1"></div>
+            <div style="display: flex; align-items: center; gap: clamp(6px, 2vw, 10px)">
+              <sc-if value="{{ mobileNav }}" hint-placeholder-val="{{ false }}">
+                <button
+                  sc-camel-on-click="{{ toggleSheet }}"
+                  aria-label="{{ sheetAria }}"
+                  aria-expanded="{{ sheetOpen }}"
+                  style="
+                    width: 40px;
+                    height: 40px;
+                    display: grid;
+                    place-items: center;
+                    background: none;
+                    border: 1px solid #e6e4de;
+                    border-radius: 8px;
+                    cursor: pointer;
+                  "
+                  style-hover="border-color:#00417A"
+                >
+                  <sc-if value="{{ sheetOpen }}" hint-placeholder-val="{{ false }}"
+                    ><svg
+                      width="18"
+                      height="18"
+                      sc-camel-view-box="0 0 18 18"
+                      fill="none"
+                      stroke="#10151B"
+                      stroke-width="1.7"
+                      stroke-linecap="round"
+                    >
+                      <path d="M4 4l10 10M14 4L4 14"></path></svg></sc-if
+                  ><sc-if value="{{ sheetClosed }}" hint-placeholder-val="{{ true }}"
+                    ><svg
+                      width="18"
+                      height="18"
+                      sc-camel-view-box="0 0 18 18"
+                      fill="none"
+                      stroke="#10151B"
+                      stroke-width="1.7"
+                      stroke-linecap="round"
+                    >
+                      <path d="M2 5h14M2 9h14M2 13h14"></path></svg
+                  ></sc-if>
+                </button>
+              </sc-if>
+              <sc-if value="{{ desktopNav }}" hint-placeholder-val="{{ true }}">
+                <button
+                  sc-camel-on-click="{{ focusSearch }}"
+                  aria-label="Search projects"
+                  style="
+                    width: 36px;
+                    height: 36px;
+                    display: grid;
+                    place-items: center;
+                    background: none;
+                    border: 1px solid #e6e4de;
+                    border-radius: 8px;
+                    cursor: pointer;
+                  "
+                  style-hover="border-color:#00417A"
+                >
+                  <svg
+                    width="16"
+                    height="16"
+                    sc-camel-view-box="0 0 16 16"
+                    fill="none"
+                    stroke="#3D4855"
+                    stroke-width="1.6"
+                  >
+                    <circle cx="7" cy="7" r="4.6"></circle>
+                    <path d="M10.5 10.5 14 14"></path>
+                  </svg>
+                </button>
+              </sc-if>
+              <sc-if value="{{ loggedOut }}" hint-placeholder-val="{{ true }}">
+                <button
+                  sc-camel-on-click="{{ openLogin }}"
+                  style="
+                    background: #00417a;
+                    color: #fff;
+                    border: 0;
+                    border-radius: 8px;
+                    padding: 9px 18px;
+                    font-size: 14px;
+                    font-weight: 700;
+                    cursor: pointer;
+                  "
+                  style-hover="background:#002C52"
+                >
+                  Login
+                </button>
+              </sc-if>
+              <sc-if value="{{ loggedIn }}" hint-placeholder-val="{{ false }}">
+                <div style="display: flex; align-items: center; gap: 10px; position: relative">
+                  <button
+                    sc-camel-on-click="{{ toggleNotifs }}"
+                    aria-label="Notifications"
+                    style="
+                      position: relative;
+                      width: 36px;
+                      height: 36px;
+                      display: grid;
+                      place-items: center;
+                      background: none;
+                      border: 1px solid #e6e4de;
+                      border-radius: 8px;
+                      cursor: pointer;
+                    "
+                    style-hover="border-color:#00417A"
+                  >
+                    <svg
+                      width="16"
+                      height="16"
+                      sc-camel-view-box="0 0 16 16"
+                      fill="none"
+                      stroke="#3D4855"
+                      stroke-width="1.6"
+                    >
+                      <path d="M4 6.5a4 4 0 1 1 8 0c0 3 1 4 1 4H3s1-1 1-4Z"></path>
+                      <path d="M6.6 13a1.6 1.6 0 0 0 2.8 0"></path>
+                    </svg>
+                    <span
+                      style="
+                        position: absolute;
+                        top: -4px;
+                        right: -4px;
+                        min-width: min(16px, 100%);
+                        height: 16px;
+                        padding: 0 4px;
+                        background: #e2572a;
+                        color: #fff;
+                        border-radius: 99px;
+                        font-family: 'IBM Plex Mono', monospace;
+                        font-size: 10px;
+                        font-weight: 500;
+                        display: grid;
+                        place-items: center;
+                      "
+                      >{{ notifCount }}</span
+                    >
+                  </button>
+                  <button
+                    sc-camel-on-click="{{ toggleMenu }}"
+                    aria-label="Account menu"
+                    style="
+                      display: flex;
+                      align-items: center;
+                      gap: 8px;
+                      background: none;
+                      border: 1px solid #e6e4de;
+                      border-radius: 99px;
+                      padding: 3px 10px 3px 3px;
+                      cursor: pointer;
+                    "
+                    style-hover="border-color:#00417A"
+                  >
+                    <span
+                      style="
+                        width: 28px;
+                        height: 28px;
+                        border-radius: 99px;
+                        background: #00417a;
+                        color: #fff;
+                        font-size: 11.5px;
+                        font-weight: 700;
+                        display: grid;
+                        place-items: center;
+                      "
+                      >{{ meInitials }}</span
+                    >
+                    <sc-if value="{{ desktopNav }}" hint-placeholder-val="{{ true }}"
+                      ><span
+                        style="
+                          font-family: 'IBM Plex Mono', monospace;
+                          font-size: 11px;
+                          color: #3d4855;
+                        "
+                        >{{ meRole }}</span
+                      ></sc-if
+                    >
+                  </button>
+                  <sc-if value="{{ notifsOpen }}" hint-placeholder-val="{{ false }}">
+                    <div
+                      role="dialog"
+                      aria-label="Notifications"
+                      style="
+                        position: absolute;
+                        top: 46px;
+                        right: 0;
+                        width: 340px;
+                        background: #fff;
+                        border: 1px solid #e6e4de;
+                        border-radius: 12px;
+                        box-shadow: 0 18px 40px rgba(16, 21, 27, 0.13);
+                        overflow: hidden;
+                        z-index: 70;
+                      "
+                    >
+                      <div
+                        style="
+                          padding: 13px 16px;
+                          border-bottom: 1px solid #efede7;
+                          font-size: 13px;
+                          font-weight: 700;
+                        "
+                      >
+                        Notifications
+                      </div>
+                      <sc-for list="{{ notifications }}" as="nt" hint-placeholder-count="3">
+                        <div
+                          style="
+                            display: flex;
+                            gap: 11px;
+                            padding: 13px 16px;
+                            border-bottom: 1px solid #f3f1eb;
+                          "
+                        >
+                          <span
+                            style="
+                              width: 7px;
+                              height: 7px;
+                              border-radius: 99px;
+                              background: #e2572a;
+                              margin-top: 6px;
+                              flex: none;
+                            "
+                          ></span>
+                          <div>
+                            <div style="font-size: 13.5px; font-weight: 600; color: #10151b">
+                              {{ nt.title }}
+                            </div>
+                            <div style="font-size: 12.5px; color: #55606c; margin-top: 2px">
+                              {{ nt.body }}
+                            </div>
+                            <div
+                              style="
+                                font-family: 'IBM Plex Mono', monospace;
+                                font-size: 10.5px;
+                                color: #5a6470;
+                                margin-top: 5px;
+                              "
+                            >
+                              {{ nt.when }}
+                            </div>
+                          </div>
+                        </div>
+                      </sc-for>
+                    </div>
+                  </sc-if>
+                  <sc-if value="{{ menuOpen }}" hint-placeholder-val="{{ false }}">
+                    <div
+                      role="menu"
+                      style="
+                        position: absolute;
+                        top: 46px;
+                        right: 0;
+                        width: 230px;
+                        background: #fff;
+                        border: 1px solid #e6e4de;
+                        border-radius: 12px;
+                        box-shadow: 0 18px 40px rgba(16, 21, 27, 0.13);
+                        padding: 6px;
+                        z-index: 70;
+                      "
+                    >
+                      <sc-for list="{{ menuItems }}" as="m" hint-placeholder-count="4">
+                        <button
+                          sc-camel-on-click="{{ m.go }}"
+                          role="menuitem"
+                          style="
+                            display: block;
+                            width: 100%;
+                            text-align: left;
+                            background: none;
+                            border: 0;
+                            padding: 9px 11px;
+                            border-radius: 8px;
+                            font-size: 13.5px;
+                            font-weight: 600;
+                            color: #3d4855;
+                            cursor: pointer;
+                          "
+                          style-hover="background:#F1EFE9;color:#00417A"
+                        >
+                          {{ m.label }}
+                        </button>
+                      </sc-for>
+                      <div style="height: 1px; background: #efede7; margin: 6px 4px"></div>
+                      <button
+                        sc-camel-on-click="{{ signOut }}"
+                        role="menuitem"
+                        style="
+                          display: block;
+                          width: 100%;
+                          text-align: left;
+                          background: none;
+                          border: 0;
+                          padding: 9px 11px;
+                          border-radius: 8px;
+                          font-size: 13.5px;
+                          font-weight: 600;
+                          color: #a83b15;
+                          cursor: pointer;
+                        "
+                        style-hover="background:#F1EFE9"
+                      >
+                        Sign out
+                      </button>
+                    </div>
+                  </sc-if>
+                </div>
+              </sc-if>
+            </div>
+          </div>
+        </header>
 
-<header style="position:sticky;top:0;z-index:60;background:rgba(251,251,249,.94);border-bottom:1px solid #E6E4DE">
-  <div style="max-width:1340px;margin:0 auto;padding:0 clamp(24px,4vw,44px);height:64px;display:flex;align-items:center;gap:clamp(12px,3vw,36px)">
-    <button sc-camel-on-click="{{ goHome }}" aria-label="OTU LaunchPad home" style="background:none;border:0;padding:0;cursor:pointer;font-size:19px;font-weight:800;letter-spacing:-.02em;color:#10151B">
-      <span style="color:#00417A">OTU</span> <span style="color:#E2572A">Launch</span><span style="color:#10151B">Pad.</span>
-    </button>
-    <sc-if value="{{ desktopNav }}" hint-placeholder-val="{{ true }}">
-    <nav aria-label="Primary" style="display:flex;align-items:center;gap:4px;margin-left:8px">
-      <sc-for list="{{ navItems }}" as="n" hint-placeholder-count="4">
-        <button sc-camel-on-click="{{ n.go }}" aria-current="{{ n.current }}" style="background:none;border:0;cursor:pointer;padding:9px 11px 6px;font-size:14.5px;font-weight:600;color:{{ n.fg }};transition:color .18s" style-hover="color:#00417A">
-          <span style="display:block">{{ n.label }}</span>
-          <span style="{{ n.bar }}"></span>
-        </button>
-      </sc-for>
-    </nav>
-    </sc-if>
-    <div style="flex:1"></div>
-    <div style="display:flex;align-items:center;gap:10px">
-      <sc-if value="{{ mobileNav }}" hint-placeholder-val="{{ false }}">
-        <button sc-camel-on-click="{{ toggleSheet }}" aria-label="{{ sheetAria }}" aria-expanded="{{ sheetOpen }}" style="width:40px;height:40px;display:grid;place-items:center;background:none;border:1px solid #E6E4DE;border-radius:8px;cursor:pointer" style-hover="border-color:#00417A">
-          <svg width="18" height="18" sc-camel-view-box="0 0 18 18" fill="none" stroke="#10151B" stroke-width="1.7" stroke-linecap="round"><path d="{{ sheetIcon }}"></path></svg>
-        </button>
-      </sc-if>
-      <button sc-camel-on-click="{{ focusSearch }}" aria-label="Search projects" style="width:36px;height:36px;display:grid;place-items:center;background:none;border:1px solid #E6E4DE;border-radius:8px;cursor:pointer" style-hover="border-color:#00417A">
-        <svg width="16" height="16" sc-camel-view-box="0 0 16 16" fill="none" stroke="#3D4855" stroke-width="1.6"><circle cx="7" cy="7" r="4.6"></circle><path d="M10.5 10.5 14 14"></path></svg>
-      </button>
-      <sc-if value="{{ loggedOut }}" hint-placeholder-val="{{ true }}">
-        <button sc-camel-on-click="{{ openLogin }}" style="background:#00417A;color:#fff;border:0;border-radius:8px;padding:9px 18px;font-size:14px;font-weight:700;cursor:pointer" style-hover="background:#002C52">Login</button>
-      </sc-if>
-      <sc-if value="{{ loggedIn }}" hint-placeholder-val="{{ false }}">
-        <div style="display:flex;align-items:center;gap:10px;position:relative">
-          <button sc-camel-on-click="{{ toggleNotifs }}" aria-label="Notifications" style="position:relative;width:36px;height:36px;display:grid;place-items:center;background:none;border:1px solid #E6E4DE;border-radius:8px;cursor:pointer" style-hover="border-color:#00417A">
-            <svg width="16" height="16" sc-camel-view-box="0 0 16 16" fill="none" stroke="#3D4855" stroke-width="1.6"><path d="M4 6.5a4 4 0 1 1 8 0c0 3 1 4 1 4H3s1-1 1-4Z"></path><path d="M6.6 13a1.6 1.6 0 0 0 2.8 0"></path></svg>
-            <span style="position:absolute;top:-4px;right:-4px;min-width:16px;height:16px;padding:0 4px;background:#E2572A;color:#fff;border-radius:99px;font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:500;display:grid;place-items:center">{{ notifCount }}</span>
-          </button>
-          <button sc-camel-on-click="{{ toggleMenu }}" aria-label="Account menu" style="display:flex;align-items:center;gap:8px;background:none;border:1px solid #E6E4DE;border-radius:99px;padding:3px 10px 3px 3px;cursor:pointer" style-hover="border-color:#00417A">
-            <span style="width:28px;height:28px;border-radius:99px;background:#00417A;color:#fff;font-size:11.5px;font-weight:700;display:grid;place-items:center">{{ meInitials }}</span>
-            <sc-if value="{{ desktopNav }}" hint-placeholder-val="{{ true }}"><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#3D4855">{{ meRole }}</span></sc-if>
-          </button>
-          <sc-if value="{{ notifsOpen }}" hint-placeholder-val="{{ false }}">
-            <div role="dialog" aria-label="Notifications" style="position:absolute;top:46px;right:0;width:340px;background:#fff;border:1px solid #E6E4DE;border-radius:12px;box-shadow:0 18px 40px rgba(16,21,27,.13);overflow:hidden;z-index:70">
-              <div style="padding:13px 16px;border-bottom:1px solid #EFEDE7;font-size:13px;font-weight:700">Notifications</div>
-              <sc-for list="{{ notifications }}" as="nt" hint-placeholder-count="3">
-                <div style="display:flex;gap:11px;padding:13px 16px;border-bottom:1px solid #F3F1EB">
-                  <span style="width:7px;height:7px;border-radius:99px;background:#E2572A;margin-top:6px;flex:none"></span>
-                  <div>
-                    <div style="font-size:13.5px;font-weight:600;color:#10151B">{{ nt.title }}</div>
-                    <div style="font-size:12.5px;color:#55606C;margin-top:2px">{{ nt.body }}</div>
-                    <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#5A6470;margin-top:5px">{{ nt.when }}</div>
-                  </div>
+        <sc-if value="{{ sheetVisible }}" hint-placeholder-val="{{ false }}">
+          <div
+            style="
+              position: fixed;
+              inset: 64px 0 0 0;
+              z-index: 55;
+              background: rgba(16, 21, 27, 0.32);
+            "
+            sc-camel-on-click="{{ closeSheet }}"
+          ></div>
+          <nav
+            aria-label="Primary"
+            style="
+              position: fixed;
+              top: 64px;
+              left: 0;
+              right: 0;
+              z-index: 56;
+              background: #fdfdfc;
+              border-bottom: 1px solid #e6e4de;
+              box-shadow: 0 24px 48px rgba(16, 21, 27, 0.14);
+              padding: 10px clamp(24px, 4vw, 44px) 18px;
+              animation: otuRise 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+            "
+          >
+            <button
+              sc-camel-on-click="{{ focusSearch }}"
+              style="
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                width: 100%;
+                text-align: left;
+                background: none;
+                border: 0;
+                border-bottom: 1px solid #efede7;
+                padding: 16px 4px;
+                font-size: 18px;
+                font-weight: 700;
+                letter-spacing: -0.015em;
+                color: #3d4855;
+                cursor: pointer;
+              "
+            >
+              Search projects<svg
+                width="16"
+                height="16"
+                sc-camel-view-box="0 0 16 16"
+                fill="none"
+                stroke="#E2572A"
+                stroke-width="1.6"
+                aria-hidden="true"
+              >
+                <circle cx="7" cy="7" r="4.6"></circle>
+                <path d="M10.5 10.5 14 14"></path>
+              </svg>
+            </button>
+            <sc-for list="{{ navItems }}" as="n" hint-placeholder-count="4">
+              <button
+                sc-camel-on-click="{{ n.go }}"
+                aria-current="{{ n.current }}"
+                sc-camel-style="display:flex;align-items:center;justify-content:space-between;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid #EFEDE7;padding:16px 4px;font-size:18px;font-weight:700;letter-spacing:-.015em;color:{{ n.fg }};cursor:pointer"
+              >
+                {{ n.label }}<span style="color: #e2572a">→</span>
+              </button>
+            </sc-for>
+            <div style="display: flex; gap: 10px; margin-top: 16px">
+              <button
+                sc-camel-on-click="{{ goProjects }}"
+                style="
+                  flex: 1;
+                  background: #00417a;
+                  color: #fff;
+                  border: 0;
+                  border-radius: 9px;
+                  padding: 14px;
+                  font-size: 15px;
+                  font-weight: 700;
+                  cursor: pointer;
+                "
+              >
+                Explore Projects
+              </button>
+              <button
+                sc-camel-on-click="{{ goSubmit }}"
+                style="
+                  flex: 1;
+                  background: #fff;
+                  color: #10151b;
+                  border: 1px solid #d2cec4;
+                  border-radius: 9px;
+                  padding: 14px;
+                  font-size: 15px;
+                  font-weight: 700;
+                  cursor: pointer;
+                "
+              >
+                Launch a Project
+              </button>
+            </div>
+          </nav>
+        </sc-if>
+
+        <main id="otu-main" style="flex: 1">
+          <div style="max-width: 940px; margin: 0 auto; padding: 48px clamp(24px, 4vw, 44px) 96px">
+            <div
+              style="
+                font-family: 'IBM Plex Mono', monospace;
+                font-size: 11.5px;
+                letter-spacing: 0.09em;
+                color: #55606c;
+              "
+            >
+              NEW PROJECT · STEP {{ stepNum }} OF 6
+            </div>
+            <h1
+              style="
+                margin: 14px 0 0;
+                font-size: clamp(32px, 4.2vw, 46px);
+                letter-spacing: -0.035em;
+                font-weight: 800;
+              "
+            >
+              {{ stepTitle }}
+            </h1>
+            <div style="display: flex; gap: 6px; margin-top: 28px">
+              <sc-for list="{{ steps }}" as="s" hint-placeholder-count="6">
+                <button
+                  sc-camel-on-click="{{ s.go }}"
+                  aria-label="{{ s.aria }}"
+                  style="
+                    flex: 1;
+                    text-align: left;
+                    background: none;
+                    border: 0;
+                    padding: 0;
+                    cursor: pointer;
+                  "
+                >
+                  <span
+                    sc-camel-style="display:block;height:4px;border-radius:99px;background:{{ s.bar }}"
+                  ></span>
+                  <span
+                    sc-camel-style="display:block;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:{{ s.fg }};margin-top:8px"
+                    >{{ s.label }}</span
+                  >
+                </button>
+              </sc-for>
+            </div>
+
+            <div
+              style="
+                margin-top: 38px;
+                border: 1px solid #e6e4de;
+                border-radius: 14px;
+                background: #fff;
+                padding: clamp(20px, 5vw, 36px);
+              "
+            >
+              <sc-for list="{{ stepFields }}" as="f" hint-placeholder-count="3">
+                <div style="margin-bottom: 24px">
+                  <label
+                    style="display: block; font-size: 14.5px; font-weight: 700; margin-bottom: 8px"
+                    >{{ f.label }}</label
+                  >
+                  <sc-if value="{{ f.isInput }}" hint-placeholder-val="{{ true }}">
+                    <input
+                      value="{{ f.value }}"
+                      sc-camel-on-change="{{ f.set }}"
+                      placeholder="{{ f.placeholder }}"
+                      style="
+                        width: 100%;
+                        border: 1px solid #d9d6ce;
+                        border-radius: 9px;
+                        padding: 13px 14px;
+                        font-size: 15px;
+                        outline: none;
+                        background: #fcfcfa;
+                      "
+                      style-focus="border-color:#00417A"
+                    />
+                  </sc-if>
+                  <sc-if value="{{ f.isArea }}" hint-placeholder-val="{{ false }}">
+                    <textarea
+                      value="{{ f.value }}"
+                      sc-camel-on-change="{{ f.set }}"
+                      placeholder="{{ f.placeholder }}"
+                      rows="4"
+                      style="
+                        width: 100%;
+                        border: 1px solid #d9d6ce;
+                        border-radius: 9px;
+                        padding: 13px 14px;
+                        font-size: 15px;
+                        outline: none;
+                        background: #fcfcfa;
+                        resize: vertical;
+                        line-height: 1.55;
+                      "
+                      style-focus="border-color:#00417A"
+                    ></textarea>
+                  </sc-if>
+                  <sc-if value="{{ f.isSelect }}" hint-placeholder-val="{{ false }}">
+                    <sc-raw-select
+                      value="{{ f.value }}"
+                      sc-camel-on-change="{{ f.set }}"
+                      style="
+                        width: 100%;
+                        border: 1px solid #d9d6ce;
+                        border-radius: 9px;
+                        padding: 13px 14px;
+                        font-size: 15px;
+                        background: #fcfcfa;
+                        cursor: pointer;
+                      "
+                    >
+                      <sc-for list="{{ f.options }}" as="o" hint-placeholder-count="3">
+                        <option value="{{ o }}">{{ o }}</option>
+                      </sc-for>
+                    </sc-raw-select>
+                  </sc-if>
+                  <sc-if value="{{ f.isToggle }}" hint-placeholder-val="{{ false }}">
+                    <div style="display: flex; gap: 10px">
+                      <sc-for list="{{ f.choices }}" as="c" hint-placeholder-count="2">
+                        <button
+                          sc-camel-on-click="{{ c.set }}"
+                          aria-pressed="{{ c.on }}"
+                          sc-camel-style="border:1px solid {{ c.border }};background:{{ c.bg }};color:{{ c.fg }};border-radius:9px;padding:11px 24px;font-size:14.5px;font-weight:700;cursor:pointer"
+                        >
+                          {{ c.label }}
+                        </button>
+                      </sc-for>
+                    </div>
+                  </sc-if>
+                  <sc-if value="{{ f.hasHint }}" hint-placeholder-val="{{ false }}">
+                    <div style="font-size: 13px; color: #55606c; margin-top: 7px">{{ f.hint }}</div>
+                  </sc-if>
                 </div>
               </sc-for>
+
+              <sc-if value="{{ isPreviewStep }}" hint-placeholder-val="{{ false }}">
+                <div>
+                  <div style="border: 1px solid #e6e4de; border-radius: 12px; overflow: hidden">
+                    <div style="position: relative; aspect-ratio: 2/1">
+                      <div sc-camel-style="{{ previewArt }}"></div>
+                    </div>
+                    <div style="padding: 26px">
+                      <h2
+                        style="
+                          margin: 0;
+                          font-size: 30px;
+                          font-weight: 800;
+                          letter-spacing: -0.03em;
+                        "
+                      >
+                        {{ previewTitle }}
+                      </h2>
+                      <p
+                        style="
+                          margin: 12px 0 0;
+                          font-size: 16.5px;
+                          line-height: 1.6;
+                          color: #3d4855;
+                        "
+                      >
+                        {{ previewDesc }}
+                      </p>
+                      <div
+                        style="
+                          font-family: 'IBM Plex Mono', monospace;
+                          font-size: 12px;
+                          color: #55606c;
+                          margin-top: 16px;
+                        "
+                      >
+                        {{ previewStack }}
+                      </div>
+                    </div>
+                  </div>
+                  <div
+                    style="
+                      margin-top: 20px;
+                      border: 1px solid #d9e3ee;
+                      background: #f2f7fc;
+                      border-radius: 10px;
+                      padding: 16px 18px;
+                      font-size: 14px;
+                      color: #22303d;
+                      line-height: 1.55;
+                    "
+                  >
+                    Submitted projects are reviewed by a moderator before they appear publicly.
+                    You'll get a notification when the review is done.
+                  </div>
+                </div>
+              </sc-if>
+
+              <div
+                style="
+                  display: flex;
+                  flex-wrap: wrap;
+                  gap: 10px;
+                  margin-top: 8px;
+                  padding-top: 24px;
+                  border-top: 1px solid #f1efe9;
+                "
+              >
+                <button
+                  sc-camel-on-click="{{ prevStep }}"
+                  disabled="{{ atFirstStep }}"
+                  sc-camel-style="background:#fff;border:1px solid #D9D6CE;border-radius:9px;padding:13px 22px;font-size:14.5px;font-weight:700;color:{{ backFg }};cursor:pointer"
+                >
+                  Back
+                </button>
+                <div style="flex: 1"></div>
+                <button
+                  sc-camel-on-click="{{ saveDraft }}"
+                  style="
+                    background: none;
+                    border: 0;
+                    padding: 13px 16px;
+                    font-size: 14.5px;
+                    font-weight: 700;
+                    color: #3d4855;
+                    cursor: pointer;
+                  "
+                  style-hover="color:#00417A"
+                >
+                  Save draft
+                </button>
+                <button
+                  sc-camel-on-click="{{ nextStep }}"
+                  style="
+                    background: #00417a;
+                    color: #fff;
+                    border: 0;
+                    border-radius: 9px;
+                    padding: 13px 26px;
+                    font-size: 14.5px;
+                    font-weight: 700;
+                    cursor: pointer;
+                  "
+                  style-hover="background:#002C52"
+                >
+                  {{ nextLabel }}
+                </button>
+              </div>
             </div>
-          </sc-if>
-          <sc-if value="{{ menuOpen }}" hint-placeholder-val="{{ false }}">
-            <div role="menu" style="position:absolute;top:46px;right:0;width:230px;background:#fff;border:1px solid #E6E4DE;border-radius:12px;box-shadow:0 18px 40px rgba(16,21,27,.13);padding:6px;z-index:70">
-              <sc-for list="{{ menuItems }}" as="m" hint-placeholder-count="4">
-                <button sc-camel-on-click="{{ m.go }}" role="menuitem" style="display:block;width:100%;text-align:left;background:none;border:0;padding:9px 11px;border-radius:8px;font-size:13.5px;font-weight:600;color:#3D4855;cursor:pointer" style-hover="background:#F1EFE9;color:#00417A">{{ m.label }}</button>
-              </sc-for>
-              <div style="height:1px;background:#EFEDE7;margin:6px 4px"></div>
-              <button sc-camel-on-click="{{ signOut }}" role="menuitem" style="display:block;width:100%;text-align:left;background:none;border:0;padding:9px 11px;border-radius:8px;font-size:13.5px;font-weight:600;color:#A83B15;cursor:pointer" style-hover="background:#F1EFE9">Sign out</button>
+          </div>
+        </main>
+
+        <footer style="border-top: 1px solid #e6e4de; background: #f3f2ed">
+          <div
+            style="
+              max-width: 1340px;
+              margin: 0 auto;
+              padding: 60px clamp(24px, 4vw, 44px) 44px;
+              display: grid;
+              grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr));
+              gap: 40px;
+            "
+          >
+            <div>
+              <div style="font-size: 18px; font-weight: 800; letter-spacing: -0.02em">
+                <span style="color: #00417a">OTU</span> <span style="color: #e2572a">Launch</span
+                ><span style="color: #10151b">Pad.</span>
+              </div>
+              <div
+                style="
+                  font-family: 'IBM Plex Mono', monospace;
+                  font-size: 12px;
+                  color: #55606c;
+                  margin-top: 10px;
+                "
+              >
+                Build. Share. Launch.
+              </div>
             </div>
-          </sc-if>
-        </div>
-      </sc-if>
-    </div>
-  </div>
-</header>
-
-<sc-if value="{{ sheetVisible }}" hint-placeholder-val="{{ false }}">
-  <div style="position:fixed;inset:64px 0 0 0;z-index:55;background:rgba(16,21,27,.32)" sc-camel-on-click="{{ closeSheet }}"></div>
-  <nav aria-label="Primary" style="position:fixed;top:64px;left:0;right:0;z-index:56;background:#FDFDFC;border-bottom:1px solid #E6E4DE;box-shadow:0 24px 48px rgba(16,21,27,.14);padding:10px clamp(24px,4vw,44px) 18px;animation:otuRise .22s cubic-bezier(.16,1,.3,1)">
-    <sc-for list="{{ navItems }}" as="n" hint-placeholder-count="4">
-      <button sc-camel-on-click="{{ n.go }}" aria-current="{{ n.current }}" style="display:flex;align-items:center;justify-content:space-between;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid #EFEDE7;padding:16px 4px;font-size:18px;font-weight:700;letter-spacing:-.015em;color:{{ n.fg }};cursor:pointer">{{ n.label }}<span style="color:#E2572A">→</span></button>
-    </sc-for>
-    <div style="display:flex;gap:10px;margin-top:16px">
-      <button sc-camel-on-click="{{ goProjects }}" style="flex:1;background:#00417A;color:#fff;border:0;border-radius:9px;padding:14px;font-size:15px;font-weight:700;cursor:pointer">Explore Projects</button>
-      <button sc-camel-on-click="{{ goSubmit }}" style="flex:1;background:#fff;color:#10151B;border:1px solid #D2CEC4;border-radius:9px;padding:14px;font-size:15px;font-weight:700;cursor:pointer">Launch a Project</button>
-    </div>
-  </nav>
-</sc-if>
-
-<main id="otu-main" style="flex:1">
-<div style="max-width:940px;margin:0 auto;padding:48px clamp(24px,4vw,44px) 96px">
-  <div style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.09em;color:#55606C">NEW PROJECT · STEP {{ stepNum }} OF 6</div>
-  <h1 style="margin:14px 0 0;font-size:clamp(32px,4.2vw,46px);letter-spacing:-.035em;font-weight:800">{{ stepTitle }}</h1>
-  <div style="display:flex;gap:6px;margin-top:28px">
-    <sc-for list="{{ steps }}" as="s" hint-placeholder-count="6">
-      <button sc-camel-on-click="{{ s.go }}" aria-label="{{ s.aria }}" style="flex:1;text-align:left;background:none;border:0;padding:0;cursor:pointer">
-        <span style="display:block;height:4px;border-radius:99px;background:{{ s.bar }}"></span>
-        <span style="display:block;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:{{ s.fg }};margin-top:8px">{{ s.label }}</span>
-      </button>
-    </sc-for>
-  </div>
-
-  <div style="margin-top:38px;border:1px solid #E6E4DE;border-radius:14px;background:#fff;padding:36px">
-    <sc-for list="{{ stepFields }}" as="f" hint-placeholder-count="3">
-      <div style="margin-bottom:24px">
-        <label style="display:block;font-size:14.5px;font-weight:700;margin-bottom:8px">{{ f.label }}</label>
-        <sc-if value="{{ f.isInput }}" hint-placeholder-val="{{ true }}">
-          <input value="{{ f.value }}" sc-camel-on-change="{{ f.set }}" placeholder="{{ f.placeholder }}" style="width:100%;border:1px solid #D9D6CE;border-radius:9px;padding:13px 14px;font-size:15px;outline:none;background:#FCFCFA" style-focus="border-color:#00417A">
-        </sc-if>
-        <sc-if value="{{ f.isArea }}" hint-placeholder-val="{{ false }}">
-          <textarea value="{{ f.value }}" sc-camel-on-change="{{ f.set }}" placeholder="{{ f.placeholder }}" rows="4" style="width:100%;border:1px solid #D9D6CE;border-radius:9px;padding:13px 14px;font-size:15px;outline:none;background:#FCFCFA;resize:vertical;line-height:1.55" style-focus="border-color:#00417A"></textarea>
-        </sc-if>
-        <sc-if value="{{ f.isSelect }}" hint-placeholder-val="{{ false }}">
-          <sc-raw-select value="{{ f.value }}" sc-camel-on-change="{{ f.set }}" style="width:100%;border:1px solid #D9D6CE;border-radius:9px;padding:13px 14px;font-size:15px;background:#FCFCFA;cursor:pointer">
-            <sc-for list="{{ f.options }}" as="o" hint-placeholder-count="3">
-              <option value="{{ o }}">{{ o }}</option>
-            </sc-for>
-          </sc-raw-select>
-        </sc-if>
-        <sc-if value="{{ f.isToggle }}" hint-placeholder-val="{{ false }}">
-          <div style="display:flex;gap:10px">
-            <sc-for list="{{ f.choices }}" as="c" hint-placeholder-count="2">
-              <button sc-camel-on-click="{{ c.set }}" aria-pressed="{{ c.on }}" style="border:1px solid {{ c.border }};background:{{ c.bg }};color:{{ c.fg }};border-radius:9px;padding:11px 24px;font-size:14.5px;font-weight:700;cursor:pointer">{{ c.label }}</button>
+            <sc-for list="{{ footerCols }}" as="c" hint-placeholder-count="3">
+              <div>
+                <div
+                  style="
+                    font-family: 'IBM Plex Mono', monospace;
+                    font-size: 11px;
+                    letter-spacing: 0.09em;
+                    color: #55606c;
+                  "
+                >
+                  {{ c.title }}
+                </div>
+                <div
+                  style="
+                    display: flex;
+                    flex-direction: column;
+                    gap: 10px;
+                    margin-top: 14px;
+                    align-items: flex-start;
+                  "
+                >
+                  <sc-for list="{{ c.links }}" as="l" hint-placeholder-count="4">
+                    <button
+                      sc-camel-on-click="{{ l.go }}"
+                      style="
+                        background: none;
+                        border: 0;
+                        padding: 0;
+                        cursor: pointer;
+                        font-size: 14px;
+                        font-weight: 600;
+                        color: #3d4855;
+                      "
+                      style-hover="color:#00417A"
+                    >
+                      {{ l.label }}
+                    </button>
+                  </sc-for>
+                </div>
+              </div>
             </sc-for>
           </div>
-        </sc-if>
-        <sc-if value="{{ f.hasHint }}" hint-placeholder-val="{{ false }}">
-          <div style="font-size:13px;color:#55606C;margin-top:7px">{{ f.hint }}</div>
-        </sc-if>
-      </div>
-    </sc-for>
-
-    <sc-if value="{{ isPreviewStep }}" hint-placeholder-val="{{ false }}">
-      <div>
-        <div style="border:1px solid #E6E4DE;border-radius:12px;overflow:hidden">
-          <div style="position:relative;aspect-ratio:2/1"><div style="{{ previewArt }}"></div></div>
-          <div style="padding:26px">
-            <h2 style="margin:0;font-size:30px;font-weight:800;letter-spacing:-.03em">{{ previewTitle }}</h2>
-            <p style="margin:12px 0 0;font-size:16.5px;line-height:1.6;color:#3D4855">{{ previewDesc }}</p>
-            <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#55606C;margin-top:16px">{{ previewStack }}</div>
+          <div
+            style="
+              max-width: 1340px;
+              margin: 0 auto;
+              padding: 0 clamp(24px, 4vw, 44px) 40px;
+              display: flex;
+              flex-direction: column;
+              gap: 8px;
+            "
+          >
+            <div style="font-size: 13px; line-height: 1.55; color: #3d4855; max-width: 72ch">
+              An independent project by a student club. Not affiliated with, endorsed by, or an
+              official service of Ontario Tech University.
+            </div>
+            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #5a6470">
+              © 2026 GDG ON CAMPUS, ONTARIO TECH UNIVERSITY · BUILT BY STUDENTS IN OSHAWA
+            </div>
           </div>
-        </div>
-        <div style="margin-top:20px;border:1px solid #D9E3EE;background:#F2F7FC;border-radius:10px;padding:16px 18px;font-size:14px;color:#22303D;line-height:1.55">Submitted projects are reviewed by a moderator before they appear publicly. You'll get a notification when the review is done.</div>
+        </footer>
+
+        <sc-if value="{{ toastVisible }}" hint-placeholder-val="{{ false }}">
+          <div
+            role="status"
+            style="
+              position: fixed;
+              left: 50%;
+              bottom: 28px;
+              transform: translateX(-50%);
+              z-index: 95;
+              background: #10151b;
+              color: #fff;
+              border-radius: 10px;
+              padding: 13px 20px;
+              font-size: 14.5px;
+              font-weight: 600;
+              box-shadow: 0 14px 34px rgba(16, 21, 27, 0.28);
+              animation: otuRise 0.2s ease-out;
+            "
+          >
+            {{ toast }}
+          </div>
+        </sc-if>
       </div>
-    </sc-if>
+    </x-dc>
+    <script type="text/x-dc" data-dc-script="">
+      const STEP_DEFS = [
+        { label: 'BASICS', title: 'Project basics', fields: [
+          { key: 'name', label: 'Project name', type: 'input', ph: 'e.g. Campus Nav AR' },
+          { key: 'short', label: 'Short description', type: 'area', ph: 'One or two sentences. This is what people read in the grid.' },
+          { key: 'cat', label: 'Category', type: 'select', options: ['Web', 'Mobile', 'Data', 'ML', 'Hardware', 'Simulation'] },
+        ] },
+        { label: 'STORY', title: 'Project story', fields: [
+          { key: 'what', label: 'What does your project do?', type: 'area', ph: '' },
+          { key: 'whyBuilt', label: 'Why did you build it?', type: 'area', ph: '' },
+          { key: 'inspired', label: 'What inspired you?', type: 'area', ph: '' },
+          { key: 'learned', label: 'What did you learn?', type: 'area', ph: '' },
+        ] },
+        { label: 'BUILD', title: 'Implementation', fields: [
+          { key: 'stack', label: 'Tech stack', type: 'input', ph: 'React · Go · Postgres', hint: 'Separate with commas. These become the tags on your card.' },
+          { key: 'arch', label: 'Architecture', type: 'area', ph: '' },
+          { key: 'challenges', label: 'Technical challenges', type: 'area', ph: '' },
+          { key: 'future', label: 'Future plans', type: 'area', ph: '' },
+        ] },
+        { label: 'LINKS', title: 'Links', fields: [
+          { key: 'github', label: 'GitHub', type: 'input', ph: 'github.com/...' },
+          { key: 'demo', label: 'Live demo', type: 'input', ph: 'https://' },
+          { key: 'figma', label: 'Figma', type: 'input', ph: 'figma.com/...' },
+          { key: 'video', label: 'Video', type: 'input', ph: 'youtube.com/...' },
+        ] },
+        { label: 'COLLAB', title: 'Collaboration', fields: [
+          { key: 'openTo', label: 'Open to contributors?', type: 'toggle', choices: ['Yes', 'No'] },
+          { key: 'roles', label: 'What roles are you looking for?', type: 'input', ph: 'Frontend, ML, design...', hint: 'Shown on your project page so people know how to help.' },
+        ] },
+        { label: 'PREVIEW', title: 'Preview & submit', fields: [] },
+      ]
+      const LAST_STEP = STEP_DEFS.length - 1
 
-    <div style="display:flex;gap:10px;margin-top:8px;padding-top:24px;border-top:1px solid #F1EFE9">
-      <button sc-camel-on-click="{{ prevStep }}" disabled="{{ atFirstStep }}" style="background:#fff;border:1px solid #D9D6CE;border-radius:9px;padding:13px 22px;font-size:14.5px;font-weight:700;color:{{ backFg }};cursor:pointer">Back</button>
-      <div style="flex:1"></div>
-      <button sc-camel-on-click="{{ saveDraft }}" style="background:none;border:0;padding:13px 16px;font-size:14.5px;font-weight:700;color:#3D4855;cursor:pointer" style-hover="color:#00417A">Save draft</button>
-      <button sc-camel-on-click="{{ nextStep }}" style="background:#00417A;color:#fff;border:0;border-radius:9px;padding:13px 26px;font-size:14.5px;font-weight:700;cursor:pointer" style-hover="background:#002C52">{{ nextLabel }}</button>
-    </div>
-  </div>
-</div>
-</main>
+      class Component extends DCLogic {
+        state = OTU.state({ step: 0, form: { openTo: 'Yes', cat: 'Web' } })
+        componentDidMount() { OTU.mount(this) }
+        componentDidUpdate() { OTU.motion(this) }
+        componentWillUnmount() { OTU.unmount(this) }
 
-<footer style="border-top:1px solid #E6E4DE;background:#F3F2ED">
-  <div style="max-width:1340px;margin:0 auto;padding:60px clamp(24px,4vw,44px) 44px;display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:40px">
-    <div>
-      <div style="font-size:18px;font-weight:800;letter-spacing:-.02em"><span style="color:#00417A">OTU</span> <span style="color:#E2572A">Launch</span><span style="color:#10151B">Pad.</span></div>
-      <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#55606C;margin-top:10px">Build. Share. Launch.</div>
-    </div>
-    <sc-for list="{{ footerCols }}" as="c" hint-placeholder-count="3">
-      <div>
-        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.09em;color:#55606C">{{ c.title }}</div>
-        <div style="display:flex;flex-direction:column;gap:10px;margin-top:14px;align-items:flex-start">
-          <sc-for list="{{ c.links }}" as="l" hint-placeholder-count="4">
-            <button sc-camel-on-click="{{ l.go }}" style="background:none;border:0;padding:0;cursor:pointer;font-size:14px;font-weight:600;color:#3D4855" style-hover="color:#00417A">{{ l.label }}</button>
-          </sc-for>
-        </div>
-      </div>
-    </sc-for>
-  </div>
-  <div style="max-width:1340px;margin:0 auto;padding:0 clamp(24px,4vw,44px) 40px;display:flex;flex-direction:column;gap:8px">
-    <div style="font-size:13px;line-height:1.55;color:#3D4855;max-width:72ch">An independent project by a student club. Not affiliated with, endorsed by, or an official service of Ontario Tech University.</div>
-    <div style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:#5A6470">© 2026 GDG ON CAMPUS, ONTARIO TECH UNIVERSITY · BUILT BY STUDENTS IN OSHAWA</div>
-  </div>
-</footer>
-
-<sc-if value="{{ toastVisible }}" hint-placeholder-val="{{ false }}">
-  <div role="status" style="position:fixed;left:50%;bottom:28px;transform:translateX(-50%);z-index:95;background:#10151B;color:#fff;border-radius:10px;padding:13px 20px;font-size:14.5px;font-weight:600;box-shadow:0 14px 34px rgba(16,21,27,.28);animation:otuRise .2s ease-out">{{ toast }}</div>
-</sc-if>
-
-</div>
-</x-dc>
-<script type="text/x-dc" data-dc-script="">
-const STEP_DEFS = [
-  { label: 'BASICS', title: 'Project basics', fields: [
-    { key: 'name', label: 'Project name', type: 'input', ph: 'e.g. Campus Nav AR' },
-    { key: 'short', label: 'Short description', type: 'area', ph: 'One or two sentences. This is what people read in the grid.' },
-    { key: 'cat', label: 'Category', type: 'select', options: ['Web', 'Mobile', 'Data', 'ML', 'Hardware', 'Simulation'] },
-  ] },
-  { label: 'STORY', title: 'Project story', fields: [
-    { key: 'what', label: 'What does your project do?', type: 'area', ph: '' },
-    { key: 'whyBuilt', label: 'Why did you build it?', type: 'area', ph: '' },
-    { key: 'inspired', label: 'What inspired you?', type: 'area', ph: '' },
-    { key: 'learned', label: 'What did you learn?', type: 'area', ph: '' },
-  ] },
-  { label: 'BUILD', title: 'Implementation', fields: [
-    { key: 'stack', label: 'Tech stack', type: 'input', ph: 'React · Go · Postgres', hint: 'Separate with commas. These become the tags on your card.' },
-    { key: 'arch', label: 'Architecture', type: 'area', ph: '' },
-    { key: 'challenges', label: 'Technical challenges', type: 'area', ph: '' },
-    { key: 'future', label: 'Future plans', type: 'area', ph: '' },
-  ] },
-  { label: 'LINKS', title: 'Links', fields: [
-    { key: 'github', label: 'GitHub', type: 'input', ph: 'github.com/...' },
-    { key: 'demo', label: 'Live demo', type: 'input', ph: 'https://' },
-    { key: 'figma', label: 'Figma', type: 'input', ph: 'figma.com/...' },
-    { key: 'video', label: 'Video', type: 'input', ph: 'youtube.com/...' },
-  ] },
-  { label: 'COLLAB', title: 'Collaboration', fields: [
-    { key: 'openTo', label: 'Open to contributors?', type: 'toggle', choices: ['Yes', 'No'] },
-    { key: 'roles', label: 'What roles are you looking for?', type: 'input', ph: 'Frontend, ML, design...', hint: 'Shown on your project page so people know how to help.' },
-  ] },
-  { label: 'PREVIEW', title: 'Preview & submit', fields: [] },
-]
-const LAST_STEP = STEP_DEFS.length - 1
-
-class Component extends DCLogic {
-  state = OTU.state({ step: 0, form: { openTo: 'Yes', cat: 'Web' } })
-  componentDidMount() { OTU.mount(this) }
-  componentDidUpdate() { OTU.motion(this) }
-  componentWillUnmount() { OTU.unmount(this) }
-
-  renderVals() {
-    const s = this.state
-    const step = STEP_DEFS[s.step]
-    const setForm = (key, value) => this.setState({ form: Object.assign({}, s.form, { [key]: value }) })
-    return Object.assign(OTU.chrome(this, 'submit'), {
-      stepNum: s.step + 1,
-      stepTitle: step.title,
-      steps: STEP_DEFS.map((d, i) => ({
-        label: d.label,
-        aria: 'Go to step ' + (i + 1) + ', ' + d.title,
-        bar: i <= s.step ? OTU.BLUE : '#E6E4DE',
-        fg: i <= s.step ? '#10151B' : '#5A6470',
-        go: () => this.setState({ step: i }),
-      })),
-      stepFields: step.fields.map((f) => ({
-        label: f.label,
-        placeholder: f.ph || '',
-        value: s.form[f.key] || '',
-        isInput: f.type === 'input',
-        isArea: f.type === 'area',
-        isSelect: f.type === 'select',
-        isToggle: f.type === 'toggle',
-        options: f.options || [],
-        hasHint: !!f.hint,
-        hint: f.hint || '',
-        set: (e) => setForm(f.key, e.target.value),
-        choices: (f.choices || []).map((c) => {
-          const on = s.form[f.key] === c
-          return { label: c, on, set: () => setForm(f.key, c), bg: on ? OTU.BLUE : '#fff', fg: on ? '#fff' : '#3D4855', border: on ? OTU.BLUE : '#D9D6CE' }
-        }),
-      })),
-      isPreviewStep: s.step === LAST_STEP,
-      previewArt: OTU.art(OTU.BLUE, '#FFB893', 'orbit'),
-      previewTitle: s.form.name || 'Untitled project',
-      previewDesc: s.form.short || 'Add a short description in step one and it will appear here.',
-      previewStack: s.form.stack || 'No tech stack yet',
-      atFirstStep: s.step === 0,
-      backFg: s.step === 0 ? '#9AA3AC' : '#3D4855',
-      nextLabel: s.step === LAST_STEP ? 'Submit for Review' : 'Continue',
-      prevStep: () => this.setState({ step: Math.max(0, s.step - 1) }),
-      nextStep: () => {
-        if (s.step === LAST_STEP) {
-          OTU.flashNext('Submitted for review · moderators notified')
-          OTU.go('dashboard')
-        } else {
-          this.setState({ step: s.step + 1 })
-          window.scrollTo(0, 0)
+        renderVals() {
+          const s = this.state
+          const step = STEP_DEFS[s.step]
+          const setForm = (key, value) => this.setState({ form: Object.assign({}, s.form, { [key]: value }) })
+          return Object.assign(OTU.chrome(this, 'submit'), {
+            stepNum: s.step + 1,
+            stepTitle: step.title,
+            steps: STEP_DEFS.map((d, i) => ({
+              label: d.label,
+              aria: 'Go to step ' + (i + 1) + ', ' + d.title,
+              bar: i <= s.step ? OTU.BLUE : '#E6E4DE',
+              fg: i <= s.step ? '#10151B' : '#5A6470',
+              go: () => this.setState({ step: i }),
+            })),
+            stepFields: step.fields.map((f) => ({
+              label: f.label,
+              placeholder: f.ph || '',
+              value: s.form[f.key] || '',
+              isInput: f.type === 'input',
+              isArea: f.type === 'area',
+              isSelect: f.type === 'select',
+              isToggle: f.type === 'toggle',
+              options: f.options || [],
+              hasHint: !!f.hint,
+              hint: f.hint || '',
+              set: (e) => setForm(f.key, e.target.value),
+              choices: (f.choices || []).map((c) => {
+                const on = s.form[f.key] === c
+                return { label: c, on, set: () => setForm(f.key, c), bg: on ? OTU.BLUE : '#fff', fg: on ? '#fff' : '#3D4855', border: on ? OTU.BLUE : '#D9D6CE' }
+              }),
+            })),
+            isPreviewStep: s.step === LAST_STEP,
+            previewArt: OTU.art(OTU.BLUE, '#FFB893', 'orbit'),
+            previewTitle: s.form.name || 'Untitled project',
+            previewDesc: s.form.short || 'Add a short description in step one and it will appear here.',
+            previewStack: s.form.stack || 'No tech stack yet',
+            atFirstStep: s.step === 0,
+            backFg: s.step === 0 ? '#9AA3AC' : '#3D4855',
+            nextLabel: s.step === LAST_STEP ? 'Submit for Review' : 'Continue',
+            prevStep: () => this.setState({ step: Math.max(0, s.step - 1) }),
+            nextStep: () => {
+              if (s.step === LAST_STEP) {
+                OTU.flashNext('Submitted for review · moderators notified')
+                OTU.go('dashboard')
+              } else {
+                this.setState({ step: s.step + 1 })
+                window.scrollTo(0, 0)
+              }
+            },
+            saveDraft: () => OTU.flash(this, 'Draft saved'),
+          })
         }
-      },
-      saveDraft: () => OTU.flash(this, 'Draft saved'),
-    })
-  }
-}
-</script>
-</body>
+      }
+    </script>
+  </body>
 </html>
