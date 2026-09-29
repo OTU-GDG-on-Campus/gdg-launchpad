@@ -1,0 +1,336 @@
+# Local Supabase stack config.
+# Reference: https://supabase.com/docs/guides/local-development/cli/config
+#
+# Comments here are kept on the same line as the setting they describe. A `supabase init` in a
+# newer CLI writes them back above the line, so re-inline them rather than taking the churn.
+
+project_id = "gdg-launchpad" # Distinguishes projects on one host. Defaults to the directory name.
+
+[api]
+enabled = true
+port = 54321 # Port for the API URL.
+schemas = ["public", "graphql_public"] # Schemas exposed as API endpoints.
+extra_search_path = ["public", "extensions"] # Added to the search_path of every request.
+max_rows = 1000 # Max rows returned from a view, table, or function. Caps payload size.
+
+# Controls whether new tables, views, sequences and functions created in the `public` schema by
+# `postgres` are reachable through the Data API roles (`anon`, `authenticated`, `service_role`)
+# without explicit GRANTs, matching the cloud default. Set to `false` to require explicit GRANTs
+# instead. Left unset, a fresh project falls back to `true`.
+# auto_expose_new_tables = true
+
+[api.tls]
+enabled = false # Serve HTTPS locally with a self-signed certificate.
+# Paths to self-signed certificate pair.
+# cert_path = "../certs/my-cert.pem"
+# key_path = "../certs/my-key.pem"
+
+[db]
+port = 54322 # Port for the local database URL.
+shadow_port = 54320 # Port for the shadow database used by `db diff`.
+health_timeout = "2m" # How long to wait for the local database health check.
+major_version = 17 # Must match the remote. Run `SHOW server_version;` there to check.
+
+[db.pooler]
+enabled = false
+port = 54329 # Port for the local connection pooler.
+pool_mode = "transaction" # When a connection may be reused. Modes: `transaction`, `session`.
+default_pool_size = 20 # Server connections per user/database pair.
+max_client_conn = 100 # Maximum client connections allowed.
+
+# [db.vault]
+# secret_key = "env(SECRET_VALUE)"
+
+[db.migrations]
+enabled = true # If disabled, migrations are skipped during a db push or reset.
+schema_paths = [] # Ordered schema files, directories, or globs relative to supabase/.
+
+[db.seed]
+enabled = true # Seed the database after migrations during a db reset.
+sql_paths = ["./seed.sql"] # Ordered seed files, globs relative to supabase/.
+
+[db.network_restrictions]
+enabled = false # Manage network restrictions from this file.
+allowed_cidrs = ["0.0.0.0/0"] # IPv4 CIDRs allowed to connect. Empty array blocks all.
+allowed_cidrs_v6 = ["::/0"] # IPv6 CIDRs allowed to connect. Empty array blocks all.
+
+# Uncomment to reject non-secure connections to the database.
+# [db.ssl_enforcement]
+# enabled = true
+
+[realtime]
+enabled = true
+# ip_version = "IPv6" # Bind realtime via IPv4 or IPv6. Defaults to IPv4.
+# max_header_length = 4096 # Max length in bytes of HTTP request headers.
+
+[studio]
+enabled = true
+port = 54323 # Port for Supabase Studio.
+api_url = "http://127.0.0.1" # External URL of the API server the frontend connects to.
+openai_api_key = "env(OPENAI_API_KEY)" # Powers Supabase AI in Studio. Optional.
+
+# Email testing server. Emails sent with the local dev setup are not actually sent, they are
+# captured and viewable from the web interface.
+[local_smtp]
+enabled = true
+port = 54324 # Port for the email testing web interface.
+# Uncomment to expose additional ports for testing user applications that send emails.
+# smtp_port = 54325
+# pop3_port = 54326
+# admin_email = "admin@email.com"
+# sender_name = "Admin"
+
+[storage]
+enabled = true
+file_size_limit = "50MiB" # Maximum upload size, for example "5MB" or "500KB".
+
+# Uncomment to configure local storage buckets
+# [storage.buckets.images]
+# public = false
+# file_size_limit = "50MiB"
+# allowed_mime_types = ["image/png", "image/jpeg"]
+# objects_path = "./images"
+
+[storage.s3_protocol]
+enabled = true # Allow connections via S3 compatible clients.
+
+# Image transformation API is available to Supabase Pro plan.
+# [storage.image_transformation]
+# enabled = true
+
+# Store analytical data in S3 for running ETL jobs over Iceberg Catalog.
+# This feature is only available on the hosted platform.
+[storage.analytics]
+enabled = false
+max_namespaces = 5
+max_tables = 10
+max_catalogs = 2
+
+# Analytics Buckets is available to Supabase Pro plan.
+# [storage.analytics.buckets.my-warehouse]
+
+# Store vector embeddings in S3 for large and durable datasets.
+[storage.vector]
+enabled = true
+max_buckets = 10
+max_indexes = 5
+
+# Vector Buckets is available to Supabase Pro plan.
+# [storage.vector.buckets.documents-openai]
+
+[auth]
+enabled = true
+site_url = "http://localhost:5173" # Allow-list for redirects and for URLs built into emails.
+# external_url = "" # Where Auth serves. Defaults to the API external URL plus `/auth/v1`.
+# Exact URLs auth may redirect to. Production and Vercel preview URLs go in the dashboard.
+additional_redirect_urls = ["http://localhost:5173", "http://localhost:5173/**"]
+jwt_expiry = 3600 # Token lifetime in seconds. Default 3600, maximum 604800.
+# jwt_issuer = "" # JWT issuer URL. Defaults to auth.external_url.
+# signing_keys_path = "./signing_keys.json" # DO NOT commit your signing keys file to git.
+enable_refresh_token_rotation = true # If disabled, the refresh token never expires.
+refresh_token_reuse_interval = 10 # Seconds a refresh token may be reused after expiry.
+enable_signup = true # New signups allowed. The domain rule is enforced by a trigger, not here.
+enable_anonymous_sign_ins = false # Anonymous sessions would have no verified email to check.
+enable_manual_linking = false # Allow testing manual linking of accounts.
+minimum_password_length = 6 # Shorter passwords are rejected as weak. 8 or more recommended.
+# Supported values: `letters_digits`, `lower_upper_letters_digits`,
+# `lower_upper_letters_digits_symbols`.
+password_requirements = ""
+
+# Configure passkey sign-ins.
+# [auth.passkey]
+# enabled = false
+
+# Configure WebAuthn relying party settings (required when passkey is enabled).
+# [auth.webauthn]
+# rp_display_name = "Supabase"
+# rp_id = "localhost"
+# rp_origins = ["http://127.0.0.1:3000"]
+
+[auth.rate_limit]
+email_sent = 2 # Emails per hour. Requires auth.email.smtp.
+sms_sent = 30 # SMS messages per hour. Requires auth.sms.
+anonymous_users = 30 # Anonymous sign-ins per hour per IP. Requires enable_anonymous_sign_ins.
+token_refresh = 150 # Session refreshes per 5 minutes per IP.
+sign_in_sign_ups = 30 # Sign up and sign-in requests per 5 minutes per IP, excluding anonymous.
+token_verifications = 30 # OTP and magic link verifications per 5 minutes per IP.
+web3 = 30 # Web3 logins per 5 minutes per IP.
+
+# Configure one of the supported captcha providers: `hcaptcha`, `turnstile`.
+# [auth.captcha]
+# enabled = true
+# provider = "hcaptcha"
+# secret = ""
+
+[auth.email]
+enable_signup = false # Google is the only way in. Email signup would bypass the domain check.
+double_confirm_changes = true # Confirm an email change on both the old and the new address.
+enable_confirmations = false # Require confirming the address before sign-in.
+secure_password_change = false # Require a recent login to change a password.
+max_frequency = "1s" # Minimum gap before resending a confirmation or reset email.
+otp_length = 6 # Characters in the email OTP.
+otp_expiry = 3600 # Seconds before the email OTP expires.
+
+# Use a production-ready SMTP server
+# [auth.email.smtp]
+# enabled = true
+# host = "smtp.sendgrid.net"
+# port = 587
+# user = "apikey"
+# pass = "env(SENDGRID_API_KEY)"
+# admin_email = "admin@email.com"
+# sender_name = "Admin"
+
+# Uncomment to customize email template
+# [auth.email.template.invite]
+# subject = "You have been invited"
+# content_path = "./supabase/templates/invite.html"
+
+# Uncomment to customize notification email template
+# [auth.email.notification.password_changed]
+# enabled = true
+# subject = "Your password has been changed"
+# content_path = "./supabase/templates/password_changed_notification.html"
+
+[auth.sms]
+enable_signup = false # New user signups via SMS.
+enable_confirmations = false # Require phone confirmation before sign-in.
+template = "Your code is {{ .Code }}" # Template for sending OTP to users.
+max_frequency = "5s" # Minimum gap before sending another SMS OTP.
+
+# Use pre-defined map of phone number to OTP for testing.
+# [auth.sms.test_otp]
+# 4152127777 = "123456"
+
+# Configure logged in session timeouts.
+# [auth.sessions]
+# timebox = "24h" # Force log out after this duration.
+# inactivity_timeout = "8h" # Force log out after this much inactivity.
+
+# This hook runs before a new user is created and allows developers to reject the request based
+# on the incoming user object.
+# [auth.hook.before_user_created]
+# enabled = true
+# uri = "pg-functions://postgres/auth/before-user-created-hook"
+
+# This hook runs before a token is issued and allows you to add additional claims based on the
+# authentication method used.
+# [auth.hook.custom_access_token]
+# enabled = true
+# uri = "pg-functions://<database>/<schema>/<hook_name>"
+
+# Configure one of the supported SMS providers: `twilio`, `twilio_verify`, `messagebird`,
+# `textlocal`, `vonage`.
+[auth.sms.twilio]
+enabled = false
+account_sid = ""
+message_service_sid = ""
+auth_token = "env(SUPABASE_AUTH_SMS_TWILIO_AUTH_TOKEN)" # DO NOT commit the token. Use env().
+
+# Multi-factor-authentication is available to Supabase Pro plan.
+[auth.mfa]
+max_enrolled_factors = 10 # How many MFA factors may be enrolled at once per user.
+
+# Control MFA via App Authenticator (TOTP)
+[auth.mfa.totp]
+enroll_enabled = false
+verify_enabled = false
+
+# Configure MFA via Phone Messaging
+[auth.mfa.phone]
+enroll_enabled = false
+verify_enabled = false
+otp_length = 6
+template = "Your code is {{ .Code }}"
+max_frequency = "5s"
+
+# Configure MFA via WebAuthn
+# [auth.mfa.web_authn]
+# enroll_enabled = true
+# verify_enabled = true
+
+# Use an external OAuth provider. The full list of providers are: `apple`, `azure`, `bitbucket`,
+# `discord`, `facebook`, `github`, `gitlab`, `google`, `keycloak`, `linkedin_oidc`, `notion`,
+# `twitch`, `twitter`, `x`, `slack`, `spotify`, `workos`, `zoom`.
+[auth.external.google]
+enabled = true
+client_id = "env(SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID)"
+secret = "env(SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET)" # DO NOT commit the secret. Use env().
+redirect_uri = "" # Overrides the callback URL derived from auth.external_url.
+url = "" # Overrides the provider URL, for self-hosted or single-tenant providers.
+skip_nonce_check = false # Skipping the nonce check is required for local Google sign-in.
+email_optional = false # Allow authenticating when the provider returns no email address.
+
+[auth.external.apple]
+enabled = false
+client_id = ""
+secret = "env(SUPABASE_AUTH_EXTERNAL_APPLE_SECRET)" # DO NOT commit the secret. Use env().
+redirect_uri = "" # Overrides the callback URL derived from auth.external_url.
+url = "" # Overrides the provider URL, for self-hosted or single-tenant providers.
+skip_nonce_check = false # Skipping the nonce check is required for local Google sign-in.
+email_optional = false # Allow authenticating when the provider returns no email address.
+
+# Allow Solana wallet holders to sign in via the Sign in with Solana (SIWS, EIP-4361) standard.
+# Configure the "web3" rate limit above and set up [auth.captcha] if self-hosting.
+[auth.web3.solana]
+enabled = false
+
+# Use Firebase Auth as a third-party provider alongside Supabase Auth.
+[auth.third_party.firebase]
+enabled = false
+# project_id = "my-firebase-project"
+
+# Use Auth0 as a third-party provider alongside Supabase Auth.
+[auth.third_party.auth0]
+enabled = false
+# tenant = "my-auth0-tenant"
+# tenant_region = "us"
+
+# Use AWS Cognito (Amplify) as a third-party provider alongside Supabase Auth.
+[auth.third_party.aws_cognito]
+enabled = false
+# user_pool_id = "my-user-pool-id"
+# user_pool_region = "us-east-1"
+
+# Use Clerk as a third-party provider alongside Supabase Auth.
+[auth.third_party.clerk]
+enabled = false
+# domain = "example.clerk.accounts.dev" # Obtain from https://clerk.com/setup/supabase
+
+[auth.oauth_server]
+enabled = false # Enable OAuth server functionality.
+authorization_url_path = "/oauth/consent" # Path for the OAuth consent flow UI.
+allow_dynamic_registration = false # Allow dynamic client registration.
+
+[edge_runtime]
+enabled = true
+# Request policy. `per_worker` hot reloads during local development, `oneshot` is the fallback
+# if hot reload misbehaves, for example in large repos or with symlinks.
+policy = "per_worker"
+inspector_port = 8083 # Chrome inspector port for debugging edge functions.
+deno_version = 2 # The Deno major version to use.
+
+# [edge_runtime.secrets]
+# secret_key = "env(SECRET_VALUE)"
+
+[analytics]
+enabled = true
+port = 54327
+backend = "postgres" # Supported backends: `postgres`, `bigquery`.
+
+# Experimental features may be deprecated any time
+[experimental]
+orioledb_version = "" # Configures Postgres storage engine to use OrioleDB (S3).
+s3_host = "env(S3_HOST)" # S3 bucket URL, eg. <bucket_name>.s3-<region>.amazonaws.com
+s3_region = "env(S3_REGION)" # S3 bucket region, eg. us-east-1
+s3_access_key = "env(S3_ACCESS_KEY)" # AWS_ACCESS_KEY_ID for the S3 bucket.
+s3_secret_key = "env(S3_SECRET_KEY)" # AWS_SECRET_ACCESS_KEY for the S3 bucket.
+
+# pg-delta is the schema diff engine for db diff / db pull / db remote commit.
+[experimental.pgdelta]
+enabled = true # Set to false to fall back to the legacy migra engine.
+# declarative_schema_path = "./schemas" # Directory under supabase/ for declarative files.
+# JSON passed through to pg-delta SQL formatting. When omitted, SQL is formatted with uppercase
+# keywords, indent 2, max width 180, trailing commas, and column/key alignment. Set to "null"
+# to emit raw, unformatted SQL.
+# format_options = "{\"keywordCase\":\"upper\",\"indent\":2,\"maxWidth\":180,\"commaStyle\":\"trailing\"}"
