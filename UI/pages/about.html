@@ -510,53 +510,208 @@
         </sc-if>
 
         <main id="otu-main" style="flex: 1">
-          <div style="max-width: 860px; margin: 0 auto; padding: 72px clamp(24px, 4vw, 44px) 110px">
+          <div
+            style="
+              max-width: 860px;
+              margin: 0 auto;
+              padding: clamp(64px, 9vw, 112px) clamp(24px, 4vw, 44px) 110px;
+            "
+          >
             <h1
               style="
                 margin: 0;
-                font-size: clamp(36px, 5vw, 58px);
-                letter-spacing: -0.035em;
+                font-size: clamp(38px, 5.6vw, 64px);
+                line-height: 1.02;
+                letter-spacing: -0.04em;
                 font-weight: 800;
-                max-width: 16ch;
+                max-width: 20ch;
+                text-wrap: balance;
               "
             >
-              A place for the things you built anyway.
+              A place for everything you’ve built<span style="color: #e2572a">.</span>
             </h1>
             <p
               style="
-                margin: 24px 0 0;
-                font-size: 19px;
-                line-height: 1.65;
-                color: #22303d;
-                max-width: 66ch;
+                margin: clamp(24px, 3vw, 32px) 0 0;
+                font-size: clamp(18px, 1.6vw, 21px);
+                line-height: 1.62;
+                color: #3d4855;
+                max-width: 58ch;
+                text-wrap: pretty;
               "
             >
-              OTU LaunchPad collects the work Ontario Tech students do outside of coursework. The
-              hackathon project, the tool you wrote to fix your own problem, the game you finished
-              over reading week. Work that usually ends up on a laptop and stays there.
+              <span style="color: #10151b; font-weight: 600"
+                >OTU LaunchPad collects the work Ontario Tech students do outside of
+                coursework.</span
+              >
+              A hackathon project, a tool you wrote to fix your own problem, a game you finished
+              over reading week. Work that usually ends up on a laptop and stays there can be put in
+              front of eyes through OTU LaunchPad.
             </p>
             <div
               style="
-                display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
-                gap: 2px;
-                margin-top: 48px;
-                background: #e6e4de;
-                border: 1px solid #e6e4de;
-                border-radius: 12px;
+                margin-top: clamp(48px, 6vw, 72px);
+                border: 1px solid #e3e0d8;
+                border-radius: 6px;
                 overflow: hidden;
+                background-color: #fafaf8;
+                background-image:
+                  linear-gradient(rgba(0, 65, 122, 0.05) 1px, transparent 1px),
+                  linear-gradient(90deg, rgba(0, 65, 122, 0.05) 1px, transparent 1px),
+                  linear-gradient(rgba(0, 65, 122, 0.08) 1px, transparent 1px),
+                  linear-gradient(90deg, rgba(0, 65, 122, 0.08) 1px, transparent 1px);
+                background-size:
+                  24px 24px,
+                  24px 24px,
+                  120px 120px,
+                  120px 120px;
               "
             >
-              <sc-for list="{{ aboutPoints }}" as="a" hint-placeholder-count="3">
-                <div style="background: #fff; padding: 28px">
-                  <div style="font-size: 18px; font-weight: 700; letter-spacing: -0.02em">
-                    {{ a.title }}
-                  </div>
-                  <div style="font-size: 14.5px; color: #3d4855; margin-top: 9px; line-height: 1.6">
-                    {{ a.body }}
+              <div sc-camel-style="{{ aboutGrid }}">
+                <div sc-camel-style="{{ aboutLeadCell }}">
+                  <div style="position: relative; flex: 1; display: flex">
+                    <div
+                      aria-hidden="true"
+                      style="
+                        position: absolute;
+                        inset: 0;
+                        transform: translate(10px, 10px);
+                        border: 1px dashed #9fb3c6;
+                        border-radius: 4px;
+                      "
+                    ></div>
+                    <div
+                      style="
+                        position: relative;
+                        flex: 1;
+                        display: flex;
+                        flex-direction: column;
+                        background: #fff;
+                        border: 1px solid #e3e0d8;
+                        border-radius: 4px;
+                        padding: clamp(24px, 3.5vw, 36px);
+                      "
+                    >
+                      <div
+                        aria-hidden="true"
+                        style="
+                          display: flex;
+                          align-items: center;
+                          justify-content: space-between;
+                          height: 16px;
+                          font-family: 'IBM Plex Mono', monospace;
+                          font-size: 11px;
+                          letter-spacing: 0.16em;
+                          color: #00417a;
+                        "
+                      >
+                        <span>01</span
+                        ><span style="width: 7px; height: 7px; background: #00417a"></span>
+                      </div>
+                      <div style="flex: 1; min-height: clamp(40px, 6vw, 72px)"></div>
+                      <div
+                        style="
+                          max-width: 12ch;
+                          font-size: clamp(26px, 3vw, 34px);
+                          line-height: 1.05;
+                          letter-spacing: -0.035em;
+                          font-weight: 800;
+                          color: #10151b;
+                          text-wrap: balance;
+                        "
+                      >
+                        {{ aboutLead.title }}
+                      </div>
+                      <div
+                        style="
+                          max-width: 34ch;
+                          margin-top: 14px;
+                          font-size: 16px;
+                          line-height: 1.6;
+                          color: #3d4855;
+                        "
+                      >
+                        {{ aboutLead.body }}
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </sc-for>
+                <div sc-camel-style="{{ aboutRestCell }}">
+                  <div style="position: relative">
+                    <span
+                      aria-hidden="true"
+                      style="
+                        position: absolute;
+                        left: 15px;
+                        top: 0;
+                        bottom: 0;
+                        width: 1px;
+                        background: repeating-linear-gradient(
+                          180deg,
+                          #9fb3c6 0 3px,
+                          transparent 3px 8px
+                        );
+                      "
+                    ></span>
+                    <sc-if value="{{ aboutLink }}" hint-placeholder-val="{{ true }}">
+                      <span
+                        aria-hidden="true"
+                        style="
+                          position: absolute;
+                          left: -32px;
+                          top: 36px;
+                          width: 47px;
+                          height: 1px;
+                          background: repeating-linear-gradient(
+                            90deg,
+                            #9fb3c6 0 3px,
+                            transparent 3px 8px
+                          );
+                        "
+                      ></span>
+                    </sc-if>
+                    <sc-for list="{{ aboutRest }}" as="a" hint-placeholder-count="2">
+                      <div style="position: relative; padding-left: 44px">
+                        <span
+                          aria-hidden="true"
+                          sc-camel-style="position:absolute;left:12px;top:33px;width:7px;height:7px;background:{{ a.accent }}"
+                        ></span>
+                        <div sc-camel-style="padding:28px 0;border-top:{{ a.rule }}">
+                          <div
+                            aria-hidden="true"
+                            sc-camel-style="height:16px;line-height:16px;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.16em;color:{{ a.accent }}"
+                          >
+                            {{ a.n }}
+                          </div>
+                          <div
+                            style="
+                              margin-top: 12px;
+                              font-size: 20px;
+                              line-height: 1.2;
+                              letter-spacing: -0.025em;
+                              font-weight: 800;
+                              color: #10151b;
+                            "
+                          >
+                            {{ a.title }}
+                          </div>
+                          <div
+                            style="
+                              max-width: 36ch;
+                              margin-top: 8px;
+                              font-size: 15px;
+                              line-height: 1.6;
+                              color: #3d4855;
+                            "
+                          >
+                            {{ a.body }}
+                          </div>
+                        </div>
+                      </div>
+                    </sc-for>
+                  </div>
+                </div>
+              </div>
             </div>
             <h2
               style="margin: 56px 0 0; font-size: 30px; font-weight: 800; letter-spacing: -0.03em"
@@ -737,7 +892,21 @@
         componentWillUnmount() { OTU.unmount(this) }
 
         renderVals() {
-          return Object.assign(OTU.chrome(this, 'about'), { aboutPoints: ABOUT_POINTS })
+          const wide = !this.state.isMobile
+          const [lead, ...rest] = ABOUT_POINTS
+          return Object.assign(OTU.chrome(this, 'about'), {
+            aboutLead: lead,
+            aboutRest: rest.map((p, i) => Object.assign({}, p, {
+              n: String(i + 2).padStart(2, '0'),
+              accent: i === rest.length - 1 ? OTU.ORANGE : OTU.BLUE,
+              rule: i ? '1px solid #E3E0D8' : '0',
+            })),
+            aboutLink: wide,
+            aboutGrid: 'display:grid;grid-template-columns:' + (wide ? 'minmax(0,1.25fr) minmax(0,1fr)' : 'minmax(0,1fr)'),
+            aboutLeadCell: 'display:flex;padding:' + (wide ? '32px' : '22px 22px 0'),
+            // Top padding tracks the lead sheet's padding so the 01 and 02 rows share a baseline.
+            aboutRestCell: wide ? 'padding:calc(clamp(24px,3.5vw,36px) + 4px) 32px 12px 0' : 'padding:0 22px 8px 7px',
+          })
         }
       }
     </script>
