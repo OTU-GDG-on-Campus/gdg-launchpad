@@ -1,14 +1,17 @@
-// Page frame shared by every route: navbar, centered content column, footer.
+// Shared page frame: full-width landing page and centered content for all other routes.
 
-import { Outlet } from 'react-router'
+import { Outlet, useLocation } from 'react-router'
+import { cn } from '@/lib/cn'
 import { Footer } from './Footer'
 import { Navbar } from './Navbar'
 
 export function AppShell() {
+  const isLandingPage = useLocation().pathname === '/'
+
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className={cn('flex min-h-screen flex-col', isLandingPage && 'landing-theme')}>
       <Navbar />
-      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-10">
+      <main className={cn('w-full flex-1', !isLandingPage && 'mx-auto max-w-6xl px-4 py-10')}>
         <Outlet />
       </main>
       <Footer />

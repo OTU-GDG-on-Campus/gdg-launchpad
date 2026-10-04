@@ -1,30 +1,32 @@
-// Top navigation: mark and wordmark, primary links, theme toggle, and the auth control.
+// Shared navigation: home wordmark, primary links, theme toggle, and auth control.
 
 import { NavLink } from 'react-router'
+import { AuthControl } from '@/components/auth/AuthControl'
+import { Wordmark } from '@/components/ui/Logo'
 import { NAV_LINKS } from '@/config/site'
 import { cn } from '@/lib/cn'
-import { AuthControl } from '@/components/auth/AuthControl'
-import { LogoMark, Wordmark } from '@/components/ui/Logo'
 import { ThemeToggle } from './ThemeToggle'
 
 export function Navbar() {
   return (
-    <header className="border-line bg-surface-raised/80 sticky top-0 z-10 border-b backdrop-blur">
-      <nav className="mx-auto flex h-16 max-w-6xl items-center gap-6 px-4">
-        <NavLink to="/" className="flex items-center gap-2">
-          <LogoMark className="h-5 w-5" />
+    <header className="border-line bg-surface-raised/95 sticky top-0 z-50 border-b backdrop-blur">
+      <nav
+        aria-label="Main navigation"
+        className="mx-auto flex min-h-16 max-w-6xl flex-wrap items-center gap-x-6 gap-y-2 px-4 py-3 sm:px-6"
+      >
+        <NavLink to="/" aria-label="LaunchPad home" className="shrink-0">
           <Wordmark />
         </NavLink>
 
-        <ul className="ml-auto hidden items-center gap-1 md:flex">
+        <ul className="order-last flex w-full flex-wrap items-center gap-1 md:order-none md:ml-4 md:w-auto">
           {NAV_LINKS.map((link) => (
             <li key={link.to}>
               <NavLink
                 to={link.to}
                 className={({ isActive }) =>
                   cn(
-                    'rounded-lg px-3 py-2 text-sm font-medium transition-colors',
-                    isActive ? 'text-brand-700' : 'text-ink-muted hover:text-ink',
+                    'inline-flex rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+                    isActive ? 'text-brand-700' : 'text-ink-soft hover:text-ink',
                   )
                 }
               >
@@ -34,7 +36,7 @@ export function Navbar() {
           ))}
         </ul>
 
-        <div className="ml-auto flex items-center gap-2 md:ml-0">
+        <div className="ml-auto flex items-center gap-2">
           <ThemeToggle />
           <AuthControl />
         </div>
