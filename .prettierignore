@@ -1,3 +1,13 @@
 dist
 node_modules
 package-lock.json
+<<<<<<< HEAD
+
+# Static design mockups and vendored libraries. Not part of the Vite build, and reformatting
+# minified vendor bundles would be churn at best and breakage at worst.
+UI
+=======
+# Vendored builds and the original design bundle must stay byte-identical to their sources.
+UI/OTU LaunchPad.html
+UI/pages/assets/vendor
+>>>>>>> 60290c5a9c6d1613bb4cda82bce6071810074eae
