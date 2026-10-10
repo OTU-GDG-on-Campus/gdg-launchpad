@@ -15,9 +15,9 @@ account is on that domain, the university has already vouched for the person.
 
 Google sign-in through Supabase is wired but not yet verified against a live project.
 
-- `supabase/migrations/20260926000000_profiles.sql` creates `profiles`, the sign-up trigger that
-  enforces the domain rule, RLS on `profiles`, and the `is_admin()` and `can_participate()` helpers
-  that later policies on `projects`, `upvotes`, and `comments` should call.
+- `supabase/migrations/20260928003656_initial_schema.sql` creates `profiles`, the sign-up trigger
+  that enforces the domain rule, RLS on every table, and the `is_admin()` and `can_participate()`
+  helpers that the policies on `projects`, `upvotes`, and `comments` call.
 - `src/lib/api/client.ts` exposes `signInWithGoogle`, `signOutUser`, `getCurrentUser`, and
   `subscribeToAuthChanges`. `AuthProvider` calls only those.
 - When `VITE_SUPABASE_URL` or `VITE_SUPABASE_ANON_KEY` is unset, `AuthProvider` falls back to the
