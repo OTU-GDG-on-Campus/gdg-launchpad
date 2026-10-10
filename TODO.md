@@ -24,7 +24,7 @@ The smallest set that makes the site real. Everything P0 below rolls up here.
 - [x] Client-side domain helper (`isAllowedStudentEmail`)
 - [x] Supabase project created and scaffolded into the repo, see [docs/supabase.md](docs/supabase.md)
 - [x] `profiles` table plus a trigger on `auth.users` rejecting non-OTU domains, written as a migration
-- [ ] **P0** Apply the initial migration, which is syntax checked but has never been run
+- [x] **P0** Apply the initial migration, which is syntax checked but has never been run
 - [ ] **P0** Env vars set in Vercel
 - [ ] **P0** Google OAuth client configured, provider enabled in Supabase
 - [ ] **P0** Replace the demo session in `AuthProvider` with real Supabase sign-in

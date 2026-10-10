@@ -68,7 +68,7 @@ Step by step setup lives in [supabase.md](supabase.md). This is the summary.
 - [x] Create the Supabase project. Ref `eavnzbmsfpslwdgpjfjv`, region `us-west-2`
 - [x] Write the `profiles` table and the `auth.users` trigger enforcing the domain rule
 - [x] Write RLS policies for `projects`, `upvotes`, and `comments`
-- [ ] Apply the initial migration, which has been syntax checked but never run
+- [x] Apply the initial migration, which has been syntax checked but never run
 - [ ] Save the URL and anon key into Vercel env vars and `.env.local`
 - [ ] Create a Google Cloud OAuth client, add the Supabase callback as an authorized redirect URI
 - [ ] Enable the Google provider in Supabase Auth with that client ID and secret

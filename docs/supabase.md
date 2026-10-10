@@ -94,7 +94,7 @@ Until all three exist the deploy job fails on every merge to main. The PR job ne
 
 ## Still to do
 
-- [ ] Apply the initial migration to the local stack and fix whatever it catches
+- [x] Apply the initial migration to the local stack and fix whatever it catches
 - [ ] Configure the Google provider, then push the migration to the hosted project
 - [ ] Generate `src/types/database.ts` and type the queries in `lib/api/client.ts` against it
 - [ ] Replace each mock read in `lib/api/client.ts` with a real query, one function at a time
