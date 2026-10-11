@@ -1,12 +1,87 @@
-// The single seam between UI and data. Every component reads through these functions, so
-// swapping mock arrays for Supabase queries touches this file and nothing else.
+// The single seam between UI and data. Auth goes through Supabase when configured, the rest still
+// reads mock arrays, so swapping those for Supabase queries touches this file and nothing else.
 
+import { ALLOWED_EMAIL_DOMAINS } from '@/config/site'
+import type { Comment, Project, ProjectPage, ProjectQuery, Sprint, User } from '@/types'
 import { MOCK_COMMENTS } from './mock/comments'
 import { MOCK_PROJECTS } from './mock/projects'
 import { MOCK_SPRINTS } from './mock/sprints'
-import type { Comment, Project, ProjectPage, ProjectQuery, Sprint } from '@/types'
+import { DEMO_USER } from './mock/users'
+import { supabase } from './supabase'
 
 export const DEFAULT_PER_PAGE = 9
+
+/** False when Supabase env vars are unset. Auth then falls back to a local demo student. */
+export const isBackendConfigured = supabase !== null
+
+interface ProfileRow {
+  id: string
+  email: string
+  name: string
+  avatar_url: string | null
+  role: 'student' | 'admin'
+  banned_at: string | null
+}
+
+function toUser(row: ProfileRow): User {
+  return {
+    id: row.id,
+    email: row.email,
+    name: row.name,
+    avatarUrl: row.avatar_url,
+    role: row.role,
+    bannedAt: row.banned_at,
+  }
+}
+
+/** Starts Google sign-in. The browser leaves the site and returns to `returnTo` afterwards. */
+export async function signInWithGoogle(returnTo: string): Promise<void> {
+  if (!supabase) return
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: returnTo,
+      // A chooser hint only. The sign-up trigger in the database is what rejects other domains.
+      queryParams: { hd: ALLOWED_EMAIL_DOMAINS[0], prompt: 'select_account' },
+    },
+  })
+  if (error) throw error
+}
+
+export async function signOutUser(): Promise<void> {
+  if (!supabase) return
+  const { error } = await supabase.auth.signOut()
+  if (error) throw error
+}
+
+/** The signed-in student's profile, or null when signed out or no profile row exists. */
+export async function getCurrentUser(): Promise<User | null> {
+  if (!supabase) return DEMO_USER
+
+  const { data: sessionData } = await supabase.auth.getSession()
+  const userId = sessionData.session?.user.id
+  if (!userId) return null
+
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('id, email, name, avatar_url, role, banned_at')
+    .eq('id', userId)
+    .maybeSingle<ProfileRow>()
+  if (error) throw error
+  return data ? toUser(data) : null
+}
+
+/** Calls `onChange` whenever the session changes. Returns an unsubscribe function. */
+export function subscribeToAuthChanges(onChange: () => void): () => void {
+  if (!supabase) return () => {}
+  const { data } = supabase.auth.onAuthStateChange((event) => {
+    if (event === 'SIGNED_IN' || event === 'SIGNED_OUT' || event === 'USER_UPDATED') {
+      // Deferred because awaiting Supabase calls inside this callback can deadlock the client.
+      setTimeout(onChange, 0)
+    }
+  })
+  return () => data.subscription.unsubscribe()
+}
 
 function sortProjects(projects: Project[], sort: ProjectQuery['sort']): Project[] {
   const compare =

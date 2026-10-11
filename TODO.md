@@ -24,7 +24,7 @@ The smallest set that makes the site real. Everything P0 below rolls up here.
 - [x] Client-side domain helper (`isAllowedStudentEmail`)
 - [x] Supabase project created and scaffolded into the repo, see [docs/supabase.md](docs/supabase.md)
 - [x] `profiles` table plus a trigger on `auth.users` rejecting non-OTU domains, written as a migration
-- [ ] **P0** Apply the initial migration, which is syntax checked but has never been run
+- [x] **P0** Apply the initial migration, which is syntax checked but has never been run
 - [ ] **P0** Env vars set in Vercel
 - [ ] **P0** Google OAuth client configured, provider enabled in Supabase
 - [ ] **P0** Replace the demo session in `AuthProvider` with real Supabase sign-in
@@ -98,7 +98,7 @@ The smallest set that makes the site real. Everything P0 below rolls up here.
 - [x] Vercel SPA rewrite so deep links survive a refresh
 - [ ] **P0** Connect the repo to Vercel, confirm preview deploys work
 - [ ] **P1** Database migrations checked into the repo
-- [ ] **P1** Seed script so a fresh local database is usable
+- [x] **P1** Seed script so a fresh local database is usable
 - [ ] **P1** Error boundary and a real error page
 - [ ] **P1** Rate limiting on submissions and comments
 - [ ] **P2** Automated tests. None exist yet, start with the data layer and `useAsync`
@@ -127,7 +127,7 @@ The smallest set that makes the site real. Everything P0 below rolls up here.
 Things a reader might mistake for finished work.
 
 - Everything reads from `src/lib/api/mock/`. No database exists.
-- `signIn()` returns a fixed demo student. Nothing is verified.
+- Without `VITE_SUPABASE_*` set, `signIn()` returns a fixed demo student. Nothing is verified.
 - Upvotes and filters are in-memory only and reset on reload.
 - No project has a real cover image or screenshot, so tinted placeholders stand in.
 - Sprint records, including the "active" Discord Bot sprint, are placeholder rows.
