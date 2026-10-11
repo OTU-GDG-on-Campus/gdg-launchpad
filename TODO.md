@@ -98,7 +98,7 @@ The smallest set that makes the site real. Everything P0 below rolls up here.
 - [x] Vercel SPA rewrite so deep links survive a refresh
 - [ ] **P0** Connect the repo to Vercel, confirm preview deploys work
 - [ ] **P1** Database migrations checked into the repo
-- [ ] **P1** Seed script so a fresh local database is usable
+- [x] **P1** Seed script so a fresh local database is usable
 - [ ] **P1** Error boundary and a real error page
 - [ ] **P1** Rate limiting on submissions and comments
 - [ ] **P2** Automated tests. None exist yet, start with the data layer and `useAsync`

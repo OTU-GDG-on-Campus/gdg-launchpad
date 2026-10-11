@@ -99,4 +99,4 @@ Until all three exist the deploy job fails on every merge to main. The PR job ne
 - [ ] Generate `src/types/database.ts` and type the queries in `lib/api/client.ts` against it
 - [ ] Replace each mock read in `lib/api/client.ts` with a real query, one function at a time
 - [ ] Storage buckets and policies for cover images and screenshots
-- [ ] Seed script for local development, so a fresh `db:reset` is not an empty site
+- [x] Seed script for local development, so a fresh `db:reset` is not an empty site
