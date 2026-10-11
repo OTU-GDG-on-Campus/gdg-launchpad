@@ -1,5 +1,4 @@
-/* Global styles and the design tokens every component reads. Tailwind v4 configures in CSS.
-   Dark is the default. Token values are re-declared under [data-theme] so the toggle can swap them. */
+/* Global theme tokens and landing-page backgrounds. Landing overrides apply only on the home route. */
 
 @import 'tailwindcss';
 
@@ -8,19 +7,17 @@
   --color-surface: #1f2833;
   --color-surface-raised: #121a21;
   --color-line: #2f3c4f;
-
   --color-ink: #e9eaec;
   --color-ink-soft: #c5c6c7;
   --color-ink-muted: #8e9aa6;
-
   --color-brand-50: #0f2233;
   --color-brand-500: #0072ce;
   --color-brand-600: #1f8ae0;
   --color-brand-700: #46b8ff;
-
   --color-accent: #45a29e;
   --color-accent-soft: #142b2a;
   --color-flare: #ff9500;
+  --color-on-brand: #ffffff;
 }
 
 [data-theme='light'] {
@@ -28,19 +25,46 @@
   --color-surface: #ffffff;
   --color-surface-raised: #f0f2f5;
   --color-line: #e3e6eb;
-
   --color-ink: #14181f;
   --color-ink-soft: #333a45;
   --color-ink-muted: #5c6573;
-
   --color-brand-50: #eef4ff;
   --color-brand-500: #0072ce;
   --color-brand-600: #005ca8;
   --color-brand-700: #1a46a0;
-
   --color-accent: #2f7a76;
   --color-accent-soft: #e6f2f1;
   --color-flare: #b45c00;
+  --color-on-brand: #ffffff;
+}
+
+.landing-theme {
+  --color-surface-muted: #0b0c10;
+  --color-surface: #121a21;
+  --color-surface-raised: #10171e;
+  --landing-grid-minor: rgb(70 184 255 / 5%);
+  --landing-grid-major: rgb(70 184 255 / 8%);
+  background-color: var(--color-surface-muted);
+  color: var(--color-ink);
+}
+
+[data-theme='light'] .landing-theme {
+  --color-surface-muted: #fcfcfa;
+  --color-surface: #ffffff;
+  --color-surface-raised: #f5f5f1;
+  --color-line: #dfe3e6;
+  --color-ink: #10151b;
+  --color-ink-soft: #333a45;
+  --color-ink-muted: #626b75;
+  --color-brand-50: #eef4fa;
+  --color-brand-500: #00417a;
+  --color-brand-600: #00335f;
+  --color-brand-700: #00417a;
+  --color-accent: #2f7a76;
+  --color-accent-soft: #e6f2f1;
+  --color-flare: #c74722;
+  --landing-grid-minor: rgb(0 65 122 / 4%);
+  --landing-grid-major: rgb(0 65 122 / 7%);
 }
 
 @layer base {
@@ -51,4 +75,42 @@
   :focus-visible {
     @apply outline-brand-700 outline-2 outline-offset-2;
   }
+}
+
+@layer utilities {
+  .landing-grid {
+    background-image:
+      linear-gradient(to right, var(--landing-grid-major) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--landing-grid-major) 1px, transparent 1px),
+      linear-gradient(to right, var(--landing-grid-minor) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--landing-grid-minor) 1px, transparent 1px);
+    background-size:
+      120px 120px,
+      120px 120px,
+      24px 24px,
+      24px 24px;
+  }
+
+  .landing-hero {
+    background-image: radial-gradient(
+      ellipse at center,
+      transparent 30%,
+      var(--color-surface-muted) 85%
+    );
+  }
+
+  .landing-cover {
+    background-image:
+      radial-gradient(ellipse at center, var(--color-brand-50), transparent 75%),
+      linear-gradient(to right, var(--landing-grid-major) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--landing-grid-major) 1px, transparent 1px);
+    background-size:
+      auto,
+      24px 24px,
+      24px 24px;
+  }
+}
+
+.landing-theme > footer {
+  margin-top: 0;
 }

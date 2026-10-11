@@ -1,116 +1,177 @@
-// Landing page: hero, what LaunchPad is for, featured projects, and a closing call to action.
+// Landing page: full-width grid, community overview, featured projects, and submission banner.
 
+import { useState } from 'react'
 import { Link } from 'react-router'
-import { ProjectList } from '@/components/projects/ProjectList'
-import { Button } from '@/components/ui/Button'
-import { Wordmark } from '@/components/ui/Logo'
-import { LoadingState } from '@/components/ui/PageState'
-import { SITE } from '@/config/site'
+import { LandingProjectCard } from '@/components/projects/LandingProjectCard'
+import { EmptyState, ErrorState, LoadingState } from '@/components/ui/PageState'
 import { useProjectFeed } from '@/hooks/useProjectFeed'
 
-const VALUE_POINTS = [
-  {
-    title: 'Find inspiration',
-    detail: 'See what people around you are building, and how they pulled it off.',
-    icon: 'M10 2a6 6 0 0 0-3.5 10.9V15a1 1 0 0 0 1 1h5a1 1 0 0 0 1-1v-2.1A6 6 0 0 0 10 2ZM8 17.5a1 1 0 0 1 1-1h2a1 1 0 0 1 0 2H9a1 1 0 0 1-1-1Z',
-  },
-  {
-    title: 'Share your projects',
-    detail: 'Put your work in front of students and employers who are already looking.',
-    icon: 'M10 2.5a1 1 0 0 1 .7.3l4 4a1 1 0 0 1-1.4 1.4L11 5.9V13a1 1 0 0 1-2 0V5.9L6.7 8.2a1 1 0 1 1-1.4-1.4l4-4a1 1 0 0 1 .7-.3ZM4 14a1 1 0 0 1 1 1v1h10v-1a1 1 0 1 1 2 0v1.5a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 3 16.5V15a1 1 0 0 1 1-1Z',
-  },
-  {
-    title: 'Contribute',
-    detail: 'Jump into a project marked open to help and grow your GitHub alongside it.',
-    icon: 'M7.8 4.7a1 1 0 0 1 0 1.4L3.9 10l3.9 3.9a1 1 0 1 1-1.4 1.4l-4.6-4.6a1 1 0 0 1 0-1.4l4.6-4.6a1 1 0 0 1 1.4 0Zm4.4 0a1 1 0 0 1 1.4 0l4.6 4.6a1 1 0 0 1 0 1.4l-4.6 4.6a1 1 0 0 1-1.4-1.4l3.9-3.9-3.9-3.9a1 1 0 0 1 0-1.4Z',
-  },
-]
+const PRIMARY_LINK =
+  'bg-brand-500 text-on-brand hover:bg-brand-600 inline-flex min-h-12 items-center justify-center rounded-lg px-6 py-3 text-sm font-semibold transition-colors'
+const SECONDARY_LINK =
+  'border-line bg-surface text-ink hover:border-brand-700 inline-flex min-h-12 items-center justify-center rounded-lg border px-6 py-3 text-sm font-semibold transition-colors'
 
 export function HomePage() {
-  const { projects, loading, upvote } = useProjectFeed({ sort: 'top' })
+  const { projects, totalCount, loading, error, upvote } = useProjectFeed({
+    sort: 'top',
+    perPage: 6,
+  })
+  const [voteError, setVoteError] = useState<string | null>(null)
+  const featuredProjects = projects.slice(0, 3)
+  const otherProjects = projects.slice(3)
+  const openCount = projects.filter((project) => project.openToContributions).length
+  const categoryCount = new Set(projects.map((project) => project.category)).size
+  const statistics = [
+    { label: 'Projects in the gallery', value: totalCount },
+    { label: 'Open in this selection', value: openCount },
+    { label: 'Categories in this selection', value: categoryCount },
+  ]
+
+  async function handleUpvote(projectId: string) {
+    setVoteError(null)
+    try {
+      await upvote(projectId)
+    } catch (cause) {
+      setVoteError(
+        cause instanceof Error ? cause.message : 'Unable to update your upvote. Try again.',
+      )
+    }
+  }
 
   return (
-    <>
-      <section className="py-16 text-center sm:py-24">
-        <Wordmark size="hero" />
-        <h1 className="mt-6 text-2xl font-bold tracking-tight sm:text-3xl">{SITE.tagline}</h1>
-        <p className="text-ink-muted mx-auto mt-4 max-w-xl text-sm">
-          A showcase for Ontario Tech computer science students. Post your projects, team up for
-          Semester Sprints, and get discovered.
+    <div className="landing-grid">
+      <section
+        aria-labelledby="landing-title"
+        className="landing-hero relative flex min-h-140 flex-col items-center justify-center px-4 py-20 text-center sm:px-6 sm:py-24"
+      >
+        <p className="text-ink-muted mb-6 font-mono text-xs tracking-widest uppercase">
+          Built by students. Made to be shared.
         </p>
-        <div className="mt-10 flex flex-wrap justify-center gap-3">
-          <Link to="/submit">
-            <Button size="lg">Post your project</Button>
+        <h1
+          id="landing-title"
+          className="mx-auto max-w-5xl text-5xl leading-[0.98] font-extrabold tracking-[-0.045em] sm:text-7xl lg:text-8xl"
+        >
+          Where <span className="text-brand-700">Ontario Tech's</span>
+          <br /> students ship<span className="text-flare">.</span>
+        </h1>
+        <p className="text-ink-muted mx-auto mt-7 max-w-xl text-base leading-relaxed sm:text-lg">
+          Discover projects built by students, contribute to the ones you love, and build something
+          of your own.
+        </p>
+        <div className="mt-9 flex w-full flex-col justify-center gap-3 sm:w-auto sm:flex-row">
+          <Link to="/projects" className={PRIMARY_LINK}>
+            Explore Projects <span aria-hidden="true">↗</span>
           </Link>
-          <Link to="/projects">
-            <Button size="lg" variant="secondary">
-              Explore gallery
-            </Button>
+          <Link to="/submit" className={SECONDARY_LINK}>
+            Launch Your Project <span aria-hidden="true">+</span>
           </Link>
         </div>
-      </section>
-
-      <section className="grid gap-10 py-16 md:grid-cols-2 md:items-center">
-        <div>
-          <h2 className="text-2xl font-semibold tracking-tight">What is {SITE.name}?</h2>
-          <p className="text-ink-muted mt-4 text-sm leading-relaxed">
-            Good projects die quietly. Students lose momentum without feedback, or never post at all
-            because they assume nobody will look. LaunchPad gives that work a home, in front of the
-            people most likely to care about it.
-          </p>
-        </div>
-
-        <ul className="space-y-6">
-          {VALUE_POINTS.map((point) => (
-            <li key={point.title} className="flex gap-4">
-              <span className="bg-accent-soft text-accent mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full">
-                <svg viewBox="0 0 20 20" aria-hidden className="h-4.5 w-4.5 fill-current">
-                  <path d={point.icon} />
-                </svg>
-              </span>
-              <div>
-                <h3 className="font-semibold">{point.title}</h3>
-                <p className="text-ink-muted mt-1 text-sm">{point.detail}</p>
-              </div>
-            </li>
+        <dl className="border-line mt-12 grid w-full max-w-2xl grid-cols-3 border-t pt-6">
+          {statistics.map((statistic) => (
+            <div key={statistic.label} className="px-2 sm:px-5">
+              <dt className="text-ink-muted text-[10px] leading-relaxed sm:text-xs">
+                {statistic.label}
+              </dt>
+              <dd className="mt-2 font-mono text-2xl font-bold sm:text-3xl">
+                {loading || error ? '-' : statistic.value}
+              </dd>
+            </div>
           ))}
-        </ul>
+        </dl>
       </section>
 
-      <section className="py-16">
-        <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <h2 className="text-2xl font-semibold tracking-tight">Featured projects</h2>
-            <p className="text-ink-muted mt-1 text-sm">
-              The most upvoted work from the Ontario Tech CS community.
+      <div className="mx-auto max-w-6xl px-4 pb-16 sm:px-6 sm:pb-24">
+        <section aria-labelledby="featured-title">
+          <div className="mb-7 flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <p className="text-flare mb-2 font-mono text-xs tracking-widest uppercase">
+                Discover what's being built
+              </p>
+              <h2 id="featured-title" className="text-3xl font-bold tracking-tight sm:text-4xl">
+                Featured projects
+              </h2>
+            </div>
+            <p className="text-ink-muted max-w-sm text-sm leading-relaxed">
+              The most upvoted projects from the student community.
             </p>
           </div>
-          <Link to="/projects">
-            <Button variant="secondary">View all projects</Button>
-          </Link>
-        </div>
+          {voteError && (
+            <p role="alert" className="border-line bg-surface mb-5 rounded-lg border p-4 text-sm">
+              {voteError}
+            </p>
+          )}
+          {error ? (
+            <ErrorState error={error} />
+          ) : loading ? (
+            <LoadingState label="Loading projects" />
+          ) : projects.length === 0 ? (
+            <EmptyState
+              title="No projects yet"
+              hint="Be the first to share what you are building."
+            />
+          ) : (
+            <div className="grid gap-6 md:grid-cols-2">
+              {featuredProjects.map((project, index) => (
+                <LandingProjectCard
+                  key={project.id}
+                  project={project}
+                  variant={index === 0 ? 'featured' : 'standard'}
+                  onUpvote={(id) => void handleUpvote(id)}
+                />
+              ))}
+            </div>
+          )}
+        </section>
 
-        {loading ? (
-          <LoadingState label="Loading projects" />
-        ) : (
-          <ProjectList projects={projects.slice(0, 6)} onUpvote={(id) => void upvote(id)} />
+        {!loading && !error && otherProjects.length > 0 && (
+          <section aria-labelledby="other-projects-title" className="mt-12">
+            <h2
+              id="other-projects-title"
+              className="text-ink-muted mb-5 font-mono text-xs tracking-widest uppercase"
+            >
+              More from the community
+            </h2>
+            <div className="grid gap-3">
+              {otherProjects.map((project) => (
+                <LandingProjectCard
+                  key={project.id}
+                  project={project}
+                  variant="compact"
+                  onUpvote={(id) => void handleUpvote(id)}
+                />
+              ))}
+            </div>
+          </section>
         )}
-      </section>
 
-      <section className="border-line bg-surface-raised mb-4 rounded-2xl border px-4 py-20 text-center">
-        <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-          Have something you have built?
-        </h2>
-        <p className="text-ink-muted mx-auto mt-4 max-w-lg text-sm">
-          Do not let it sit on your local drive. Post it, get real feedback, and build your public
-          footprint.
-        </p>
-        <div className="mt-8 flex justify-center">
-          <Link to="/submit">
-            <Button size="lg">Post your first project</Button>
+        <Link
+          to="/projects"
+          className="border-line bg-surface hover:border-brand-700 mt-7 flex min-h-14 items-center justify-center gap-2 rounded-xl border px-4 py-4 text-sm font-semibold transition-colors"
+        >
+          Explore the project gallery <span aria-hidden="true">↗</span>
+        </Link>
+
+        <section
+          aria-labelledby="submit-title"
+          className="border-ink-muted mt-16 flex flex-col items-start justify-between gap-6 rounded-xl border border-dashed px-6 py-10 sm:px-10 md:flex-row md:items-center"
+        >
+          <div>
+            <h2
+              id="submit-title"
+              className="max-w-xl text-3xl leading-tight font-bold tracking-tight"
+            >
+              Built something at <span className="text-brand-700">Ontario Tech</span>?
+            </h2>
+            <p className="text-ink-muted mt-3 max-w-lg text-sm leading-relaxed">
+              Give your project a home. Share your work, find collaborators, and inspire the next
+              student to start building.
+            </p>
+          </div>
+          <Link to="/submit" className={PRIMARY_LINK}>
+            Post your project <span aria-hidden="true">↗</span>
           </Link>
-        </div>
-      </section>
-    </>
+        </section>
+      </div>
+    </div>
   )
 }
