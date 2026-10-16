@@ -114,6 +114,7 @@ src/
   types/index.ts       Shared domain types, mirroring future DB tables
   lib/
     api/client.ts      The only seam between UI and data
+    api/supabase.ts    Supabase browser client, null without env vars. Only client.ts imports it
     api/mock/          Placeholder records, deleted once the DB is live
     auth/              AuthProvider, context, useAuth hook, domain rules
     supabase/client.ts The configured Supabase browser client

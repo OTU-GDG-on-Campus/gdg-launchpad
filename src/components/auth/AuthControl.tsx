@@ -1,19 +1,22 @@
-// Navbar auth widget: sign-in button when signed out, name and sign-out when signed in.
+// Navbar auth widget: link to login when signed out, name and sign-out when signed in.
 
 import { Link } from 'react-router'
 import { Button } from '@/components/ui/Button'
 import { useAuth } from '@/lib/auth/useAuth'
 
 export function AuthControl() {
-  const { status, user, isAdmin, signIn, signOut } = useAuth()
+  const { status, user, isAdmin, signOut } = useAuth()
 
   if (status === 'loading') return <span className="text-ink-muted text-sm">Signing in...</span>
 
   if (!user) {
     return (
-      <Button size="sm" onClick={() => void signIn()}>
-        Sign in with Ontario Tech
-      </Button>
+      <Link
+        to="/login"
+        className="bg-brand-500 text-on-brand hover:bg-brand-600 inline-flex min-h-8 items-center justify-center rounded-lg px-3 py-2 text-sm font-medium transition-colors"
+      >
+        Login
+      </Link>
     )
   }
 
