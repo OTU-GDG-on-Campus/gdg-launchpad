@@ -2,7 +2,6 @@
 // reads mock arrays, so swapping those for Supabase queries touches this file and nothing else.
 
 import type { AuthError } from '@supabase/supabase-js'
-import { ALLOWED_EMAIL_DOMAINS } from '@/config/site'
 import type {
   Comment,
   Project,
@@ -45,20 +44,6 @@ function toUser(row: ProfileRow): User {
     bannedAt: row.banned_at,
     registeredAt: row.registered_at,
   }
-}
-
-/** Starts Google sign-in. The browser leaves the site and returns to `returnTo` afterwards. */
-export async function signInWithGoogle(returnTo: string): Promise<void> {
-  if (!supabase) return
-  const { error } = await supabase.auth.signInWithOAuth({
-    provider: 'google',
-    options: {
-      redirectTo: returnTo,
-      // A chooser hint only. The sign-up trigger in the database is what rejects other domains.
-      queryParams: { hd: ALLOWED_EMAIL_DOMAINS[0], prompt: 'select_account' },
-    },
-  })
-  if (error) throw error
 }
 
 function authMessage(error: AuthError, fallback: string): string {

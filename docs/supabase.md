@@ -6,16 +6,16 @@ Read [auth.md](auth.md) first. It explains the product rules this schema exists 
 
 ## What is already here
 
-| Piece                                      | State                                                     |
-| ------------------------------------------ | --------------------------------------------------------- |
-| `supabase/config.toml`                     | Local stack config. Google provider on, email signup off  |
-| `supabase/migrations/*_initial_schema.sql` | Tables, triggers, and RLS policies. Never applied yet     |
-| `src/lib/supabase/client.ts`               | Configured browser client, stubbed until env vars are set |
-| `.github/workflows/supabase.yml`           | Replays migrations on a PR, pushes them on merge to main  |
-| `npm run db:*` scripts                     | Wrappers over the Supabase CLI                            |
+| Piece                            | State                                                                |
+| -------------------------------- | -------------------------------------------------------------------- |
+| `supabase/config.toml`           | Local stack config. Email code sign-in on, Brevo SMTP off by default |
+| `supabase/migrations/*.sql`      | Tables, triggers, RLS, and registration columns. Applied locally     |
+| `src/lib/supabase/client.ts`     | Configured browser client, stubbed until env vars are set            |
+| `.github/workflows/supabase.yml` | Replays migrations on a PR, pushes them on merge to main             |
+| `npm run db:*` scripts           | Wrappers over the Supabase CLI                                       |
 
-The migration has been checked for syntax only. **Nothing in it has been run against a real
-Postgres instance.** Applying it to the local stack for the first time is the next step.
+The migrations have been applied to the local stack and tested there. They have not been pushed
+to the hosted project yet.
 
 ## The hosted project
 
@@ -48,23 +48,28 @@ npm run db:types    # regenerate src/types/database.ts from the linked project
 Write schema changes as a new file in `supabase/migrations/`. Never edit a migration that has
 already been pushed, since the CLI tracks which ones have run and will not replay an edited one.
 
-## Google sign-in
+## Email code sign-in
 
-Not configured yet. Order matters:
+Sign-in emails a six digit code, so the Email provider is the only one in use. Order matters:
 
-1. In Google Cloud Console, create an OAuth 2.0 client of type Web application.
-2. Add `https://eavnzbmsfpslwdgpjfjv.supabase.co/auth/v1/callback` as an authorized redirect URI.
-3. In the Supabase dashboard, Authentication > Providers > Google, paste the client ID and secret.
-4. Add the production and Vercel preview URLs under Authentication > URL Configuration.
-5. For the local stack, export `SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID` and
-   `SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET` before `npm run db:start`. `config.toml` reads them by
-   name so the secret never lands in git.
+1. In the hosted dashboard, open Authentication > Providers > Email, turn it on, and keep Confirm
+   email on.
+2. Under Authentication > Emails > SMTP Settings, turn on custom SMTP with the Brevo details:
+   host `smtp-relay.brevo.com`, port `587`, the SMTP login and key from Brevo's SMTP & API page,
+   and `otu.gdsc@gmail.com` as the sender. The built in sender allows 2 emails an hour, and only to
+   people on the Supabase team.
+3. Raise the email rate limit under Authentication > Rate Limits.
+4. Under Authentication > Emails > Templates, paste `supabase/templates/confirmation.html` into
+   Confirm signup and `supabase/templates/magic_link.html` into Magic Link. They contain
+   `{{ .Token }}`, which is the code. Without it the email carries a link instead.
+5. Add the production and Vercel preview URLs under Authentication > URL Configuration.
 
-Then replace the `signIn` and `signOut` bodies in `src/lib/auth/AuthProvider.tsx` with
-`supabase.auth.signInWithOAuth({ provider: 'google', options: { queryParams: { hd: ... } } })`.
-The context shape stays exactly as it is, so no consumer changes.
+Brevo SMTP keys expire after 90 days without use, so a quiet stretch can silently stop sign-in
+emails.
 
-Pass `hd` for the account chooser only. It is a hint a caller can strip, not a security control.
+For real emails from the local stack, copy `supabase/.env.example` to `supabase/.env`, fill in the
+Brevo login and key, set `enabled = true` under `[auth.email.smtp]` in `supabase/config.toml`, and
+restart the stack. Keep `enabled = false` in anything you commit. See [local-dev.md](local-dev.md).
 
 ## How the domain rule is actually enforced
 
@@ -95,7 +100,7 @@ Until all three exist the deploy job fails on every merge to main. The PR job ne
 ## Still to do
 
 - [x] Apply the initial migration to the local stack and fix whatever it catches
-- [ ] Configure the Google provider, then push the migration to the hosted project
+- [ ] Configure email sign-in in the hosted project, then push the migrations to it
 - [ ] Generate `src/types/database.ts` and type the queries in `lib/api/client.ts` against it
 - [ ] Replace each mock read in `lib/api/client.ts` with a real query, one function at a time
 - [ ] Storage buckets and policies for cover images and screenshots

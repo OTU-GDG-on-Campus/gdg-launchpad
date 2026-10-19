@@ -14,7 +14,6 @@ export interface AuthContextValue {
   /** True when a signed-in, registered, non-banned user may post, upvote, and comment. */
   canParticipate: boolean
   isAdmin: boolean
-  signIn: () => Promise<void>
   /** Emails a sign-in code. Throws a message safe to show the student. */
   sendCode: (email: string, mode: AuthMode) => Promise<void>
   /** Verifies the emailed code and signs the student in. Throws a message safe to show. */

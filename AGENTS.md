@@ -15,8 +15,9 @@ built and maintained by GDG on Campus at Ontario Tech.
 Four rules define the product. Do not quietly change them:
 
 1. **Anyone can read.** Browsing projects requires no account.
-2. **Only verified Ontario Tech students can write.** Posting, upvoting, and commenting require a
-   Google sign-in on an `ontariotechu.net` or `ontariotechu.ca` account.
+2. **Only verified Ontario Tech students can write.** Posting, upvoting, and commenting require an
+   emailed code sent to an `ontariotechu.net` or `ontariotechu.ca` address, and a finished
+   registration.
 3. **Upvotes only.** There is no downvote anywhere in the product. The default feed ordering is
    most upvoted.
 4. **This is not an official university service.** See Branding below. It is the rule most easily
@@ -46,24 +47,24 @@ are building" are accurate and stay.
 ## Current state
 
 The repository is a working skeleton. The layout, routing, and component structure are real and
-typecheck clean. Data and auth are deliberately stubbed.
+typecheck clean. Data is deliberately stubbed. Auth works against a local Supabase stack.
 
-| Area                  | State                                                                  |
-| --------------------- | ---------------------------------------------------------------------- |
-| Routing and layout    | Done                                                                   |
-| Home page             | Done: hero, value points, featured grid, closing call to action        |
-| Dark and light themes | Done. Dark is the default, toggle persists to localStorage             |
-| Project listing       | Done: category pills, search, sort, pagination. Filters in memory      |
-| Project detail        | Done: cover, tech stack, screenshots slot, discussion, sidebar         |
-| Semester Sprints      | Landing page, sprint cards, and detail page done                       |
-| Comments              | List renders from mock data. No composer, posting is not built         |
-| Upvoting              | UI done, toggles local state only                                      |
-| Auth                  | Stubbed. `signIn()` returns a fixed demo user                          |
-| Submission form       | Placeholder page                                                       |
-| Admin panel           | Placeholder page listing planned sections                              |
-| Project cover art     | Type field exists, every mock row is null so cards show a tint         |
-| Backend               | Supabase project created and scaffolded. Schema written, never applied |
-| Database schema       | `supabase/migrations/` holds the initial schema. Syntax checked only   |
+| Area                  | State                                                                                             |
+| --------------------- | ------------------------------------------------------------------------------------------------- |
+| Routing and layout    | Done                                                                                              |
+| Home page             | Done: hero, value points, featured grid, closing call to action                                   |
+| Dark and light themes | Done. Dark is the default, toggle persists to localStorage                                        |
+| Project listing       | Done: category pills, search, sort, pagination. Filters in memory                                 |
+| Project detail        | Done: cover, tech stack, screenshots slot, discussion, sidebar                                    |
+| Semester Sprints      | Landing page, sprint cards, and detail page done                                                  |
+| Comments              | List renders from mock data. No composer, posting is not built                                    |
+| Upvoting              | UI done, toggles local state only                                                                 |
+| Auth                  | Email code login and registration, tested locally. Demo user when `VITE_SUPABASE_*` is unset      |
+| Submission form       | Placeholder page                                                                                  |
+| Admin panel           | Placeholder page listing planned sections                                                         |
+| Project cover art     | Type field exists, every mock row is null so cards show a tint                                    |
+| Backend               | Supabase project created. Schema applied and tested locally, not yet pushed to the hosted project |
+| Database schema       | `supabase/migrations/` holds the schema and the registration columns. Applied to the local stack  |
 
 Before starting work, re-read this table and correct it if it has drifted.
 
@@ -236,8 +237,8 @@ endpoint directly.
 
 Every rule that matters must also be enforced on the server:
 
-- the email domain restriction, checked against the `hd` claim of a signature-verified Google ID
-  token, never against a client-supplied email string
+- the email domain restriction, enforced by the trigger on `auth.users` for an address whose
+  ownership the emailed code proved, never by a client-supplied claim
 - one upvote per user per project, as a database unique constraint
 - moderation status, so unapproved projects are never returned to non-admins
 - admin role and ban checks on every write

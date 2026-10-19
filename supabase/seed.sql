@@ -10,19 +10,19 @@ values
   (
     '11111111-1111-4111-8111-111111111111',
     'amira.khan@ontariotechu.net',
-    '{"provider":"google"}',
+    '{"provider":"email","providers":["email"]}',
     '{"full_name":"Amira Khan"}'
   ),
   (
     '22222222-2222-4222-8222-222222222222',
     'priya.raman@ontariotechu.net',
-    '{"provider":"google"}',
+    '{"provider":"email","providers":["email"]}',
     '{"full_name":"Priya Raman"}'
   ),
   (
     '33333333-3333-4333-8333-333333333333',
     'test.admin@ontariotechu.ca',
-    '{"provider":"google"}',
+    '{"provider":"email","providers":["email"]}',
     '{"full_name":"Test Admin"}'
   );
 
