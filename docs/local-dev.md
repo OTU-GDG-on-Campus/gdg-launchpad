@@ -72,24 +72,38 @@ run queries.
 | Projects | Four approved, one pending, one of them attached to the sprint               |
 | Activity | A few upvotes and comments, so the count triggers have something to total up |
 
-Seeded people exist as data only. They cannot sign in, because the app only offers Google
-sign-in and they have no Google identity.
+Seeded people exist as data only. They cannot log in, because they have no sign-in identity.
 
-To act as an admin yourself, sign in once with a real Google account through the local stack,
-then promote that row in Studio's SQL editor:
+To act as an admin yourself, register through the site at `/register` with your own address
+(the code arrives in Mailpit, see below), then promote that row in Studio's SQL editor:
 
 ```sql
 update public.profiles set role = 'admin' where email = 'you@ontariotechu.net';
 ```
 
+## Sign-in emails
+
+Sign-in sends a six digit code. By default the local stack catches every email in Mailpit at
+http://127.0.0.1:54324, so nothing reaches a real inbox and you can read the code there.
+
+To send real emails through Brevo instead, for example to check delivery to an Ontario Tech inbox:
+
+1. Copy `supabase/.env.example` to `supabase/.env` and fill in the Brevo login and SMTP key from the
+   Brevo dashboard, under SMTP & API. The file is git-ignored.
+2. Set `enabled = true` under `[auth.email.smtp]` in `supabase/config.toml`.
+3. Restart the stack with `npm run db:stop` and `npm run db:start`.
+
+Mailpit stays empty while Brevo is on. Set `enabled` back to `false` before you commit, and never
+paste the key into the repo, a chat, or an issue.
+
 ## Testing the sign-up rule
 
 The domain rule lives in a trigger on `auth.users`, so you can test it in Studio's SQL editor
-without Google. An Ontario Tech address should succeed:
+without going through the site. An Ontario Tech address should succeed:
 
 ```sql
 insert into auth.users (id, email, raw_app_meta_data, raw_user_meta_data)
-values (gen_random_uuid(), 'trigger.test@ontariotechu.net', '{"provider":"google"}',
+values (gen_random_uuid(), 'trigger.test@ontariotechu.net', '{"provider":"email"}',
         '{"full_name":"Trigger Test"}');
 ```
 
@@ -98,7 +112,7 @@ ontariotechu.ca address":
 
 ```sql
 insert into auth.users (id, email, raw_app_meta_data, raw_user_meta_data)
-values (gen_random_uuid(), 'someone@gmail.com', '{"provider":"google"}',
+values (gen_random_uuid(), 'someone@gmail.com', '{"provider":"email"}',
         '{"full_name":"Gmail User"}');
 ```
 

@@ -148,7 +148,7 @@ password_requirements = ""
 # rp_origins = ["http://127.0.0.1:3000"]
 
 [auth.rate_limit]
-email_sent = 2 # Emails per hour. Requires auth.email.smtp.
+email_sent = 30 # Emails per hour. Requires auth.email.smtp.
 sms_sent = 30 # SMS messages per hour. Requires auth.sms.
 anonymous_users = 30 # Anonymous sign-ins per hour per IP. Requires enable_anonymous_sign_ins.
 token_refresh = 150 # Session refreshes per 5 minutes per IP.
@@ -163,23 +163,33 @@ web3 = 30 # Web3 logins per 5 minutes per IP.
 # secret = ""
 
 [auth.email]
-enable_signup = false # Google is the only way in. Email signup would bypass the domain check.
+enable_signup = true # Students sign up with an email code. The domain rule is enforced by a trigger.
 double_confirm_changes = true # Confirm an email change on both the old and the new address.
-enable_confirmations = false # Require confirming the address before sign-in.
+enable_confirmations = true # Require confirming the address before sign-in.
 secure_password_change = false # Require a recent login to change a password.
 max_frequency = "1s" # Minimum gap before resending a confirmation or reset email.
 otp_length = 6 # Characters in the email OTP.
-otp_expiry = 3600 # Seconds before the email OTP expires.
+otp_expiry = 600 # Seconds before the email OTP expires. Ten minutes.
 
-# Use a production-ready SMTP server
-# [auth.email.smtp]
-# enabled = true
-# host = "smtp.sendgrid.net"
-# port = 587
-# user = "apikey"
-# pass = "env(SENDGRID_API_KEY)"
-# admin_email = "admin@email.com"
-# sender_name = "Admin"
+# Off by default, so local sign-in emails land in the Mailpit inbox. Set enabled = true to send real
+# emails through Brevo. The login and key come from supabase/.env, see supabase/.env.example.
+[auth.email.smtp]
+enabled = false
+host = "smtp-relay.brevo.com"
+port = 587
+user = "env(BREVO_SMTP_USER)"
+pass = "env(BREVO_SMTP_KEY)"
+admin_email = "otu.gdsc@gmail.com"
+sender_name = "LaunchPad"
+
+# The six digit code lives in {{ .Token }}. Both templates must include it, or students get a link.
+[auth.email.template.confirmation]
+subject = "Your LaunchPad sign-in code"
+content_path = "./supabase/templates/confirmation.html"
+
+[auth.email.template.magic_link]
+subject = "Your LaunchPad sign-in code"
+content_path = "./supabase/templates/magic_link.html"
 
 # Uncomment to customize email template
 # [auth.email.template.invite]
@@ -252,15 +262,6 @@ max_frequency = "5s"
 # Use an external OAuth provider. The full list of providers are: `apple`, `azure`, `bitbucket`,
 # `discord`, `facebook`, `github`, `gitlab`, `google`, `keycloak`, `linkedin_oidc`, `notion`,
 # `twitch`, `twitter`, `x`, `slack`, `spotify`, `workos`, `zoom`.
-[auth.external.google]
-enabled = true
-client_id = "env(SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID)"
-secret = "env(SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET)" # DO NOT commit the secret. Use env().
-redirect_uri = "" # Overrides the callback URL derived from auth.external_url.
-url = "" # Overrides the provider URL, for self-hosted or single-tenant providers.
-skip_nonce_check = false # Skipping the nonce check is required for local Google sign-in.
-email_optional = false # Allow authenticating when the provider returns no email address.
-
 [auth.external.apple]
 enabled = false
 client_id = ""

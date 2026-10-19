@@ -1,6 +1,6 @@
 // Single source of truth for site-wide constants: branding, nav, footer, and auth domain rules.
 
-/** Only Google accounts on these domains may sign in, since both require the OTU student portal. */
+/** Only addresses on these domains may sign up, since the university issues both to its students. */
 export const ALLOWED_EMAIL_DOMAINS = ['ontariotechu.net', 'ontariotechu.ca'] as const
 
 export const SITE = {
