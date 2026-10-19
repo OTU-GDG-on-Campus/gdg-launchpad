@@ -9,6 +9,29 @@
       name="description"
       content="Projects built by Ontario Tech University students, posted and upvoted by the CS community."
     />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Inter+Tight:wght@600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script>
+      // Applies the stored theme before first paint so a dark page never flashes white.
+      ;(function () {
+        var resolved = 'dark'
+        try {
+          var stored = localStorage.getItem('launchpad-theme')
+          if (stored === 'light' || stored === 'dark') {
+            resolved = stored
+          } else if (window.matchMedia('(prefers-color-scheme: light)').matches) {
+            resolved = 'light'
+          }
+        } catch (error) {
+          resolved = 'dark'
+        }
+        document.documentElement.dataset.theme = resolved
+      })()
+    </script>
   </head>
   <body>
     <div id="root"></div>

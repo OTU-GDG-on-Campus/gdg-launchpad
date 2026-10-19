@@ -1,4 +1,4 @@
-// Hook for reading and toggling the theme. Throws if used outside ThemeProvider.
+// Hook for reading theme state. Throws if used outside ThemeProvider.
 
 import { useContext } from 'react'
 import { ThemeContext, type ThemeContextValue } from './theme-context'

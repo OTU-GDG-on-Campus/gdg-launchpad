@@ -1,8 +1,20 @@
-// The single seam between UI and data. Auth goes through Supabase when configured, the rest still
-// reads mock arrays, so swapping those for Supabase queries touches this file and nothing else.
+// The single seam between UI and data. Auth, bookmarks, and the featured slot go through Supabase
+// when configured; the project feed still reads mock arrays until the schema is applied, so
+// swapping those for Supabase queries touches this file and nothing else.
 
 import { ALLOWED_EMAIL_DOMAINS } from '@/config/site'
-import type { Comment, Project, ProjectPage, ProjectQuery, Sprint, User } from '@/types'
+import type {
+  Comment,
+  FeaturedSelection,
+  PersonPreview,
+  Project,
+  ProjectPage,
+  ProjectQuery,
+  ProjectStats,
+  Sprint,
+  TechnologyFacet,
+  User,
+} from '@/types'
 import { MOCK_COMMENTS } from './mock/comments'
 import { MOCK_PROJECTS } from './mock/projects'
 import { MOCK_SPRINTS } from './mock/sprints'
@@ -83,17 +95,45 @@ export function subscribeToAuthChanges(onChange: () => void): () => void {
   return () => data.subscription.unsubscribe()
 }
 
+// Trending needs per-upvote timestamps the mock store does not have, so it blends total
+// engagement with how recently a project was posted. Once the upvotes table is live this
+// becomes a count of distinct upvoters over the previous seven days.
+function trendingScore(project: Project): number {
+  const ageDays = Math.max(0, (Date.now() - Date.parse(project.createdAt)) / 86_400_000)
+  return (project.upvoteCount + project.commentCount * 2) / (ageDays + 3)
+}
+
 function sortProjects(projects: Project[], sort: ProjectQuery['sort']): Project[] {
+  const byUpvotes = (a: Project, b: Project) => b.upvoteCount - a.upvoteCount
   const compare =
     sort === 'new'
       ? (a: Project, b: Project) => b.createdAt.localeCompare(a.createdAt)
-      : (a: Project, b: Project) => b.upvoteCount - a.upvoteCount
+      : sort === 'trending'
+        ? (a: Project, b: Project) => trendingScore(b) - trendingScore(a) || byUpvotes(a, b)
+        : byUpvotes
   return [...projects].sort(compare)
 }
 
 function matchesSearch(project: Project, search: string): boolean {
-  const haystack = [project.title, project.summary, ...project.tags].join(' ').toLowerCase()
+  const haystack = [
+    project.title,
+    project.summary,
+    project.authorName,
+    ...project.tags,
+    ...project.contributors.map((contributor) => contributor.name),
+  ]
+    .join(' ')
+    .toLowerCase()
   return haystack.includes(search.trim().toLowerCase())
+}
+
+function hasAllTechnologies(project: Project, technologies: string[]): boolean {
+  const tags = project.tags.map((tag) => tag.toLowerCase())
+  return technologies.every((technology) => tags.includes(technology.toLowerCase()))
+}
+
+function approvedProjects(): Project[] {
+  return MOCK_PROJECTS.filter((project) => project.status === 'approved')
 }
 
 export async function listProjects({
@@ -101,13 +141,18 @@ export async function listProjects({
   sprintId,
   category = 'All',
   search = '',
+  technologies = [],
+  openToContributions = false,
   page = 1,
   perPage = DEFAULT_PER_PAGE,
 }: ProjectQuery = {}): Promise<ProjectPage> {
-  let matched = MOCK_PROJECTS.filter((project) => project.status === 'approved')
+  let matched = approvedProjects()
   if (sprintId) matched = matched.filter((project) => project.sprintId === sprintId)
   if (category !== 'All') matched = matched.filter((project) => project.category === category)
   if (search) matched = matched.filter((project) => matchesSearch(project, search))
+  if (technologies.length > 0)
+    matched = matched.filter((project) => hasAllTechnologies(project, technologies))
+  if (openToContributions) matched = matched.filter((project) => project.openToContributions)
 
   const sorted = sortProjects(matched, sort)
   const pageCount = Math.max(1, Math.ceil(sorted.length / perPage))
@@ -119,6 +164,104 @@ export async function listProjects({
     totalCount: sorted.length,
     pageCount,
     page: safePage,
+  }
+}
+
+/** Best matches across every approved project, ranked for the command palette. */
+export async function searchProjects(query: string, limit = 8): Promise<Project[]> {
+  const text = query.trim().toLowerCase()
+  if (!text) return []
+
+  function score(project: Project): number {
+    if (project.title.toLowerCase().startsWith(text)) return 4
+    if (project.title.toLowerCase().includes(text)) return 3
+    if (project.tags.some((tag) => tag.toLowerCase().includes(text))) return 2.5
+    if (project.summary.toLowerCase().includes(text)) return 2
+    if (project.authorName.toLowerCase().includes(text)) return 1.5
+    if (project.contributors.some((contributor) => contributor.name.toLowerCase().includes(text)))
+      return 1.5
+    if (project.category.toLowerCase().includes(text)) return 1
+    return 0
+  }
+
+  return approvedProjects()
+    .map((project) => ({ project, score: score(project) }))
+    .filter((entry) => entry.score > 0)
+    .sort((a, b) => b.score - a.score || b.project.upvoteCount - a.project.upvoteCount)
+    .slice(0, limit)
+    .map((entry) => entry.project)
+}
+
+/** Technology facets over every approved project, most used first. */
+export async function listTechnologies(): Promise<TechnologyFacet[]> {
+  const byKey = new Map<string, TechnologyFacet>()
+  for (const project of approvedProjects()) {
+    for (const tag of project.tags) {
+      const key = tag.toLowerCase()
+      const facet = byKey.get(key)
+      if (facet) facet.projectCount += 1
+      else byKey.set(key, { name: tag, projectCount: 1 })
+    }
+  }
+  return [...byKey.values()].sort(
+    (a, b) => b.projectCount - a.projectCount || a.name.localeCompare(b.name),
+  )
+}
+
+/** Counts behind the hero statistics. Every number is derived from approved projects. */
+export async function getProjectStats(): Promise<ProjectStats> {
+  const projects = approvedProjects()
+  const builders = new Set<string>()
+  for (const project of projects) {
+    builders.add(project.authorId)
+    for (const contributor of project.contributors) builders.add(contributor.name.toLowerCase())
+  }
+  const technologies = new Set<string>()
+  for (const project of projects)
+    for (const tag of project.tags) technologies.add(tag.toLowerCase())
+
+  return {
+    projectCount: projects.length,
+    builderCount: builders.size,
+    technologyCount: technologies.size,
+  }
+}
+
+/** Public details about a builder, assembled only from approved project records. */
+export async function getPersonPreview({
+  name,
+  profileId,
+  roleOnProject = null,
+}: {
+  name: string
+  profileId?: string | null
+  roleOnProject?: string | null
+}): Promise<PersonPreview | null> {
+  const approved = approvedProjects()
+  const authored = profileId
+    ? approved.filter((project) => project.authorId === profileId)
+    : approved.filter((project) => project.authorName === name)
+  const contributed = approved.filter((project) =>
+    project.contributors.some(
+      (contributor) => contributor.name.toLowerCase() === name.toLowerCase(),
+    ),
+  )
+
+  const seen = new Set<string>()
+  for (const project of [...authored, ...contributed]) seen.add(project.id)
+  if (seen.size === 0) return null
+
+  const authoredProject = authored[0] ?? null
+  const contributorRecord = contributed
+    .flatMap((project) => project.contributors)
+    .find((contributor) => contributor.name.toLowerCase() === name.toLowerCase())
+
+  return {
+    name,
+    avatarUrl: authoredProject?.authorAvatarUrl ?? contributorRecord?.avatarUrl ?? null,
+    headline: authoredProject?.authorHeadline ?? null,
+    roleOnProject,
+    projectCount: seen.size,
   }
 }
 
@@ -154,4 +297,140 @@ export async function listSprints(): Promise<Sprint[]> {
 
 export async function getSprintBySlug(slug: string): Promise<Sprint | null> {
   return MOCK_SPRINTS.find((sprint) => sprint.slug === slug) ?? null
+}
+
+// Bookmarks ---------------------------------------------------------------------------------
+
+// Holds the demo fallback while Supabase is unset. A configured backend persists to the
+// bookmarks table instead, where row level security keeps every row private to its owner.
+const mockBookmarks = new Set<string>()
+
+/** The ids of every project the signed-in viewer has saved, newest first. */
+export async function listBookmarkedIds(): Promise<string[]> {
+  if (!supabase) return [...mockBookmarks]
+
+  const { data, error } = await supabase
+    .from('bookmarks')
+    .select('project_id, created_at')
+    .order('created_at', { ascending: false })
+  if (error) throw error
+  return (data ?? []).map((row) => row.project_id as string)
+}
+
+/** Saves or unsaves a project and returns the new saved state. */
+export async function toggleBookmark(projectId: string): Promise<boolean> {
+  if (!supabase) {
+    if (mockBookmarks.has(projectId)) mockBookmarks.delete(projectId)
+    else mockBookmarks.add(projectId)
+    return mockBookmarks.has(projectId)
+  }
+
+  const { data: sessionData } = await supabase.auth.getSession()
+  const userId = sessionData.session?.user.id
+  if (!userId) throw new Error('Sign in with your Ontario Tech account to save projects')
+
+  const { data: existing, error: lookupError } = await supabase
+    .from('bookmarks')
+    .select('project_id')
+    .eq('user_id', userId)
+    .eq('project_id', projectId)
+    .maybeSingle()
+  if (lookupError) throw lookupError
+
+  if (existing) {
+    const { error } = await supabase
+      .from('bookmarks')
+      .delete()
+      .eq('user_id', userId)
+      .eq('project_id', projectId)
+    if (error) throw error
+    return false
+  }
+
+  const { error } = await supabase
+    .from('bookmarks')
+    .insert({ user_id: userId, project_id: projectId })
+  if (error) throw error
+  return true
+}
+
+// Featured project --------------------------------------------------------------------------
+
+// Demo fallback: the most upvoted approved project, featured for the current week.
+let mockFeatured: FeaturedSelection | null = null
+
+function currentWeekWindow(): { startsAt: string; endsAt: string } {
+  const now = new Date()
+  const monday = new Date(now)
+  monday.setDate(now.getDate() - ((now.getDay() + 6) % 7))
+  const sunday = new Date(monday)
+  sunday.setDate(monday.getDate() + 6)
+  const toIsoDate = (date: Date) => date.toISOString().slice(0, 10)
+  return { startsAt: toIsoDate(monday), endsAt: toIsoDate(sunday) }
+}
+
+function defaultFeatured(): FeaturedSelection | null {
+  const top = [...approvedProjects()].sort((a, b) => b.upvoteCount - a.upvoteCount)[0]
+  if (!top) return null
+  return { project: top, ...currentWeekWindow() }
+}
+
+/** The project currently featured by an admin, or null when none is inside its window. */
+export async function getFeaturedProject(): Promise<FeaturedSelection | null> {
+  if (!supabase) return mockFeatured ?? defaultFeatured()
+
+  const today = new Date().toISOString().slice(0, 10)
+  const { data, error } = await supabase
+    .from('featured_projects')
+    .select('project:projects(*), starts_at, ends_at')
+    .lte('starts_at', today)
+    .gte('ends_at', today)
+    .maybeSingle()
+  if (error) throw error
+  if (!data || !data.project) return null
+
+  return {
+    project: data.project as unknown as Project,
+    startsAt: data.starts_at as string,
+    endsAt: data.ends_at as string,
+  }
+}
+
+/** Sets the featured project for a date window. Admins only; enforced again by row level security. */
+export async function setFeaturedProject({
+  projectId,
+  startsAt,
+  endsAt,
+}: {
+  projectId: string
+  startsAt: string
+  endsAt: string
+}): Promise<FeaturedSelection | null> {
+  const project = MOCK_PROJECTS.find(
+    (candidate) => candidate.id === projectId && candidate.status === 'approved',
+  )
+  if (!project) throw new Error(`Unknown project: ${projectId}`)
+  if (endsAt < startsAt) throw new Error('The feature window must end on or after it starts')
+
+  if (!supabase) {
+    mockFeatured = { project, startsAt, endsAt }
+    return mockFeatured
+  }
+
+  const { data: sessionData } = await supabase.auth.getSession()
+  const userId = sessionData.session?.user.id
+  if (!userId) throw new Error('Sign in as a coordinator to feature a project')
+
+  const { error: clearError } = await supabase.from('featured_projects').delete()
+  if (clearError) throw clearError
+
+  const { error } = await supabase.from('featured_projects').insert({
+    project_id: projectId,
+    starts_at: startsAt,
+    ends_at: endsAt,
+    set_by: userId,
+  })
+  if (error) throw error
+
+  return { project, startsAt, endsAt }
 }
