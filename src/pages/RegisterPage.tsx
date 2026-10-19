@@ -1,10 +1,12 @@
-// Two-step registration design: existing demo sign-in followed by an unsaved profile form.
+// Two-step registration: verify an Ontario Tech email with a code, then save the profile details.
 
-import { useState } from 'react'
-import { Link } from 'react-router'
-import { OntarioTechSignInButton } from '@/components/auth/OntarioTechSignInButton'
+import { useState, type SyntheticEvent } from 'react'
+import { Link, useNavigate } from 'react-router'
+import { EmailCodeForm } from '@/components/auth/EmailCodeForm'
+import { Button } from '@/components/ui/Button'
 import { Wordmark } from '@/components/ui/Logo'
 import { ALLOWED_EMAIL_DOMAINS } from '@/config/site'
+import { isBackendConfigured } from '@/lib/api/client'
 import { cn } from '@/lib/cn'
 import { useAuth } from '@/lib/auth/useAuth'
 
@@ -23,40 +25,50 @@ const PERKS = [
 ]
 const FIELD_CLASS =
   'border-line bg-surface-muted text-ink focus:border-brand-700 mt-2 min-h-12 w-full rounded-lg border px-3 py-3 text-sm'
+const MAX_SKILLS = 20
+
+function parseSkills(value: string): string[] {
+  const skills = value
+    .split(',')
+    .map((skill) => skill.trim().slice(0, 40))
+    .filter(Boolean)
+  return [...new Set(skills)].slice(0, MAX_SKILLS)
+}
 
 export function RegisterPage() {
-  const { status, user, error, signIn } = useAuth()
+  const { user, error, completeRegistration } = useAuth()
+  const navigate = useNavigate()
   const [showIntro, setShowIntro] = useState(false)
-  const [pending, setPending] = useState(false)
-  const [requestError, setRequestError] = useState<string | null>(null)
+  const [saving, setSaving] = useState(false)
+  const [saveError, setSaveError] = useState<string | null>(null)
   const [name, setName] = useState('')
   const [program, setProgram] = useState('')
   const [year, setYear] = useState('')
   const [skills, setSkills] = useState('')
   const [bio, setBio] = useState('')
   const [agreed, setAgreed] = useState(false)
-  const step = user && !showIntro ? 2 : 1
-  const isBusy = pending || status === 'loading'
-  const message = requestError ?? error
+  const needsDetails = user !== null && user.registeredAt === null
+  const step = needsDetails && !showIntro ? 2 : 1
   const detailsComplete = Boolean(name.trim() && program && year && agreed)
 
-  async function handleConnect() {
-    if (isBusy) return
-    setRequestError(null)
-    if (user) {
-      setShowIntro(false)
-      return
-    }
-    setPending(true)
+  async function handleSubmit(event: SyntheticEvent<HTMLFormElement>) {
+    event.preventDefault()
+    if (!detailsComplete || saving) return
+    setSaveError(null)
+    setSaving(true)
     try {
-      await signIn()
-      setShowIntro(false)
+      await completeRegistration({
+        name: name.trim(),
+        program,
+        studyYear: year,
+        skills: parseSkills(skills),
+        bio: bio.trim(),
+      })
+      navigate('/projects')
     } catch (cause) {
-      setRequestError(
-        cause instanceof Error ? cause.message : 'Unable to sign in. Please try again.',
-      )
+      setSaveError(cause instanceof Error ? cause.message : 'Could not save your details.')
     } finally {
-      setPending(false)
+      setSaving(false)
     }
   }
 
@@ -79,17 +91,17 @@ export function RegisterPage() {
             className={cn('h-1 flex-1 rounded-full', step === 2 ? 'bg-brand-700' : 'bg-line')}
           />
         </div>
-        {message && (
+        {error && (
           <p role="alert" className="border-flare text-ink mt-5 rounded-lg border p-3 text-sm">
-            {message}
+            {error}
           </p>
         )}
 
         {step === 1 ? (
           <div>
             <p className="text-ink-soft mt-5 text-sm leading-relaxed">
-              LaunchPad is designed to use your Ontario Tech Google account, so there's no password
-              to create. Browsing never needs an account.
+              Enter your Ontario Tech email and we will send you a six digit code, so there is no
+              password to create. Browsing never needs an account.
             </p>
             <ul className="mt-5 space-y-3">
               {PERKS.map((perk) => (
@@ -102,28 +114,38 @@ export function RegisterPage() {
                 </li>
               ))}
             </ul>
-            <OntarioTechSignInButton
-              pending={isBusy}
-              onClick={() => void handleConnect()}
-              label={user ? 'Continue to profile' : 'Continue with Ontario Tech'}
-            />
+            {needsDetails && (
+              <Button size="lg" className="mt-6 w-full" onClick={() => setShowIntro(false)}>
+                Continue to profile
+              </Button>
+            )}
+            {user && !needsDetails && (
+              <p
+                role="status"
+                className="border-line bg-brand-50 mt-6 rounded-lg border p-4 text-sm leading-relaxed"
+              >
+                You already have an account.{' '}
+                <Link to="/projects" className="text-brand-700 font-semibold">
+                  Explore projects
+                </Link>
+              </p>
+            )}
+            {!user && <EmailCodeForm mode="register" onVerified={() => setShowIntro(false)} />}
             <p className="text-ink-muted mt-4 font-mono text-[10px] leading-relaxed tracking-wide uppercase">
               Allowed domains · {ALLOWED_EMAIL_DOMAINS.map((domain) => `@${domain}`).join(' · ')}
-            </p>
-            <p className="border-line bg-surface-raised text-ink-muted mt-5 rounded-lg border p-3 text-xs leading-relaxed">
-              Demo preview: this opens a sample account. Google sign-in and saving a new profile are
-              not available yet.
             </p>
           </div>
         ) : (
           <div>
             <div className="border-line bg-accent-soft mt-5 flex flex-wrap items-center justify-between gap-2 rounded-lg border p-3 text-sm">
               <span className="min-w-0 font-semibold break-all">{user?.email}</span>
-              <span className="text-accent font-mono text-[10px] tracking-wide uppercase">
-                Demo account
-              </span>
+              {!isBackendConfigured && (
+                <span className="text-accent font-mono text-[10px] tracking-wide uppercase">
+                  Demo account
+                </span>
+              )}
             </div>
-            <form onSubmit={(event) => event.preventDefault()} className="mt-6 space-y-5">
+            <form onSubmit={(event) => void handleSubmit(event)} className="mt-6 space-y-5">
               <div>
                 <label htmlFor="register-name" className="text-sm font-semibold">
                   Full name <span className="text-ink-muted">(required)</span>
@@ -234,22 +256,18 @@ export function RegisterPage() {
                 </button>
                 <button
                   type="submit"
-                  disabled
-                  aria-describedby="registration-unavailable"
-                  className="bg-brand-500 text-on-brand min-h-11 cursor-not-allowed rounded-lg px-5 py-3 text-sm font-semibold opacity-50"
+                  disabled={!detailsComplete || saving}
+                  aria-busy={saving}
+                  className="bg-brand-500 text-on-brand min-h-11 rounded-lg px-5 py-3 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  Create account
+                  {saving ? 'Saving...' : 'Create account'}
                 </button>
               </div>
-              <p
-                id="registration-unavailable"
-                role="status"
-                className="text-ink-muted text-xs leading-relaxed"
-              >
-                {detailsComplete ? 'Your details are filled in. ' : ''}This form is a design
-                preview. Account creation is not available yet, and these details are not saved. You
-                can review the layout without creating an account.
-              </p>
+              {saveError && (
+                <p role="alert" className="border-flare text-ink rounded-lg border p-3 text-sm">
+                  {saveError}
+                </p>
+              )}
             </form>
           </div>
         )}

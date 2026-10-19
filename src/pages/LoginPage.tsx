@@ -1,32 +1,42 @@
-// Login page matching the supplied card design and using the existing demo auth provider.
+// Login page matching the supplied card design. Existing students log in with an emailed code.
 
-import { useState } from 'react'
+import type { ReactNode } from 'react'
 import { Link } from 'react-router'
-import { OntarioTechSignInButton } from '@/components/auth/OntarioTechSignInButton'
+import { EmailCodeForm } from '@/components/auth/EmailCodeForm'
 import { Wordmark } from '@/components/ui/Logo'
 import { ALLOWED_EMAIL_DOMAINS } from '@/config/site'
 import { useAuth } from '@/lib/auth/useAuth'
 
 export function LoginPage() {
-  const { status, user, error, signIn } = useAuth()
-  const [requestError, setRequestError] = useState<string | null>(null)
-  const [pending, setPending] = useState(false)
-  const isBusy = pending || status === 'loading'
-  const message = requestError ?? error
+  const { user, error } = useAuth()
 
-  async function handleSignIn() {
-    if (isBusy) return
-    setRequestError(null)
-    setPending(true)
-    try {
-      await signIn()
-    } catch (cause) {
-      setRequestError(
-        cause instanceof Error ? cause.message : 'Unable to sign in. Please try again.',
-      )
-    } finally {
-      setPending(false)
-    }
+  let panel: ReactNode = <EmailCodeForm mode="login" />
+  if (user && !user.registeredAt) {
+    panel = (
+      <div
+        role="status"
+        className="border-line bg-brand-50 mt-5 rounded-lg border p-4 text-sm leading-relaxed"
+      >
+        <p>Your email is verified, but your account is not finished yet.</p>
+        <Link to="/register" className="text-brand-700 mt-2 inline-block font-semibold">
+          Finish creating your account <span aria-hidden="true">→</span>
+        </Link>
+      </div>
+    )
+  } else if (user) {
+    panel = (
+      <div
+        role="status"
+        className="border-line bg-brand-50 mt-5 rounded-lg border p-4 text-sm leading-relaxed"
+      >
+        <p>
+          You're signed in as <strong>{user.name}</strong>.
+        </p>
+        <Link to="/projects" className="text-brand-700 mt-2 inline-block font-semibold">
+          Explore projects <span aria-hidden="true">→</span>
+        </Link>
+      </div>
+    )
   }
 
   return (
@@ -40,33 +50,16 @@ export function LoginPage() {
           Sign in to LaunchPad
         </h1>
         <p className="text-ink-soft mt-3 text-sm leading-relaxed">
-          Use your Ontario Tech Google account to participate. You can browse projects without
-          signing in.
-        </p>
-        <p className="border-line bg-surface-raised text-ink-muted mt-5 rounded-lg border p-3 text-xs leading-relaxed">
-          Demo preview: sign-in currently opens a sample account. It does not connect to Google yet.
+          Enter the Ontario Tech email you registered with and we will send you a six digit code.
+          There is no password. You can browse projects without signing in.
         </p>
 
-        {message && (
+        {error && (
           <p role="alert" className="border-flare text-ink mt-5 rounded-lg border p-3 text-sm">
-            {message}
+            {error}
           </p>
         )}
-        {user ? (
-          <div
-            role="status"
-            className="border-line bg-brand-50 mt-5 rounded-lg border p-4 text-sm leading-relaxed"
-          >
-            <p>
-              You're signed in as <strong>{user.name}</strong>.
-            </p>
-            <Link to="/projects" className="text-brand-700 mt-2 inline-block font-semibold">
-              Explore projects <span aria-hidden="true">→</span>
-            </Link>
-          </div>
-        ) : (
-          <OntarioTechSignInButton pending={isBusy} onClick={() => void handleSignIn()} />
-        )}
+        {panel}
         <p className="text-ink-muted mt-4 font-mono text-[10px] leading-relaxed tracking-wide uppercase">
           Allowed domains · {ALLOWED_EMAIL_DOMAINS.map((domain) => `@${domain}`).join(' · ')}
         </p>

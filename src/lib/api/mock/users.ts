@@ -9,6 +9,7 @@ export const DEMO_USER: User = {
   avatarUrl: null,
   role: 'student',
   bannedAt: null,
+  registeredAt: '2026-09-01T00:00:00.000Z',
 }
 
 export const DEMO_ADMIN: User = {
@@ -18,4 +19,5 @@ export const DEMO_ADMIN: User = {
   avatarUrl: null,
   role: 'admin',
   bannedAt: null,
+  registeredAt: '2026-09-01T00:00:00.000Z',
 }

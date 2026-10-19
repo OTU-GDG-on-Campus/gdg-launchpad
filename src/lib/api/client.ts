@@ -1,8 +1,17 @@
 // The single seam between UI and data. Auth goes through Supabase when configured, the rest still
 // reads mock arrays, so swapping those for Supabase queries touches this file and nothing else.
 
+import type { AuthError } from '@supabase/supabase-js'
 import { ALLOWED_EMAIL_DOMAINS } from '@/config/site'
-import type { Comment, Project, ProjectPage, ProjectQuery, Sprint, User } from '@/types'
+import type {
+  Comment,
+  Project,
+  ProjectPage,
+  ProjectQuery,
+  RegistrationDetails,
+  Sprint,
+  User,
+} from '@/types'
 import { MOCK_COMMENTS } from './mock/comments'
 import { MOCK_PROJECTS } from './mock/projects'
 import { MOCK_SPRINTS } from './mock/sprints'
@@ -21,7 +30,10 @@ interface ProfileRow {
   avatar_url: string | null
   role: 'student' | 'admin'
   banned_at: string | null
+  registered_at: string | null
 }
+
+const PROFILE_COLUMNS = 'id, email, name, avatar_url, role, banned_at, registered_at'
 
 function toUser(row: ProfileRow): User {
   return {
@@ -31,6 +43,7 @@ function toUser(row: ProfileRow): User {
     avatarUrl: row.avatar_url,
     role: row.role,
     bannedAt: row.banned_at,
+    registeredAt: row.registered_at,
   }
 }
 
@@ -46,6 +59,43 @@ export async function signInWithGoogle(returnTo: string): Promise<void> {
     },
   })
   if (error) throw error
+}
+
+function authMessage(error: AuthError, fallback: string): string {
+  if (error.code === 'otp_disabled' || /signups not allowed/i.test(error.message)) {
+    return 'No account found for that email. Create an account first.'
+  }
+  if (error.status === 429 || /rate limit|seconds/i.test(error.message)) {
+    return 'Too many attempts. Wait a minute and try again.'
+  }
+  // A failed sign-up trigger surfaces as this generic message, and the domain rule is its only check.
+  if (/database error saving new user|ontariotechu/i.test(error.message)) {
+    return 'LaunchPad accounts require an Ontario Tech email address.'
+  }
+  return fallback
+}
+
+/** Emails a six digit code. Only registering may create an account, logging in never does. */
+export async function sendEmailCode(email: string, mode: 'login' | 'register'): Promise<void> {
+  if (!supabase) return
+  const { error } = await supabase.auth.signInWithOtp({
+    email: email.trim().toLowerCase(),
+    options: { shouldCreateUser: mode === 'register' },
+  })
+  if (error) throw new Error(authMessage(error, 'Could not send the code. Try again.'))
+}
+
+/** Exchanges the emailed code for a session. */
+export async function verifyEmailCode(email: string, code: string): Promise<void> {
+  if (!supabase) return
+  const { error } = await supabase.auth.verifyOtp({
+    email: email.trim().toLowerCase(),
+    token: code.trim(),
+    type: 'email',
+  })
+  if (error) {
+    throw new Error(authMessage(error, 'That code is wrong or has expired. Request a new one.'))
+  }
 }
 
 export async function signOutUser(): Promise<void> {
@@ -64,11 +114,40 @@ export async function getCurrentUser(): Promise<User | null> {
 
   const { data, error } = await supabase
     .from('profiles')
-    .select('id, email, name, avatar_url, role, banned_at')
+    .select(PROFILE_COLUMNS)
     .eq('id', userId)
     .maybeSingle<ProfileRow>()
   if (error) throw error
   return data ? toUser(data) : null
+}
+
+/** Demo mode only: an unregistered demo student for `email`, so the register flow can be previewed. */
+export function startDemoRegistration(email: string): User {
+  const address = email.trim().toLowerCase()
+  return { ...DEMO_USER, email: address, name: address.split('@')[0], registeredAt: null }
+}
+
+/** Saves the registration details onto the signed-in student's profile and marks it finished. */
+export async function saveRegistration(user: User, details: RegistrationDetails): Promise<User> {
+  if (!supabase) {
+    return { ...user, name: details.name, registeredAt: new Date().toISOString() }
+  }
+
+  const { data, error } = await supabase
+    .from('profiles')
+    .update({
+      name: details.name,
+      program: details.program,
+      study_year: details.studyYear,
+      skills: details.skills,
+      bio: details.bio || null,
+      registered_at: new Date().toISOString(),
+    })
+    .eq('id', user.id)
+    .select(PROFILE_COLUMNS)
+    .single<ProfileRow>()
+  if (error) throw new Error('Could not save your details. Try again.')
+  return toUser(data)
 }
 
 /** Calls `onChange` whenever the session changes. Returns an unsubscribe function. */

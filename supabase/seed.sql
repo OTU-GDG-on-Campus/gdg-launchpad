@@ -27,11 +27,13 @@ values
   );
 
 update public.profiles
-set headline = 'CS Year 3'
+set headline = 'CS Year 3', program = 'Computer Science', study_year = 'Year 3',
+    registered_at = now()
 where id = '11111111-1111-4111-8111-111111111111';
 
 update public.profiles
-set headline = 'Software Engineering Year 2'
+set headline = 'Software Engineering Year 2', program = 'Software Engineering',
+    study_year = 'Year 2', registered_at = now()
 where id = '22222222-2222-4222-8222-222222222222';
 
 -- The privilege guard rejects role changes from anyone who is not an admin, and a seed runs with
@@ -39,7 +41,7 @@ where id = '22222222-2222-4222-8222-222222222222';
 alter table public.profiles disable trigger guard_profile_privileges;
 
 update public.profiles
-set role = 'admin', headline = 'Coordinator'
+set role = 'admin', headline = 'Coordinator', registered_at = now()
 where id = '33333333-3333-4333-8333-333333333333';
 
 alter table public.profiles enable trigger guard_profile_privileges;
