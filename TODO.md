@@ -12,7 +12,7 @@ have.
 
 The smallest set that makes the site real. Everything P0 below rolls up here.
 
-- [ ] Students can sign in with an Ontario Tech Google account
+- [ ] Students can register and log in with an emailed code to an Ontario Tech address
 - [ ] Students can submit a project
 - [ ] Coordinators can approve or reject submissions
 - [ ] Approved projects appear publicly and can be upvoted
@@ -26,8 +26,10 @@ The smallest set that makes the site real. Everything P0 below rolls up here.
 - [x] `profiles` table plus a trigger on `auth.users` rejecting non-OTU domains, written as a migration
 - [x] **P0** Apply the initial migration, which is syntax checked but has never been run
 - [ ] **P0** Env vars set in Vercel
-- [ ] **P0** Google OAuth client configured, provider enabled in Supabase
-- [ ] **P0** Replace the demo session in `AuthProvider` with real Supabase sign-in
+- [ ] **P0** Email provider and Brevo SMTP configured in the hosted Supabase project
+- [x] **P0** Replace the demo session in `AuthProvider` with real Supabase sign-in, tested on the
+      local stack and not yet on the hosted project
+- [x] **P0** Separate login from registration, and save name, program, year, skills, and bio
 - [ ] **P0** Verify a personal Gmail account is actually rejected end to end
 - [ ] **P1** Session persistence across reloads and token refresh
 - [ ] **P1** Profile page: your projects, your upvotes, edit display name

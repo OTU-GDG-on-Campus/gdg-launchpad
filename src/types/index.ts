@@ -9,6 +9,17 @@ export interface User {
   avatarUrl: string | null
   role: UserRole
   bannedAt: string | null
+  /** Null until the student finishes creating their account after verifying their email. */
+  registeredAt: string | null
+}
+
+/** What a student fills in to finish creating their account. */
+export interface RegistrationDetails {
+  name: string
+  program: string
+  studyYear: string
+  skills: string[]
+  bio: string
 }
 
 export type ProjectStatus = 'pending' | 'approved' | 'rejected'
