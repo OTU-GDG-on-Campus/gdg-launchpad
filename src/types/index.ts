@@ -70,6 +70,9 @@ export interface ProjectQuery {
   sprintId?: string
   category?: ProjectCategory | 'All'
   search?: string
+  /** Every listed technology must appear in the project's tags. */
+  technologies?: string[]
+  openToContributions?: boolean
   page?: number
   perPage?: number
 }
@@ -98,7 +101,31 @@ export interface Sprint {
   projectCount: number
 }
 
-export type ProjectSort = 'top' | 'new'
+/** Trending ranks by recent engagement, top by total upvotes, new by creation date. */
+export type ProjectSort = 'trending' | 'top' | 'new'
+
+export interface TechnologyFacet {
+  name: string
+  projectCount: number
+}
+
+/** An admin-picked project shown above the feed, valid for a date window. */
+export interface FeaturedSelection {
+  project: Project
+  startsAt: string
+  endsAt: string
+}
+
+/** Public details about a builder, shown when their name or avatar is selected. */
+export interface PersonPreview {
+  name: string
+  avatarUrl: string | null
+  /** Academic program or year, for example "CS Year 3". Null when unspecified. */
+  headline: string | null
+  /** What they did on the project the preview was opened from. Null for project authors. */
+  roleOnProject: string | null
+  projectCount: number
+}
 
 export interface Comment {
   id: string

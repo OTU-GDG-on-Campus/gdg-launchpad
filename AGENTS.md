@@ -53,18 +53,21 @@ typecheck clean. Data is deliberately stubbed. Auth works against a local Supaba
 | --------------------- | ------------------------------------------------------------------------------------------------- |
 | Routing and layout    | Done                                                                                              |
 | Home page             | Done: hero, value points, featured grid, closing call to action                                   |
-| Dark and light themes | Done. Dark is the default, toggle persists to localStorage                                        |
-| Project listing       | Done: category pills, search, sort, pagination. Filters in memory                                 |
+| Dark and light themes | Done. Dark by default, light, or follow the system. Persisted                                     |
+| Project listing       | Done: discovery page, tabs, tech chips, URL filters, grid/list                                    |
 | Project detail        | Done: cover, tech stack, screenshots slot, discussion, sidebar                                    |
+| Featured project      | Done in the UI. Admin picker on /admin, stored by a migration                                     |
+| Bookmarks             | Done in the UI. Optimistic, private per user, table written not applied                           |
+| Global search         | Done: command palette on Ctrl/Cmd+K, mounted in AppShell                                          |
 | Semester Sprints      | Landing page, sprint cards, and detail page done                                                  |
 | Comments              | List renders from mock data. No composer, posting is not built                                    |
 | Upvoting              | UI done, toggles local state only                                                                 |
 | Auth                  | Email code login and registration, tested locally. Demo user when `VITE_SUPABASE_*` is unset      |
 | Submission form       | Placeholder page                                                                                  |
-| Admin panel           | Placeholder page listing planned sections                                                         |
-| Project cover art     | Type field exists, every mock row is null so cards show a tint                                    |
+| Admin panel           | Featured picker live. Moderation and user management not built                                    |
+| Project cover art     | Type field exists, every mock row is null so cards show derived art                               |
 | Backend               | Supabase project created. Schema applied and tested locally, not yet pushed to the hosted project |
-| Database schema       | `supabase/migrations/` holds the schema and the registration columns. Applied to the local stack  |
+| Database schema       | `supabase/migrations/` holds the schema, registration columns, and bookmarks and featured tables  |
 
 Before starting work, re-read this table and correct it if it has drifted.
 
@@ -119,19 +122,25 @@ src/
     api/mock/          Placeholder records, deleted once the DB is live
     auth/              AuthProvider, context, useAuth hook, domain rules
     supabase/client.ts The configured Supabase browser client
-    theme/             ThemeProvider, context, useTheme hook
+    theme/             ThemeProvider (dark, light, system), context, useTheme hook
     cn.ts              Class name joiner
     coverTint.ts       Deterministic gradient for projects with no cover image
     format.ts          Date, relative time, and count formatters
+    platform.ts        Ctrl/Cmd detection for keyboard hints
     useAsync.ts        Async loader hook with stale-result protection
+    useDebouncedValue.ts Debounce for the search palette
   hooks/               Feature hooks that compose lib primitives
+                       useProjectDiscovery, useProjectsUrlState, useProjectsView
   components/
     layout/            AppShell, Navbar, Footer, ThemeToggle
     ui/                Avatar, Badge, Button, Card, FilterPills, Logo, PageHeader,
-                       PageState, Pagination, SearchInput, Select
+                       PageState, Pagination, SearchInput, Select, Kbd, Toast, CardSkeleton
     auth/              AuthControl, RequireAuth route guard
-    projects/          ProjectCard, ProjectList, ProjectSidebar, UpvoteButton,
-                       ContributorStack, CommentList
+    projects/          ProjectCard, ProjectRowCard, ProjectList, ProjectCover, ProjectSidebar,
+                       UpvoteButton, BookmarkButton, ContributorStack, PersonTrigger,
+                       PersonPopover, CommentList, ProjectsHero, DiscoveryTabs, TechFilterChips,
+                       AdvancedFilters, ViewToggle, FeaturedProject, FeaturedProjectPicker,
+                       CommandPalette
     sprints/           SprintCard, SprintGrid
   pages/               One file per route
 

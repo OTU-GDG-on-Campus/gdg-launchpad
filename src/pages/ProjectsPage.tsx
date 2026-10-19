@@ -1,105 +1,155 @@
-// Project gallery: category filters, search, sort, and a paginated grid.
+// The projects discovery page: a hero with global search, the featured project of the week,
+// discovery tabs, technology and advanced filters, and a grid or list feed. Opening a project
+// goes to its full detail page. Every filter lives in the URL, so any view here is shareable.
 
 import { useState } from 'react'
-import { Link } from 'react-router'
+import { Link, useNavigate } from 'react-router'
+import { AdvancedFilters } from '@/components/projects/AdvancedFilters'
+import { DiscoveryTabs } from '@/components/projects/DiscoveryTabs'
+import { FeaturedProject } from '@/components/projects/FeaturedProject'
 import { ProjectList } from '@/components/projects/ProjectList'
+import { ProjectsHero } from '@/components/projects/ProjectsHero'
+import { TechFilterChips } from '@/components/projects/TechFilterChips'
+import { ViewToggle } from '@/components/projects/ViewToggle'
 import { Button } from '@/components/ui/Button'
-import { FilterPills } from '@/components/ui/FilterPills'
+import { CardSkeleton } from '@/components/ui/CardSkeleton'
+import { ErrorState } from '@/components/ui/PageState'
 import { Pagination } from '@/components/ui/Pagination'
-import { PageHeader } from '@/components/ui/PageHeader'
-import { ErrorState, LoadingState } from '@/components/ui/PageState'
-import { SearchInput } from '@/components/ui/SearchInput'
-import { Select } from '@/components/ui/Select'
-import { CATEGORY_FILTERS } from '@/config/site'
-import { useProjectFeed } from '@/hooks/useProjectFeed'
+import { Toast } from '@/components/ui/Toast'
+import { useProjectDiscovery } from '@/hooks/useProjectDiscovery'
+import { useProjectsUrlState } from '@/hooks/useProjectsUrlState'
+import { useProjectsView } from '@/hooks/useProjectsView'
+import { getFeaturedProject, listTechnologies } from '@/lib/api/client'
+import { useAuth } from '@/lib/auth/useAuth'
 import { formatCount } from '@/lib/format'
-import type { ProjectSort } from '@/types'
+import { useAsync } from '@/lib/useAsync'
 
-type CategoryFilter = (typeof CATEGORY_FILTERS)[number]
-
-const SORT_OPTIONS: { value: ProjectSort; label: string }[] = [
-  { value: 'top', label: 'Most upvoted' },
-  { value: 'new', label: 'Newest' },
-]
+const SKELETON_COUNT = 6
 
 export function ProjectsPage() {
-  const [category, setCategory] = useState<CategoryFilter>('All')
-  const [search, setSearch] = useState('')
-  const [sort, setSort] = useState<ProjectSort>('top')
-  const [page, setPage] = useState(1)
+  const filters = useProjectsUrlState()
+  const navigate = useNavigate()
+  const { user } = useAuth()
+  const [view, setView] = useProjectsView()
+  const [bookmarkError, setBookmarkError] = useState<string | null>(null)
 
-  const { projects, totalCount, pageCount, loading, error, upvote } = useProjectFeed({
-    category,
-    search,
-    sort,
-    page,
-  })
+  const feed = useProjectDiscovery(
+    {
+      sort: filters.sort,
+      category: filters.category,
+      search: filters.search,
+      technologies: filters.technologies,
+      openToContributions: filters.openToContributions,
+      page: filters.page,
+    },
+    user?.id ?? 'signed-out',
+  )
 
-  // Narrowing the results can strand the viewer on a page that no longer exists.
-  function changeCategory(next: CategoryFilter) {
-    setCategory(next)
-    setPage(1)
+  const technologies = useAsync(() => listTechnologies(), 'technology-facets')
+  const featured = useAsync(() => getFeaturedProject(), 'featured-project')
+
+  function toggleBookmark(projectId: string) {
+    feed.toggleSaved(projectId).catch(() => {
+      setBookmarkError('Could not save this project. Check your connection and try again.')
+    })
   }
 
-  function changeSearch(next: string) {
-    setSearch(next)
-    setPage(1)
-  }
-
-  function changeSort(next: ProjectSort) {
-    setSort(next)
-    setPage(1)
+  function openProject(slug: string) {
+    navigate(`/projects/${slug}`)
   }
 
   return (
     <>
-      <PageHeader
-        title="Projects"
-        description="Explore what Ontario Tech students are building."
-        actions={
-          <Link to="/submit">
-            <Button>Post a project</Button>
-          </Link>
-        }
-      />
+      <ProjectsHero onOpenSearch={() => window.dispatchEvent(new Event('launchpad:open-search'))} />
 
-      <div className="space-y-4">
-        <FilterPills
-          label="Filter by category"
-          options={CATEGORY_FILTERS}
-          value={category}
-          onChange={changeCategory}
-        />
-
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <SearchInput
-            label="Search projects"
-            placeholder="Search projects..."
-            value={search}
-            onChange={changeSearch}
+      <div className="mx-auto max-w-6xl px-4 pb-20 sm:px-6">
+        {!filters.hasActiveFilters && featured.data && (
+          <FeaturedProject
+            selection={featured.data}
+            saved={feed.savedIds.has(featured.data.project.id)}
+            onUpvote={(id) => void feed.upvote(id)}
+            onToggleBookmark={toggleBookmark}
+            onOpen={openProject}
           />
-          <Select label="Sort by:" options={SORT_OPTIONS} value={sort} onChange={changeSort} />
-        </div>
-      </div>
+        )}
 
-      <div className="mt-8">
-        {error ? (
-          <ErrorState error={error} />
-        ) : loading ? (
-          <LoadingState label="Loading projects" />
-        ) : (
-          <>
-            <p className="text-ink-muted mb-4 text-sm">{formatCount(totalCount, 'project')}</p>
-            <ProjectList
-              projects={projects}
-              onUpvote={(id) => void upvote(id)}
-              emptyTitle="No projects match those filters"
-              emptyHint="Try a different category, or clear the search."
+        <div className="mt-12 space-y-6">
+          <DiscoveryTabs value={filters.sort} onChange={filters.setSort} />
+
+          {technologies.data && technologies.data.length > 0 && (
+            <TechFilterChips
+              technologies={technologies.data}
+              selected={filters.technologies}
+              onChange={filters.setTechnologies}
             />
-            <div className="mt-10">
-              <Pagination page={page} pageCount={pageCount} onChange={setPage} />
+          )}
+
+          <AdvancedFilters
+            category={filters.category}
+            onCategoryChange={filters.setCategory}
+            openToContributions={filters.openToContributions}
+            onOpenToContributionsChange={filters.setOpenToContributions}
+            onClearAll={filters.clearFilters}
+          />
+
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <p className="text-ink-muted text-sm">
+              {feed.loading
+                ? 'Loading projects...'
+                : `${formatCount(feed.totalCount, 'project')}${
+                    filters.search ? ` matching "${filters.search}"` : ' in the feed'
+                  }`}
+              {!feed.loading && filters.hasActiveFilters && (
+                <button
+                  type="button"
+                  onClick={filters.clearFilters}
+                  className="text-brand-700 hover:text-brand-600 ml-2 font-medium"
+                >
+                  Clear all filters
+                </button>
+              )}
+            </p>
+            <ViewToggle view={view} onChange={setView} />
+          </div>
+
+          {feed.error ? (
+            <ErrorState error={feed.error} />
+          ) : feed.loading ? (
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3" aria-hidden="true">
+              {Array.from({ length: SKELETON_COUNT }).map((_, index) => (
+                <CardSkeleton key={index} />
+              ))}
             </div>
-          </>
+          ) : (
+            <ProjectList
+              projects={feed.projects}
+              view={view}
+              savedIds={feed.savedIds}
+              onUpvote={(id) => void feed.upvote(id)}
+              onToggleBookmark={toggleBookmark}
+              onOpen={openProject}
+              emptyTitle="No projects match these filters"
+              emptyHint="Try a different search or technology, or clear the filters."
+            />
+          )}
+
+          <Pagination page={filters.page} pageCount={feed.pageCount} onChange={filters.setPage} />
+
+          <div className="border-line bg-surface mt-6 flex flex-wrap items-center justify-between gap-4 rounded-2xl border p-6">
+            <div>
+              <h2 className="font-display text-lg font-semibold">Built something worth sharing?</h2>
+              <p className="text-ink-muted mt-1 text-sm">
+                Post it to LaunchPad and let the campus find your team.
+              </p>
+            </div>
+            <Link to="/submit">
+              <Button>Post a project</Button>
+            </Link>
+          </div>
+        </div>
+
+        {bookmarkError && (
+          <Toast message={bookmarkError} onDismiss={() => setBookmarkError(null)} />
         )}
       </div>
     </>

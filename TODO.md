@@ -55,12 +55,22 @@ The smallest set that makes the site real. Everything P0 below rolls up here.
 - [x] Project detail page with tech stack, screenshots, team, and discussion
 - [x] Upvote control with the signed-out state handled
 - [x] Default sort by upvotes, alternative sort by newest
+- [x] Trending, Most Upvoted, and Recently Added tabs with URL sync
+- [x] Multi-select technology filter chips with counts, plus Advanced Filters
+- [x] Filter to only projects open to contributions
+- [x] Grid and list views, toggled and persisted in localStorage
+- [x] Clicking a project card opens its full detail page directly
+- [x] Global search palette on Ctrl/Cmd+K, debounced with stale-request cancellation
+- [x] Bookmarking UI, optimistic with rollback, private per user
+- [x] Contributor profile previews on hover, focus, and tap
 - [ ] **P0** Real upvote persistence, one per user, enforced by a unique constraint
+- [ ] **P0** Apply `20261018000000_bookmarks_and_featured_projects.sql` and drop the bookmark and featured fallbacks in `client.ts`
 - [ ] **P1** Server-side search and pagination, since the current pass filters in memory
 - [ ] **P1** Empty and error states verified against the real API
-- [ ] **P2** Filter by tag as well as category
-- [ ] **P2** Filter to only projects open to contributions
+- [ ] **P1** Featured project date range enforcement server-side, so an expired selection ends by itself
+- [ ] **P2** Filter by tag as well as category (tech chips cover the stack, not free-form tags)
 - [ ] **P2** Related projects on the detail page
+- [ ] **P2** Trending from real 7-day upvote timestamps once the `upvotes` table exists
 
 ## Comments
 
@@ -99,7 +109,7 @@ The smallest set that makes the site real. Everything P0 below rolls up here.
 - [x] CI running typecheck, lint, format check, and build
 - [x] Vercel SPA rewrite so deep links survive a refresh
 - [ ] **P0** Connect the repo to Vercel, confirm preview deploys work
-- [ ] **P1** Database migrations checked into the repo
+- [x] **P1** Database migrations checked into the repo
 - [x] **P1** Seed script so a fresh local database is usable
 - [ ] **P1** Error boundary and a real error page
 - [ ] **P1** Rate limiting on submissions and comments
@@ -109,12 +119,13 @@ The smallest set that makes the site real. Everything P0 below rolls up here.
 
 ## Accessibility and polish
 
-- [x] Dark and light themes with tokenised colours
-- [ ] **P1** Keyboard navigation pass over filters, cards, and the upvote control
+- [x] Dark, light, and system themes with tokenised colours, no flash on load
+- [x] Reduced motion support for card and palette animations
+- [x] Keyboard support on the discovery tabs, filter chips, view toggle, and search palette
+- [ ] **P1** Full keyboard navigation pass over filters, cards, and the upvote control
 - [ ] **P1** Mobile nav. The links are hidden below `md` with nothing replacing them
 - [ ] **P1** Focus management on route change, and a skip-to-content link
-- [ ] **P1** Screen reader pass on the upvote button and contributor stack
-- [ ] **P2** Reduced motion support if animation gets added
+- [ ] **P1** Screen reader pass on the upvote button, contributor stack, and detail modal
 - [ ] **P2** Real favicon and social share image
 
 ## Legal and branding
@@ -131,6 +142,14 @@ Things a reader might mistake for finished work.
 - Everything reads from `src/lib/api/mock/`. No database exists.
 - Without `VITE_SUPABASE_*` set, `signIn()` returns a fixed demo student. Nothing is verified.
 - Upvotes and filters are in-memory only and reset on reload.
+- Bookmarks survive a reload through `sessionStorage` only, and the Featured Project of the Week
+  picker does the same. Both have real Supabase query paths in `client.ts` that are unreachable
+  until the `20261018000000` migration is applied.
+- Trending uses a derived engagement score from mock data, not real upvote timestamps.
+- The admin Featured Project picker was never clicked in a browser, because the demo session is
+  a student and `adminOnly` blocks the route.
 - No project has a real cover image or screenshot, so tinted placeholders stand in.
 - Sprint records, including the "active" Discord Bot sprint, are placeholder rows.
 - Comment posting is not wired up. The list renders, the composer does not exist.
+- The discovery redesign has typechecked, linted, and built, but has not been reviewed in a
+  browser. Both themes and the breakpoints are unverified visually.

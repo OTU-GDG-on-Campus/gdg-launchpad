@@ -2,13 +2,20 @@
 
 import { createContext } from 'react'
 
-export type Theme = 'dark' | 'light'
+/** What the visitor chose. 'system' follows the operating system preference. */
+export type ThemePreference = 'dark' | 'light' | 'system'
+
+export type ResolvedTheme = 'dark' | 'light'
 
 export interface ThemeContextValue {
-  theme: Theme
-  toggleTheme: () => void
+  theme: ThemePreference
+  /** The theme actually applied to the document, with 'system' resolved. */
+  resolvedTheme: ResolvedTheme
+  setTheme: (theme: ThemePreference) => void
 }
 
 export const THEME_STORAGE_KEY = 'launchpad-theme'
+
+export const THEME_ORDER: ThemePreference[] = ['dark', 'light', 'system']
 
 export const ThemeContext = createContext<ThemeContextValue | null>(null)
