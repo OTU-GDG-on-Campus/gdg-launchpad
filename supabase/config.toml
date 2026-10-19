@@ -163,13 +163,13 @@ web3 = 30 # Web3 logins per 5 minutes per IP.
 # secret = ""
 
 [auth.email]
-enable_signup = false # Google is the only way in. Email signup would bypass the domain check.
+enable_signup = true # Students sign up with an email code. The domain rule is enforced by a trigger.
 double_confirm_changes = true # Confirm an email change on both the old and the new address.
-enable_confirmations = false # Require confirming the address before sign-in.
+enable_confirmations = true # Require confirming the address before sign-in.
 secure_password_change = false # Require a recent login to change a password.
 max_frequency = "1s" # Minimum gap before resending a confirmation or reset email.
 otp_length = 6 # Characters in the email OTP.
-otp_expiry = 3600 # Seconds before the email OTP expires.
+otp_expiry = 600 # Seconds before the email OTP expires. Ten minutes.
 
 # Use a production-ready SMTP server
 # [auth.email.smtp]
@@ -180,6 +180,15 @@ otp_expiry = 3600 # Seconds before the email OTP expires.
 # pass = "env(SENDGRID_API_KEY)"
 # admin_email = "admin@email.com"
 # sender_name = "Admin"
+
+# The six digit code lives in {{ .Token }}. Both templates must include it, or students get a link.
+[auth.email.template.confirmation]
+subject = "Your LaunchPad sign-in code"
+content_path = "./supabase/templates/confirmation.html"
+
+[auth.email.template.magic_link]
+subject = "Your LaunchPad sign-in code"
+content_path = "./supabase/templates/magic_link.html"
 
 # Uncomment to customize email template
 # [auth.email.template.invite]
