@@ -1,13 +1,12 @@
-// The projects discovery page: a hero with live counts, the featured project of the week,
-// discovery tabs, technology and advanced filters, a grid or list feed, and the in-page detail
-// modal. Every filter lives in the URL, so any view here is shareable and survives a reload.
+// The projects discovery page: a hero with global search, the featured project of the week,
+// discovery tabs, technology and advanced filters, and a grid or list feed. Opening a project
+// goes to its full detail page. Every filter lives in the URL, so any view here is shareable.
 
 import { useState } from 'react'
-import { Link } from 'react-router'
+import { Link, useNavigate } from 'react-router'
 import { AdvancedFilters } from '@/components/projects/AdvancedFilters'
 import { DiscoveryTabs } from '@/components/projects/DiscoveryTabs'
 import { FeaturedProject } from '@/components/projects/FeaturedProject'
-import { ProjectDetailModal } from '@/components/projects/ProjectDetailModal'
 import { ProjectList } from '@/components/projects/ProjectList'
 import { ProjectsHero } from '@/components/projects/ProjectsHero'
 import { TechFilterChips } from '@/components/projects/TechFilterChips'
@@ -20,7 +19,7 @@ import { Toast } from '@/components/ui/Toast'
 import { useProjectDiscovery } from '@/hooks/useProjectDiscovery'
 import { useProjectsUrlState } from '@/hooks/useProjectsUrlState'
 import { useProjectsView } from '@/hooks/useProjectsView'
-import { getFeaturedProject, getProjectStats, listTechnologies } from '@/lib/api/client'
+import { getFeaturedProject, listTechnologies } from '@/lib/api/client'
 import { useAuth } from '@/lib/auth/useAuth'
 import { formatCount } from '@/lib/format'
 import { useAsync } from '@/lib/useAsync'
@@ -29,6 +28,7 @@ const SKELETON_COUNT = 6
 
 export function ProjectsPage() {
   const filters = useProjectsUrlState()
+  const navigate = useNavigate()
   const { user } = useAuth()
   const [view, setView] = useProjectsView()
   const [bookmarkError, setBookmarkError] = useState<string | null>(null)
@@ -45,7 +45,6 @@ export function ProjectsPage() {
     user?.id ?? 'signed-out',
   )
 
-  const stats = useAsync(() => getProjectStats(), 'project-stats')
   const technologies = useAsync(() => listTechnologies(), 'technology-facets')
   const featured = useAsync(() => getFeaturedProject(), 'featured-project')
 
@@ -55,16 +54,13 @@ export function ProjectsPage() {
     })
   }
 
-  const openListed = filters.openSlug
-    ? feed.projects.find((project) => project.slug === filters.openSlug)
-    : undefined
+  function openProject(slug: string) {
+    navigate(`/projects/${slug}`)
+  }
 
   return (
     <>
-      <ProjectsHero
-        stats={stats.data}
-        onOpenSearch={() => window.dispatchEvent(new Event('launchpad:open-search'))}
-      />
+      <ProjectsHero onOpenSearch={() => window.dispatchEvent(new Event('launchpad:open-search'))} />
 
       <div className="mx-auto max-w-6xl px-4 pb-20 sm:px-6">
         {!filters.hasActiveFilters && featured.data && (
@@ -73,7 +69,7 @@ export function ProjectsPage() {
             saved={feed.savedIds.has(featured.data.project.id)}
             onUpvote={(id) => void feed.upvote(id)}
             onToggleBookmark={toggleBookmark}
-            onOpen={filters.openProject}
+            onOpen={openProject}
           />
         )}
 
@@ -131,7 +127,7 @@ export function ProjectsPage() {
               savedIds={feed.savedIds}
               onUpvote={(id) => void feed.upvote(id)}
               onToggleBookmark={toggleBookmark}
-              onOpen={filters.openProject}
+              onOpen={openProject}
               emptyTitle="No projects match these filters"
               emptyHint="Try a different search or technology, or clear the filters."
             />
@@ -151,17 +147,6 @@ export function ProjectsPage() {
             </Link>
           </div>
         </div>
-
-        {filters.openSlug && (
-          <ProjectDetailModal
-            slug={filters.openSlug}
-            savedIds={feed.savedIds}
-            override={openListed ? feed.overrideFor(openListed.id) : undefined}
-            onUpvote={(id) => void feed.upvote(id)}
-            onToggleBookmark={toggleBookmark}
-            onClose={filters.closeProject}
-          />
-        )}
 
         {bookmarkError && (
           <Toast message={bookmarkError} onDismiss={() => setBookmarkError(null)} />

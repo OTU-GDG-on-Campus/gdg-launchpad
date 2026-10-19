@@ -10,7 +10,6 @@ import type {
   Project,
   ProjectPage,
   ProjectQuery,
-  ProjectStats,
   Sprint,
   TechnologyFacet,
   User,
@@ -206,25 +205,6 @@ export async function listTechnologies(): Promise<TechnologyFacet[]> {
   return [...byKey.values()].sort(
     (a, b) => b.projectCount - a.projectCount || a.name.localeCompare(b.name),
   )
-}
-
-/** Counts behind the hero statistics. Every number is derived from approved projects. */
-export async function getProjectStats(): Promise<ProjectStats> {
-  const projects = approvedProjects()
-  const builders = new Set<string>()
-  for (const project of projects) {
-    builders.add(project.authorId)
-    for (const contributor of project.contributors) builders.add(contributor.name.toLowerCase())
-  }
-  const technologies = new Set<string>()
-  for (const project of projects)
-    for (const tag of project.tags) technologies.add(tag.toLowerCase())
-
-  return {
-    projectCount: projects.length,
-    builderCount: builders.size,
-    technologyCount: technologies.size,
-  }
 }
 
 /** Public details about a builder, assembled only from approved project records. */

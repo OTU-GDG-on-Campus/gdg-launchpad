@@ -18,7 +18,7 @@ interface ProjectCardProps {
   saved?: boolean
   onUpvote: (projectId: string) => void
   onToggleBookmark?: (projectId: string) => void
-  /** Opens the in-page detail view. Without it the title links to the full detail page. */
+  /** Opens the project. Without it the title links straight to the detail page. */
   onOpen?: (slug: string) => void
 }
 

@@ -57,11 +57,10 @@ The smallest set that makes the site real. Everything P0 below rolls up here.
 - [x] Multi-select technology filter chips with counts, plus Advanced Filters
 - [x] Filter to only projects open to contributions
 - [x] Grid and list views, toggled and persisted in localStorage
-- [x] Project detail modal, route-aware via `?open=`, shareable and back-navigable
+- [x] Clicking a project card opens its full detail page directly
 - [x] Global search palette on Ctrl/Cmd+K, debounced with stale-request cancellation
 - [x] Bookmarking UI, optimistic with rollback, private per user
 - [x] Contributor profile previews on hover, focus, and tap
-- [x] Hero with real stats from `getProjectStats`
 - [ ] **P0** Real upvote persistence, one per user, enforced by a unique constraint
 - [ ] **P0** Apply `20261018000000_bookmarks_and_featured_projects.sql` and drop the bookmark and featured fallbacks in `client.ts`
 - [ ] **P1** Server-side search and pagination, since the current pass filters in memory

@@ -53,7 +53,7 @@ typecheck clean. Data and auth are deliberately stubbed.
 | Routing and layout    | Done                                                                    |
 | Home page             | Done: hero, value points, featured grid, closing call to action         |
 | Dark and light themes | Done. Dark by default, light, or follow the system. Persisted           |
-| Project listing       | Done: discovery page, tabs, tech chips, URL filters, grid/list, modal   |
+| Project listing       | Done: discovery page, tabs, tech chips, URL filters, grid/list          |
 | Project detail        | Done: cover, tech stack, screenshots slot, discussion, sidebar          |
 | Featured project      | Done in the UI. Admin picker on /admin, stored by a migration           |
 | Bookmarks             | Done in the UI. Optimistic, private per user, table written not applied |
@@ -139,7 +139,7 @@ src/
                        UpvoteButton, BookmarkButton, ContributorStack, PersonTrigger,
                        PersonPopover, CommentList, ProjectsHero, DiscoveryTabs, TechFilterChips,
                        AdvancedFilters, ViewToggle, FeaturedProject, FeaturedProjectPicker,
-                       ProjectDetailModal, CommandPalette
+                       CommandPalette
     sprints/           SprintCard, SprintGrid
   pages/               One file per route
 

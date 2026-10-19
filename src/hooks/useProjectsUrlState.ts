@@ -1,8 +1,8 @@
 // Mirrors the discovery filters in the URL, so any view of the feed can be shared and survives a
-// reload. Filter changes reset to page one, and the open param drives the in-page detail view.
+// reload. Filter changes reset to page one.
 
-import { useCallback, useRef } from 'react'
-import { useNavigate, useSearchParams } from 'react-router'
+import { useCallback } from 'react'
+import { useSearchParams } from 'react-router'
 import { CATEGORY_FILTERS } from '@/config/site'
 import type { ProjectCategory, ProjectSort } from '@/types'
 
@@ -16,7 +16,6 @@ export interface ProjectsUrlState {
   technologies: string[]
   openToContributions: boolean
   page: number
-  openSlug: string | null
   /** True when a search, category, technology, or contribution filter is narrowing the feed. */
   hasActiveFilters: boolean
   setSearch: (value: string) => void
@@ -26,15 +25,10 @@ export interface ProjectsUrlState {
   setOpenToContributions: (value: boolean) => void
   setPage: (value: number) => void
   clearFilters: () => void
-  openProject: (slug: string) => void
-  closeProject: () => void
 }
 
 export function useProjectsUrlState(): ProjectsUrlState {
   const [params, setParams] = useSearchParams()
-  const navigate = useNavigate()
-  // A modal opened by a click can be closed with Back; one that was linked to directly cannot.
-  const openedOnMount = useRef(params.has('open'))
 
   const search = params.get('q') ?? ''
   const sortParam = params.get('tab')
@@ -50,7 +44,6 @@ export function useProjectsUrlState(): ProjectsUrlState {
     .filter(Boolean)
   const openToContributions = params.get('contrib') === '1'
   const page = Math.max(1, Number(params.get('page')) || 1)
-  const openSlug = params.get('open')
 
   const update = useCallback(
     (changes: Record<string, string | null>, resetPage = true) => {
@@ -77,16 +70,6 @@ export function useProjectsUrlState(): ProjectsUrlState {
     setParams(next)
   }, [params, setParams])
 
-  const closeProject = useCallback(() => {
-    if (!openedOnMount.current && window.history.length > 1) {
-      navigate(-1)
-      return
-    }
-    const next = new URLSearchParams(params)
-    next.delete('open')
-    setParams(next, { replace: true })
-  }, [navigate, params, setParams])
-
   return {
     search,
     sort,
@@ -94,7 +77,6 @@ export function useProjectsUrlState(): ProjectsUrlState {
     technologies,
     openToContributions,
     page,
-    openSlug,
     hasActiveFilters:
       search !== '' || category !== 'All' || technologies.length > 0 || openToContributions,
     setSearch: (value) => update({ q: value }),
@@ -104,7 +86,5 @@ export function useProjectsUrlState(): ProjectsUrlState {
     setOpenToContributions: (value) => update({ contrib: value ? '1' : null }),
     setPage,
     clearFilters,
-    openProject: (slug) => update({ open: slug }, false),
-    closeProject,
   }
 }

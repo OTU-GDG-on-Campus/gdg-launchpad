@@ -1,24 +1,13 @@
-// The discovery hero: the page's pitch, the global search trigger, and counts derived from
-// approved projects. Every statistic comes from the project data, never a hardcoded number.
+// The discovery hero: the page's pitch and the global search trigger.
 
 import { Kbd } from '@/components/ui/Kbd'
 import { commandKeyLabel } from '@/lib/platform'
-import type { ProjectStats } from '@/types'
 
 interface ProjectsHeroProps {
-  stats: ProjectStats | null
   onOpenSearch: () => void
 }
 
-function count(stats: ProjectStats | null, key: keyof ProjectStats): string {
-  return stats ? stats[key].toLocaleString('en-CA') : '-'
-}
-
-function label(stats: ProjectStats | null, key: keyof ProjectStats, one: string, many: string) {
-  return stats && stats[key] === 1 ? one : many
-}
-
-export function ProjectsHero({ stats, onOpenSearch }: ProjectsHeroProps) {
+export function ProjectsHero({ onOpenSearch }: ProjectsHeroProps) {
   return (
     <section className="discovery-hero border-line border-b">
       <div className="mx-auto max-w-6xl px-4 pt-14 pb-12 sm:px-6 sm:pt-20 sm:pb-14">
@@ -52,33 +41,6 @@ export function ProjectsHero({ stats, onOpenSearch }: ProjectsHeroProps) {
           </span>
           <Kbd className="ml-auto hidden sm:inline-flex">{commandKeyLabel()} K</Kbd>
         </button>
-
-        <dl className="border-line bg-surface/60 divide-line mt-10 grid max-w-2xl grid-cols-3 divide-x rounded-xl border">
-          <div className="px-4 py-4 sm:px-6 sm:py-5">
-            <dd className="font-display text-2xl font-bold tabular-nums sm:text-3xl">
-              {count(stats, 'projectCount')}
-            </dd>
-            <dt className="text-ink-muted mt-0.5 text-xs sm:text-sm">
-              {label(stats, 'projectCount', 'project posted', 'projects posted')}
-            </dt>
-          </div>
-          <div className="px-4 py-4 sm:px-6 sm:py-5">
-            <dd className="font-display text-2xl font-bold tabular-nums sm:text-3xl">
-              {count(stats, 'builderCount')}
-            </dd>
-            <dt className="text-ink-muted mt-0.5 text-xs sm:text-sm">
-              {label(stats, 'builderCount', 'student builder', 'student builders')}
-            </dt>
-          </div>
-          <div className="px-4 py-4 sm:px-6 sm:py-5">
-            <dd className="font-display text-2xl font-bold tabular-nums sm:text-3xl">
-              {count(stats, 'technologyCount')}
-            </dd>
-            <dt className="text-ink-muted mt-0.5 text-xs sm:text-sm">
-              {label(stats, 'technologyCount', 'technology in use', 'technologies in use')}
-            </dt>
-          </div>
-        </dl>
       </div>
     </section>
   )

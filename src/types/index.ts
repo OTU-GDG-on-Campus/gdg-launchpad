@@ -93,13 +93,6 @@ export interface Sprint {
 /** Trending ranks by recent engagement, top by total upvotes, new by creation date. */
 export type ProjectSort = 'trending' | 'top' | 'new'
 
-/** Counts derived from the approved project list, shown in the discovery hero. */
-export interface ProjectStats {
-  projectCount: number
-  builderCount: number
-  technologyCount: number
-}
-
 export interface TechnologyFacet {
   name: string
   projectCount: number

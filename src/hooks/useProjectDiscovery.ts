@@ -71,12 +71,6 @@ export function useProjectDiscovery(query: ProjectQuery, viewerKey: string) {
     [savedIds],
   )
 
-  /** The upvoted version of a project, so the detail view matches the grid after an upvote. */
-  const overrideFor = useCallback(
-    (projectId: string): Project | undefined => upvoteOverrides[projectId],
-    [upvoteOverrides],
-  )
-
   return {
     projects,
     totalCount: data?.totalCount ?? 0,
@@ -86,6 +80,5 @@ export function useProjectDiscovery(query: ProjectQuery, viewerKey: string) {
     savedIds,
     upvote,
     toggleSaved,
-    overrideFor,
   }
 }
