@@ -2,7 +2,33 @@
 
 @import 'tailwindcss';
 
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url('../UI/pages/assets/fonts/manrope-latin.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../UI/pages/assets/fonts/ibm-plex-mono-400-latin.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('../UI/pages/assets/fonts/ibm-plex-mono-500-latin.woff2') format('woff2');
+}
+
 @theme {
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+  --color-flare-soft: #291b16;
   --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
   --font-display: 'Inter Tight', 'Inter', ui-sans-serif, system-ui, sans-serif;
 
@@ -29,6 +55,7 @@
 }
 
 [data-theme='light'] {
+  --color-flare-soft: #fdf4f0;
   --color-surface-muted: #fafaf8;
   --color-surface: #ffffff;
   --color-surface-raised: #f3f4f0;
@@ -52,6 +79,8 @@
 }
 
 .landing-theme {
+  --font-sans: 'Manrope', ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-sans);
   --color-surface-muted: #0b0c10;
   --color-surface: #121a21;
   --color-surface-raised: #10171e;
@@ -62,22 +91,24 @@
 }
 
 [data-theme='light'] .landing-theme {
-  --color-surface-muted: #fcfcfa;
+  --font-sans: 'Manrope', ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-sans);
+  --color-surface-muted: #fdfdfc;
   --color-surface: #ffffff;
-  --color-surface-raised: #f5f5f1;
-  --color-line: #dfe3e6;
+  --color-surface-raised: #f3f2ed;
+  --color-line: #e6e4de;
   --color-ink: #10151b;
-  --color-ink-soft: #333a45;
-  --color-ink-muted: #626b75;
-  --color-brand-50: #eef4fa;
+  --color-ink-soft: #3d4855;
+  --color-ink-muted: #55606c;
+  --color-brand-50: #f2f7fc;
   --color-brand-500: #00417a;
-  --color-brand-600: #00335f;
+  --color-brand-600: #002c52;
   --color-brand-700: #00417a;
   --color-accent: #2f7a76;
   --color-accent-soft: #e6f2f1;
-  --color-flare: #c74722;
-  --landing-grid-minor: rgb(0 65 122 / 4%);
-  --landing-grid-major: rgb(0 65 122 / 7%);
+  --color-flare: #e2572a;
+  --landing-grid-minor: rgb(0 65 122 / 5%);
+  --landing-grid-major: rgb(0 65 122 / 8.5%);
 }
 
 @layer base {
@@ -119,23 +150,9 @@
       24px 24px;
   }
 
-  .landing-hero {
-    background-image: radial-gradient(
-      ellipse at center,
-      transparent 30%,
-      var(--color-surface-muted) 85%
-    );
-  }
-
   .landing-cover {
-    background-image:
-      radial-gradient(ellipse at center, var(--color-brand-50), transparent 75%),
-      linear-gradient(to right, var(--landing-grid-major) 1px, transparent 1px),
-      linear-gradient(to bottom, var(--landing-grid-major) 1px, transparent 1px);
-    background-size:
-      auto,
-      24px 24px,
-      24px 24px;
+    background-image: radial-gradient(ellipse at center, var(--color-brand-50), transparent 75%);
+    background-size: auto;
   }
 
   /* Discovery hero backdrop: a faint blueprint grid that fades out towards the edges. */

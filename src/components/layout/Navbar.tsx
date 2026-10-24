@@ -16,16 +16,16 @@ interface NavbarProps {
 
 export function Navbar({ onOpenSearch }: NavbarProps) {
   return (
-    <header className="border-line bg-surface-raised/95 sticky top-0 z-50 border-b backdrop-blur">
+    <header className="border-line bg-surface-muted/95 sticky top-0 z-50 border-b backdrop-blur">
       <nav
         aria-label="Main navigation"
-        className="mx-auto flex min-h-16 max-w-6xl flex-wrap items-center gap-x-6 gap-y-2 px-4 py-3 sm:px-6"
+        className="mx-auto flex min-h-16 max-w-335 flex-wrap items-center gap-x-5 gap-y-2 px-6 py-3 sm:px-11"
       >
         <NavLink to="/" aria-label="LaunchPad home" className="shrink-0">
           <Wordmark />
         </NavLink>
 
-        <ul className="order-last flex w-full flex-wrap items-center gap-1 md:order-none md:ml-4 md:w-auto">
+        <ul className="order-last flex w-full flex-wrap items-center gap-1 xl:order-none xl:ml-1 xl:w-auto">
           {NAV_LINKS.map((link) => (
             <li key={link.to}>
               <NavLink

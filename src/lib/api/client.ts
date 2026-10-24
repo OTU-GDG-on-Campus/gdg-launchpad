@@ -1,9 +1,12 @@
-// The single seam between UI and data. Auth, bookmarks, and the featured slot go through Supabase
-// when configured; the project feed still reads mock arrays until the schema is applied, so
-// swapping those for Supabase queries touches this file and nothing else.
+// Data seam for Supabase email auth, bookmarks, and featured projects, plus mock feeds.
+// Profile edits and viewing history remain private browser-only previews.
 
 import type { AuthError } from '@supabase/supabase-js'
 import type {
+  AccountWorkspace,
+  CommunityContributor,
+  ProfilePreview,
+  ViewedProject,
   Comment,
   FeaturedSelection,
   PersonPreview,
@@ -34,9 +37,13 @@ interface ProfileRow {
   role: 'student' | 'admin'
   banned_at: string | null
   registered_at: string | null
+  program: string | null
+  study_year: string | null
+  bio: string | null
 }
 
-const PROFILE_COLUMNS = 'id, email, name, avatar_url, role, banned_at, registered_at'
+const PROFILE_COLUMNS =
+  'id, email, name, avatar_url, role, banned_at, registered_at, program, study_year, bio'
 
 function toUser(row: ProfileRow): User {
   return {
@@ -47,6 +54,9 @@ function toUser(row: ProfileRow): User {
     role: row.role,
     bannedAt: row.banned_at,
     registeredAt: row.registered_at,
+    program: row.program,
+    studyYear: row.study_year,
+    bio: row.bio,
   }
 }
 
@@ -470,4 +480,181 @@ export async function setFeaturedProject({
   if (error) throw error
 
   return { project, startsAt, endsAt }
+}
+
+function readBrowserValue(key: string): unknown {
+  try {
+    return JSON.parse(localStorage.getItem(key) ?? 'null') as unknown
+  } catch {
+    return null
+  }
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
+
+function previewKey(userId: string): string {
+  return `launchpad:profile-preview:${encodeURIComponent(userId)}`
+}
+
+function historyKey(userId: string): string {
+  return `launchpad:recent-projects:${encodeURIComponent(userId)}`
+}
+
+async function workspaceUser(userId: string): Promise<User> {
+  const user = await getCurrentUser()
+  if (!user || user.id !== userId || user.bannedAt)
+    throw new Error('Sign in to view your workspace.')
+  return user
+}
+
+function userProjects(userId: string): Project[] {
+  return MOCK_PROJECTS.filter((project) => project.authorId === userId).sort((a, b) =>
+    b.createdAt.localeCompare(a.createdAt),
+  )
+}
+
+function profilePreview(user: User, projects: Project[]): ProfilePreview {
+  const saved = readBrowserValue(previewKey(user.id))
+  const values = isRecord(saved) ? saved : {}
+  const text = (key: string, fallback = '') =>
+    typeof values[key] === 'string' ? (values[key] as string) : fallback
+  const eligible = new Set(
+    projects.filter((project) => project.status === 'approved').map((project) => project.id),
+  )
+  const pins = Array.isArray(values.pinnedProjectIds)
+    ? values.pinnedProjectIds
+        .filter((id): id is string => typeof id === 'string' && eligible.has(id))
+        .slice(0, 3)
+    : []
+  return {
+    userId: user.id,
+    name: text('name', user.name),
+    program: text('program', user.program ?? ''),
+    year: text('year', user.studyYear ?? ''),
+    about: text('about', user.bio ?? ''),
+    pinnedProjectIds: pins,
+    updatedAt: text('updatedAt') || null,
+  }
+}
+
+function viewedProjects(userId: string): ViewedProject[] {
+  const value = readBrowserValue(historyKey(userId))
+  if (!Array.isArray(value)) return []
+  const seen = new Set<string>()
+  return value
+    .flatMap((item: unknown) => {
+      if (
+        !isRecord(item) ||
+        typeof item.projectId !== 'string' ||
+        typeof item.viewedAt !== 'string' ||
+        !Number.isFinite(Date.parse(item.viewedAt)) ||
+        seen.has(item.projectId)
+      )
+        return []
+      const project = MOCK_PROJECTS.find(
+        (candidate) => candidate.id === item.projectId && candidate.status === 'approved',
+      )
+      if (!project) return []
+      seen.add(project.id)
+      return [{ project, viewedAt: item.viewedAt }]
+    })
+    .sort((a, b) => b.viewedAt.localeCompare(a.viewedAt))
+    .slice(0, 8)
+}
+
+/** Profile previews and history are browser-only. They never update a public Supabase profile. */
+export async function getAccountWorkspace(userId: string): Promise<AccountWorkspace> {
+  const user = await workspaceUser(userId)
+  const projects = userProjects(userId)
+  return {
+    profile: profilePreview(user, projects),
+    projects,
+    recentlyViewed: viewedProjects(userId),
+  }
+}
+
+export async function saveProfilePreview(
+  userId: string,
+  input: ProfilePreview,
+): Promise<ProfilePreview> {
+  const user = await workspaceUser(userId)
+  if (
+    !input.name.trim() ||
+    input.name.length > 100 ||
+    input.about.length > 1000 ||
+    input.program.length > 100 ||
+    input.year.length > 30
+  )
+    throw new Error(
+      'Enter a name of up to 100 characters and an About me of up to 1,000 characters.',
+    )
+  const eligible = new Set(
+    userProjects(userId)
+      .filter((project) => project.status === 'approved')
+      .map((project) => project.id),
+  )
+  const next: ProfilePreview = {
+    ...input,
+    userId: user.id,
+    name: input.name.trim(),
+    about: input.about.trim(),
+    pinnedProjectIds: [...new Set(input.pinnedProjectIds)]
+      .filter((id) => eligible.has(id))
+      .slice(0, 3),
+    updatedAt: new Date().toISOString(),
+  }
+  try {
+    localStorage.setItem(previewKey(userId), JSON.stringify(next))
+  } catch {
+    throw new Error('Your browser could not save the preview. Allow site storage and try again.')
+  }
+  return next
+}
+
+export async function recordProjectView(userId: string, projectId: string): Promise<void> {
+  await workspaceUser(userId)
+  if (!MOCK_PROJECTS.some((project) => project.id === projectId && project.status === 'approved'))
+    return
+  const next = [
+    { projectId, viewedAt: new Date().toISOString() },
+    ...viewedProjects(userId)
+      .filter((entry) => entry.project.id !== projectId)
+      .map((entry) => ({ projectId: entry.project.id, viewedAt: entry.viewedAt })),
+  ].slice(0, 8)
+  localStorage.setItem(historyKey(userId), JSON.stringify(next))
+}
+
+export async function clearRecentlyViewed(userId: string): Promise<void> {
+  await workspaceUser(userId)
+  localStorage.removeItem(historyKey(userId))
+}
+
+export async function listContributors(): Promise<CommunityContributor[]> {
+  const people = new Map<string, CommunityContributor & { projectIds: Set<string> }>()
+  for (const project of MOCK_PROJECTS.filter((item) => item.status === 'approved')) {
+    const contributors = [
+      {
+        id: project.authorId,
+        name: project.authorName,
+        avatarUrl: project.authorAvatarUrl,
+        role: 'Project creator',
+      },
+      ...project.contributors,
+    ]
+    for (const contributor of contributors) {
+      const person = people.get(contributor.id) ?? {
+        ...contributor,
+        projectCount: 0,
+        projectIds: new Set<string>(),
+      }
+      person.projectIds.add(project.id)
+      person.projectCount = person.projectIds.size
+      people.set(person.id, person)
+    }
+  }
+  return [...people.values()]
+    .map(({ projectIds: _projectIds, ...person }) => person)
+    .sort((a, b) => b.projectCount - a.projectCount || a.name.localeCompare(b.name))
 }

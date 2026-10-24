@@ -32,7 +32,12 @@ The smallest set that makes the site real. Everything P0 below rolls up here.
 - [x] **P0** Separate login from registration, and save name, program, year, skills, and bio
 - [ ] **P0** Verify a personal Gmail account is actually rejected end to end
 - [ ] **P1** Session persistence across reloads and token refresh
-- [ ] **P1** Profile page: your projects, your upvotes, edit display name
+- [x] Profile page UI: name, About me, pinned projects, recent projects, and browser-only editor
+- [x] Dashboard UI matching the supplied reference, with Recently Viewed and a profile checklist
+- [x] Per-account browser-only profile previews and signed-in project viewing history
+- [ ] **P1** Persist approved profiles and pinned projects in the backend
+- [ ] **P1** Submit profile edits for moderator review and display approved changes publicly
+- [ ] **P1** Real dashboard project data, upvote totals, and cross-device viewing history
 - [ ] **P2** Public profile at `/u/:handle`
 - [ ] **P2** Link a GitHub username to the profile
 
@@ -139,7 +144,7 @@ The smallest set that makes the site real. Everything P0 below rolls up here.
 
 Things a reader might mistake for finished work.
 
-- Everything reads from `src/lib/api/mock/`. No database exists.
+- Project feeds, contributor lists, and project-derived dashboard counts use mock records. Supabase auth is wired when configured; live setup is not verified by these UI changes.
 - Without `VITE_SUPABASE_*` set, `signIn()` returns a fixed demo student. Nothing is verified.
 - Upvotes and filters are in-memory only and reset on reload.
 - Bookmarks survive a reload through `sessionStorage` only, and the Featured Project of the Week
@@ -153,3 +158,13 @@ Things a reader might mistake for finished work.
 - Comment posting is not wired up. The list renders, the composer does not exist.
 - The discovery redesign has typechecked, linted, and built, but has not been reviewed in a
   browser. Both themes and the breakpoints are unverified visually.
+
+## Workspace UI handoff
+
+- Profile edits and pin choices are private previews on the current browser, keyed by signed-in
+  account. They do not update auth names or public profiles and do not send moderation requests.
+- Recently Viewed lists actual signed-in visits to approved sample project pages, newest first,
+  with duplicates removed. Clearing removes that account's local history only.
+- The dashboard uses project status summaries, not fabricated notification events. Profile views
+  are not tracked. The third statistics card counts locally viewed projects instead.
+- Login/register notices distinguish configured Supabase sign-in from the demo fallback.

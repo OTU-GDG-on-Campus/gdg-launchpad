@@ -1,4 +1,4 @@
-// Shared domain types for LaunchPad. These mirror the eventual Supabase table shapes.
+// Shared domain types, including browser-only profile previews and project viewing history.
 
 export type UserRole = 'visitor' | 'student' | 'admin'
 
@@ -11,6 +11,9 @@ export interface User {
   bannedAt: string | null
   /** Null until the student finishes creating their account after verifying their email. */
   registeredAt: string | null
+  program?: string | null
+  studyYear?: string | null
+  bio?: string | null
 }
 
 /** What a student fills in to finish creating their account. */
@@ -135,4 +138,29 @@ export interface Comment {
   authorAvatarUrl: string | null
   body: string
   createdAt: string
+}
+
+export interface ProfilePreview {
+  userId: string
+  name: string
+  program: string
+  year: string
+  about: string
+  pinnedProjectIds: string[]
+  updatedAt: string | null
+}
+
+export interface ViewedProject {
+  project: Project
+  viewedAt: string
+}
+
+export interface AccountWorkspace {
+  profile: ProfilePreview
+  projects: Project[]
+  recentlyViewed: ViewedProject[]
+}
+
+export interface CommunityContributor extends Contributor {
+  projectCount: number
 }

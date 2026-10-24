@@ -1,6 +1,10 @@
 // App entrypoint: theme and auth providers, shared layout, and every page route.
 
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router'
+import { RequireAuth } from '@/components/auth/RequireAuth'
+import { DashboardPage } from '@/pages/DashboardPage'
+import { ProfilePage } from '@/pages/ProfilePage'
+import { ContributorsPage } from '@/pages/ContributorsPage'
 import { AppShell } from '@/components/layout/AppShell'
 import { AuthProvider } from '@/lib/auth/AuthProvider'
 import { ThemeProvider } from '@/lib/theme/ThemeProvider'
@@ -25,6 +29,23 @@ export default function App() {
           <Routes>
             <Route element={<AppShell />}>
               <Route index element={<HomePage />} />
+              <Route
+                path="dashboard"
+                element={
+                  <RequireAuth>
+                    <DashboardPage />
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="profile"
+                element={
+                  <RequireAuth>
+                    <ProfilePage />
+                  </RequireAuth>
+                }
+              />
+              <Route path="contributors" element={<ContributorsPage />} />
               <Route path="login" element={<LoginPage />} />
               <Route path="register" element={<RegisterPage />} />
               <Route path="signup" element={<Navigate to="/register" replace />} />

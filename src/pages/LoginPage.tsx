@@ -32,8 +32,8 @@ export function LoginPage() {
         <p>
           You're signed in as <strong>{user.name}</strong>.
         </p>
-        <Link to="/projects" className="text-brand-700 mt-2 inline-block font-semibold">
-          Explore projects <span aria-hidden="true">→</span>
+        <Link to="/dashboard" className="text-brand-700 mt-2 inline-block font-semibold">
+          Open dashboard
         </Link>
       </div>
     )

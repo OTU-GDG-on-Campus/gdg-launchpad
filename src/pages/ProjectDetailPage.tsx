@@ -1,12 +1,14 @@
 // Single project view: cover, write-up, tech stack, screenshots, discussion, and a detail sidebar.
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useParams } from 'react-router'
+import { ContributorList } from '@/components/projects/ContributorList'
+import { useAuth } from '@/lib/auth/useAuth'
 import { CommentList } from '@/components/projects/CommentList'
 import { ProjectSidebar } from '@/components/projects/ProjectSidebar'
 import { Badge } from '@/components/ui/Badge'
 import { EmptyState, ErrorState, LoadingState } from '@/components/ui/PageState'
-import { getProjectBySlug, listComments, toggleUpvote } from '@/lib/api/client'
+import { getProjectBySlug, listComments, toggleUpvote, recordProjectView } from '@/lib/api/client'
 import { cn } from '@/lib/cn'
 import { coverTint } from '@/lib/coverTint'
 import { useAsync } from '@/lib/useAsync'
@@ -14,15 +16,19 @@ import type { Project } from '@/types'
 
 export function ProjectDetailPage() {
   const { slug = '' } = useParams()
+  const { user } = useAuth()
   const { data, loading, error } = useAsync(() => getProjectBySlug(slug), slug)
   const comments = useAsync(() => listComments(data?.id ?? ''), data?.id ?? 'none')
   const [override, setOverride] = useState<Project | null>(null)
+  useEffect(() => {
+    if (user && data?.slug === slug) void recordProjectView(user.id, data.id).catch(() => {})
+  }, [user, data, slug])
 
   if (error) return <ErrorState error={error} />
   if (loading) return <LoadingState label="Loading project" />
   if (!data) return <EmptyState title="Project not found" />
 
-  const project = override ?? data
+  const project = override?.slug === data.slug ? override : data
 
   async function upvote() {
     setOverride(await toggleUpvote(project.id))
@@ -67,6 +73,22 @@ export function ProjectDetailPage() {
             </div>
           </section>
 
+          <section aria-labelledby="project-contributors-title">
+            <h2 id="project-contributors-title" className="mb-3 text-lg font-semibold">
+              Contributors
+            </h2>
+            <ContributorList
+              contributors={[
+                {
+                  id: project.authorId,
+                  name: project.authorName,
+                  avatarUrl: project.authorAvatarUrl,
+                  role: 'Project creator',
+                },
+                ...project.contributors.filter((person) => person.id !== project.authorId),
+              ]}
+            />
+          </section>
           <section>
             <h2 className="mb-3 text-lg font-semibold">Screenshots</h2>
             {project.screenshotUrls.length > 0 ? (

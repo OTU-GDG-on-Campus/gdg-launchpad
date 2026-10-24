@@ -52,6 +52,13 @@ export function LandingProjectCard({
             loading="lazy"
             className="h-full w-full object-cover"
           />
+        ) : compact ? (
+          <div
+            aria-hidden="true"
+            className="bg-brand-50 text-brand-700 flex h-full w-full items-center justify-center font-mono text-lg font-bold"
+          >
+            {project.title.slice(0, 2).toUpperCase()}
+          </div>
         ) : (
           <div
             aria-hidden="true"
@@ -145,7 +152,7 @@ export function LandingProjectCard({
               <ContributorStack contributors={project.contributors} />
             </div>
             <Link to={projectPath} className="text-brand-700 text-sm font-semibold">
-              Open project <span aria-hidden="true">↗</span>
+              Open project
             </Link>
           </div>
         )}

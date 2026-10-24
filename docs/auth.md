@@ -24,6 +24,9 @@ sent through Brevo. It has not been run against the hosted project yet.
 - When `VITE_SUPABASE_URL` or `VITE_SUPABASE_ANON_KEY` is unset, `AuthProvider` falls back to the
   demo student in `src/lib/api/mock/users.ts`, so contributors can still run the app with no setup.
 
+The profile editor saves a private browser-only preview; it does not change the public profile,
+auth identity, or moderator queue. See [workspace-ui.md](workspace-ui.md).
+
 ## Login and registration
 
 They are separate on purpose.

@@ -1,7 +1,10 @@
-// Landing page: full-width grid, community overview, featured projects, and submission banner.
+// Landing page: plain hero, grid below the hero, featured projects, and named contributors.
 
 import { useState } from 'react'
 import { Link } from 'react-router'
+import { Avatar } from '@/components/ui/Avatar'
+import { listContributors } from '@/lib/api/client'
+import { useAsync } from '@/lib/useAsync'
 import { LandingProjectCard } from '@/components/projects/LandingProjectCard'
 import { EmptyState, ErrorState, LoadingState } from '@/components/ui/PageState'
 import { useProjectFeed } from '@/hooks/useProjectFeed'
@@ -16,6 +19,7 @@ export function HomePage() {
     sort: 'top',
     perPage: 6,
   })
+  const contributors = useAsync(listContributors, 'landing-contributors')
   const [voteError, setVoteError] = useState<string | null>(null)
   const featuredProjects = projects.slice(0, 3)
   const otherProjects = projects.slice(3)
@@ -39,17 +43,17 @@ export function HomePage() {
   }
 
   return (
-    <div className="landing-grid">
+    <div>
       <section
         aria-labelledby="landing-title"
-        className="landing-hero relative flex min-h-140 flex-col items-center justify-center px-4 py-20 text-center sm:px-6 sm:py-24"
+        className="bg-surface-muted relative flex min-h-140 flex-col items-center justify-center px-4 py-20 text-center sm:px-6 sm:py-24"
       >
         <p className="text-ink-muted mb-6 font-mono text-xs tracking-widest uppercase">
           Built by students. Made to be shared.
         </p>
         <h1
           id="landing-title"
-          className="mx-auto max-w-5xl text-5xl leading-[0.98] font-extrabold tracking-[-0.045em] sm:text-7xl lg:text-8xl"
+          className="mx-auto max-w-290 text-5xl leading-[0.98] font-extrabold tracking-[-0.045em] sm:text-7xl lg:text-[96px]"
         >
           Where <span className="text-brand-700">Ontario Tech's</span>
           <br /> students ship<span className="text-flare">.</span>
@@ -60,10 +64,10 @@ export function HomePage() {
         </p>
         <div className="mt-9 flex w-full flex-col justify-center gap-3 sm:w-auto sm:flex-row">
           <Link to="/projects" className={PRIMARY_LINK}>
-            Explore Projects <span aria-hidden="true">↗</span>
+            Explore Projects
           </Link>
           <Link to="/submit" className={SECONDARY_LINK}>
-            Launch Your Project <span aria-hidden="true">+</span>
+            Launch Your Project
           </Link>
         </div>
         <dl className="border-line mt-12 grid w-full max-w-2xl grid-cols-3 border-t pt-6">
@@ -80,97 +84,136 @@ export function HomePage() {
         </dl>
       </section>
 
-      <div className="mx-auto max-w-6xl px-4 pb-16 sm:px-6 sm:pb-24">
-        <section aria-labelledby="featured-title">
-          <div className="mb-7 flex flex-wrap items-end justify-between gap-4">
-            <div>
-              <p className="text-flare mb-2 font-mono text-xs tracking-widest uppercase">
-                Discover what's being built
+      <div className="landing-grid border-line border-t">
+        <div className="mx-auto max-w-335 px-6 pt-12 pb-16 sm:px-11 sm:pb-24">
+          <section aria-labelledby="featured-title">
+            <div className="mb-7 flex flex-wrap items-end justify-between gap-4">
+              <div>
+                <p className="text-flare mb-2 font-mono text-xs tracking-widest uppercase">
+                  Discover what's being built
+                </p>
+                <h2 id="featured-title" className="text-3xl font-bold tracking-tight sm:text-4xl">
+                  Featured projects
+                </h2>
+              </div>
+              <p className="text-ink-muted max-w-sm text-sm leading-relaxed">
+                The most upvoted projects from the student community.
               </p>
-              <h2 id="featured-title" className="text-3xl font-bold tracking-tight sm:text-4xl">
-                Featured projects
-              </h2>
             </div>
-            <p className="text-ink-muted max-w-sm text-sm leading-relaxed">
-              The most upvoted projects from the student community.
-            </p>
-          </div>
-          {voteError && (
-            <p role="alert" className="border-line bg-surface mb-5 rounded-lg border p-4 text-sm">
-              {voteError}
-            </p>
-          )}
-          {error ? (
-            <ErrorState error={error} />
-          ) : loading ? (
-            <LoadingState label="Loading projects" />
-          ) : projects.length === 0 ? (
-            <EmptyState
-              title="No projects yet"
-              hint="Be the first to share what you are building."
-            />
-          ) : (
-            <div className="grid gap-6 md:grid-cols-2">
-              {featuredProjects.map((project, index) => (
-                <LandingProjectCard
-                  key={project.id}
-                  project={project}
-                  variant={index === 0 ? 'featured' : 'standard'}
-                  onUpvote={(id) => void handleUpvote(id)}
-                />
-              ))}
-            </div>
-          )}
-        </section>
-
-        {!loading && !error && otherProjects.length > 0 && (
-          <section aria-labelledby="other-projects-title" className="mt-12">
-            <h2
-              id="other-projects-title"
-              className="text-ink-muted mb-5 font-mono text-xs tracking-widest uppercase"
-            >
-              More from the community
-            </h2>
-            <div className="grid gap-3">
-              {otherProjects.map((project) => (
-                <LandingProjectCard
-                  key={project.id}
-                  project={project}
-                  variant="compact"
-                  onUpvote={(id) => void handleUpvote(id)}
-                />
-              ))}
-            </div>
+            {voteError && (
+              <p role="alert" className="border-line bg-surface mb-5 rounded-lg border p-4 text-sm">
+                {voteError}
+              </p>
+            )}
+            {error ? (
+              <ErrorState error={error} />
+            ) : loading ? (
+              <LoadingState label="Loading projects" />
+            ) : projects.length === 0 ? (
+              <EmptyState
+                title="No projects yet"
+                hint="Be the first to share what you are building."
+              />
+            ) : (
+              <div className="grid gap-6 md:grid-cols-2">
+                {featuredProjects.map((project, index) => (
+                  <LandingProjectCard
+                    key={project.id}
+                    project={project}
+                    variant={index === 0 ? 'featured' : 'standard'}
+                    onUpvote={(id) => void handleUpvote(id)}
+                  />
+                ))}
+              </div>
+            )}
           </section>
-        )}
 
-        <Link
-          to="/projects"
-          className="border-line bg-surface hover:border-brand-700 mt-7 flex min-h-14 items-center justify-center gap-2 rounded-xl border px-4 py-4 text-sm font-semibold transition-colors"
-        >
-          Explore the project gallery <span aria-hidden="true">↗</span>
-        </Link>
+          {!loading && !error && otherProjects.length > 0 && (
+            <section aria-labelledby="other-projects-title" className="mt-12">
+              <h2
+                id="other-projects-title"
+                className="text-ink-muted mb-5 font-mono text-xs tracking-widest uppercase"
+              >
+                More from the community
+              </h2>
+              <div className="grid gap-3">
+                {otherProjects.map((project) => (
+                  <LandingProjectCard
+                    key={project.id}
+                    project={project}
+                    variant="compact"
+                    onUpvote={(id) => void handleUpvote(id)}
+                  />
+                ))}
+              </div>
+            </section>
+          )}
 
-        <section
-          aria-labelledby="submit-title"
-          className="border-ink-muted mt-16 flex flex-col items-start justify-between gap-6 rounded-xl border border-dashed px-6 py-10 sm:px-10 md:flex-row md:items-center"
-        >
-          <div>
-            <h2
-              id="submit-title"
-              className="max-w-xl text-3xl leading-tight font-bold tracking-tight"
-            >
-              Built something at <span className="text-brand-700">Ontario Tech</span>?
-            </h2>
-            <p className="text-ink-muted mt-3 max-w-lg text-sm leading-relaxed">
-              Give your project a home. Share your work, find collaborators, and inspire the next
-              student to start building.
-            </p>
-          </div>
-          <Link to="/submit" className={PRIMARY_LINK}>
-            Post your project <span aria-hidden="true">↗</span>
+          <Link
+            to="/projects"
+            className="border-line bg-surface hover:border-brand-700 mt-7 flex min-h-14 items-center justify-center gap-2 rounded-xl border px-4 py-4 text-sm font-semibold transition-colors"
+          >
+            Explore the project gallery
           </Link>
-        </section>
+
+          <section aria-labelledby="contributors-title" className="mt-16">
+            <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+              <div>
+                <p className="text-brand-700 font-mono text-xs tracking-widest uppercase">
+                  Built together
+                </p>
+                <h2 id="contributors-title" className="mt-2 text-3xl font-extrabold tracking-tight">
+                  Contributors
+                </h2>
+              </div>
+              <Link to="/contributors" className="text-brand-700 text-sm font-bold">
+                View all contributors
+              </Link>
+            </div>
+            {contributors.error ? (
+              <ErrorState error={contributors.error} />
+            ) : contributors.loading ? (
+              <LoadingState label="Loading contributors" />
+            ) : (
+              <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {contributors.data?.slice(0, 6).map((person) => (
+                  <li
+                    key={person.id}
+                    className="border-line bg-surface flex items-center gap-3 rounded-xl border p-4"
+                  >
+                    <Avatar name={person.name} src={person.avatarUrl} />
+                    <div>
+                      <p className="text-sm font-bold">{person.name}</p>
+                      <p className="text-ink-muted mt-1 font-mono text-[10px]">
+                        {person.projectCount} {person.projectCount === 1 ? 'project' : 'projects'}
+                      </p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+          <section
+            aria-labelledby="submit-title"
+            className="border-ink-muted mt-16 flex flex-col items-start justify-between gap-6 rounded-xl border border-dashed px-6 py-10 sm:px-10 md:flex-row md:items-center"
+          >
+            <div>
+              <h2
+                id="submit-title"
+                className="max-w-xl text-3xl leading-tight font-bold tracking-tight"
+              >
+                Built something at <span className="text-brand-700">Ontario Tech</span>?
+              </h2>
+              <p className="text-ink-muted mt-3 max-w-lg text-sm leading-relaxed">
+                Give your project a home. Share your work, find collaborators, and inspire the next
+                student to start building.
+              </p>
+            </div>
+            <Link to="/submit" className={PRIMARY_LINK}>
+              Post your project
+            </Link>
+          </section>
+        </div>
       </div>
     </div>
   )

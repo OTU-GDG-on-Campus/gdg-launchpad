@@ -1,4 +1,4 @@
-// Shared frame: full-width home and auth pages, a full-bleed projects page, centered content
+// Shared frame: full-width home, account, and auth pages, full-bleed projects, centered content
 // elsewhere. The global command palette mounts here so Ctrl+K works on every route.
 
 import { useCallback, useEffect, useState } from 'react'
@@ -8,7 +8,15 @@ import { cn } from '@/lib/cn'
 import { Footer } from './Footer'
 import { Navbar } from './Navbar'
 
-const FULL_WIDTH_ROUTES = ['/', '/login', '/register', '/signup']
+const FULL_WIDTH_ROUTES = [
+  '/',
+  '/login',
+  '/register',
+  '/signup',
+  '/profile',
+  '/dashboard',
+  '/contributors',
+]
 
 export function AppShell() {
   const pathname = useLocation().pathname.replace(/\/+$/, '') || '/'

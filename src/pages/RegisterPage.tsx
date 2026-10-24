@@ -64,7 +64,7 @@ export function RegisterPage() {
         skills: parseSkills(skills),
         bio: bio.trim(),
       })
-      navigate('/projects')
+      navigate('/dashboard')
     } catch (cause) {
       setSaveError(cause instanceof Error ? cause.message : 'Could not save your details.')
     } finally {
@@ -125,8 +125,8 @@ export function RegisterPage() {
                 className="border-line bg-brand-50 mt-6 rounded-lg border p-4 text-sm leading-relaxed"
               >
                 You already have an account.{' '}
-                <Link to="/projects" className="text-brand-700 font-semibold">
-                  Explore projects
+                <Link to="/dashboard" className="text-brand-700 font-semibold">
+                  Open dashboard
                 </Link>
               </p>
             )}

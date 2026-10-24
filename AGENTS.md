@@ -69,6 +69,9 @@ typecheck clean. Data is deliberately stubbed. Auth works against a local Supaba
 | Backend               | Supabase project created. Schema applied and tested locally, not yet pushed to the hosted project |
 | Database schema       | `supabase/migrations/` holds the schema, registration columns, and bookmarks and featured tables  |
 
+| Profile and dashboard | UI implemented. Edits, pins, and viewing history are browser-only previews |
+| Contributors | Named lists from mock project data, including project creators |
+
 Before starting work, re-read this table and correct it if it has drifted.
 
 [TODO.md](TODO.md) is the full feature backlog, with priorities and a known-gaps list. Tick items
@@ -308,3 +311,14 @@ Put it in `src/components/ui/`. It must not import anything from `types/`, `lib/
 - Reformatting files you did not otherwise change.
 - Leaving `TODO` without context. Say what is missing and what the next step is.
 - Claiming a feature works when it reads from `lib/api/mock/`.
+
+## Workspace preview behavior
+
+The profile editor stores per-account, browser-only previews, including pin choices. It does not
+publish profile changes or implement moderation. Recently Viewed records signed-in visits to
+approved sample project detail pages. All storage access stays in `src/lib/api/client.ts`.
+
+Account routes use the shared design fonts from `UI/pages/assets/fonts/`, bundled by Vite through
+`src/index.css`. The home hero and each following home section have independent, subtle grid
+fades. The projects page retains its discovery hero grid. The navbar has an accessible profile icon and an account-name
+link. Avoid decorative text symbols next to action labels.
