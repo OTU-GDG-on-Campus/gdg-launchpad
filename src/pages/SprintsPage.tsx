@@ -1,163 +1,313 @@
-// Semester Sprints landing page: what a sprint is, how it runs, why to join, and every sprint.
+// Semester Sprints overview with a themed build journey, filterable sprint directory, and FAQs.
 
+import { useState } from 'react'
 import { Link } from 'react-router'
 import { SprintGrid } from '@/components/sprints/SprintGrid'
-import { Badge } from '@/components/ui/Badge'
-import { Button } from '@/components/ui/Button'
-import { Card } from '@/components/ui/Card'
-import { ErrorState, LoadingState } from '@/components/ui/PageState'
-import { listSprints } from '@/lib/api/client'
-import { formatDate, formatMonthYear } from '@/lib/format'
+import { EmptyState, ErrorState, LoadingState } from '@/components/ui/PageState'
+import { isBackendConfigured, listSprints } from '@/lib/api/client'
 import { useAsync } from '@/lib/useAsync'
+import type { SprintStatus } from '@/types'
+
+const PRIMARY_LINK =
+  'bg-brand-500 text-on-brand hover:bg-brand-600 inline-flex min-h-12 items-center justify-center gap-3 rounded-lg px-6 py-3 text-sm font-semibold transition-colors'
+const SECONDARY_LINK =
+  'border-line bg-surface text-ink hover:border-brand-700 inline-flex min-h-12 items-center justify-center gap-3 rounded-lg border px-6 py-3 text-sm font-semibold transition-colors'
 
 const PHASES = [
   {
     number: '01',
-    window: 'Weeks 1-2',
-    title: 'Form and ideate',
-    detail: 'Submit an idea or join an open one. Teams run up to 5 people, across any course.',
+    label: 'Find your direction',
+    title: 'Pick a small, good idea.',
+    detail: 'Start with the theme. Choose one problem and a version you can realistically finish.',
   },
   {
     number: '02',
-    window: 'Weeks 3-6',
-    title: 'Build',
-    detail: 'Write code with weekly check-ins. Workshops cover the sprint theme end to end.',
+    label: 'Make it work',
+    title: 'Build, learn, repeat.',
+    detail:
+      'Turn the idea into a working prototype. Use workshops and check-ins to work through the unfamiliar parts.',
   },
   {
     number: '03',
-    window: 'Weeks 7-8',
-    title: 'Polish and demo',
-    detail: 'Clean up the repo, write a readable README, and demo the project to the group.',
+    label: 'Make it yours',
+    title: 'Polish the experience.',
+    detail:
+      'Test the main flow, tidy the repository, and write a README that helps someone else get started.',
   },
   {
     number: '04',
-    window: 'After',
-    title: 'Publish',
-    detail: 'Your project goes on LaunchPad permanently, with a certificate and a montage spot.',
+    label: 'Share the process',
+    title: 'Show what you made.',
+    detail:
+      'Prepare a short demo. Share what worked, what surprised you, and what you would try next.',
   },
 ]
 
 const REASONS = [
   {
-    title: 'Something worth showing',
-    detail: 'Go past coursework. Build a project you would actually link on a resume.',
+    title: 'A reason to start',
+    detail:
+      'A theme gives you a direction. A shared finish line helps you turn an idea into a manageable project.',
   },
   {
-    title: 'Help when you get stuck',
-    detail: 'Workshops and coordinators who have shipped the thing you are trying to ship.',
+    title: 'People to learn alongside',
+    detail:
+      'Work through unfamiliar tools with other students and bring questions to workshops and check-ins.',
   },
   {
-    title: 'A real audience',
-    detail: 'Demo to the club, then leave the work on a page employers browse.',
+    title: 'Work you can explain',
+    detail:
+      'Leave with a clearer story about what you built, the choices you made, and the things you learned.',
+  },
+]
+
+const FILTERS: { value: SprintStatus | 'all'; label: string }[] = [
+  { value: 'all', label: 'All sprints' },
+  { value: 'active', label: 'Running now' },
+  { value: 'upcoming', label: 'Upcoming' },
+  { value: 'completed', label: 'Completed' },
+]
+const FILTER_STYLES = {
+  selected: 'border-brand-700 bg-brand-50 text-brand-700',
+  idle: 'border-line bg-surface text-ink-muted hover:border-brand-700 hover:text-ink',
+}
+
+const QUESTIONS = [
+  {
+    question: 'How long is a sprint?',
+    answer:
+      'Sprints are short building seasons that fit alongside classes. The theme and schedule can vary, so use the dates on each sprint listing rather than a fixed weekly timetable.',
+  },
+  {
+    question: 'Do I need to know the technology already?',
+    answer:
+      'You can explore the theme before committing to an idea. Read the sprint brief for the tools involved, and choose a small scope that leaves room to learn.',
+  },
+  {
+    question: 'Can I register a team here?',
+    answer: isBackendConfigured
+      ? 'Team registration is not available on LaunchPad yet. Read the sprint brief for information about the event.'
+      : 'Team registration is not available on LaunchPad yet. The sprint directory currently contains demonstration records, so the dates and statuses are previews, not confirmed event announcements.',
+  },
+  {
+    question: 'Will I get a certificate?',
+    answer:
+      'Certificates and sprint montage features are planned, but are not available on the platform yet. Check the confirmed event details for any participation requirements or recognition.',
   },
 ]
 
 export function SprintsPage() {
   const { data: sprints, loading, error } = useAsync(() => listSprints(), 'sprints')
-  const activeSprint = sprints?.find((sprint) => sprint.status === 'active')
-  const nextSprint = activeSprint ?? sprints?.find((sprint) => sprint.status === 'upcoming')
+  const [filter, setFilter] = useState<SprintStatus | 'all'>('all')
+  const filteredSprints = sprints?.filter((sprint) => filter === 'all' || sprint.status === filter)
 
   return (
-    <>
-      <section className="py-16 text-center sm:py-20">
-        {nextSprint && <Badge tone="success">{formatMonthYear(nextSprint.startDate)} season</Badge>}
-        <h1 className="mt-5 text-4xl font-bold tracking-tight sm:text-5xl">Semester Sprints</h1>
-        <p className="text-ink-muted mx-auto mt-5 max-w-2xl text-sm leading-relaxed">
-          Short building seasons where Ontario Tech students ship real projects together. Turn
-          coursework theory into something live, build alongside other people, and finish with
-          something you are glad to show.
-        </p>
-        <div className="mt-8 flex flex-wrap justify-center gap-3">
-          {nextSprint && (
-            <Link to={`/sprints/${nextSprint.slug}`}>
-              <Button size="lg">
-                {nextSprint.status === 'active' ? 'Join' : 'See'} the {nextSprint.title}
-              </Button>
-            </Link>
-          )}
-          <Link to="/projects">
-            <Button size="lg" variant="secondary">
-              View past submissions
-            </Button>
-          </Link>
+    <div className="space-y-16 pb-6 sm:space-y-20">
+      <section
+        aria-labelledby="sprints-title"
+        className="discovery-hero border-line overflow-hidden rounded-2xl border"
+      >
+        <div className="grid gap-10 px-6 py-12 sm:px-10 sm:py-16 lg:grid-cols-[1.4fr_1fr] lg:items-center lg:gap-16">
+          <div>
+            <p className="text-brand-700 mb-5 font-mono text-xs tracking-widest uppercase">
+              Semester Sprints
+            </p>
+            <h1
+              id="sprints-title"
+              className="max-w-2xl text-4xl leading-tight font-bold tracking-tight sm:text-6xl"
+            >
+              A shared theme.
+              <br />
+              Your next <span className="text-brand-700">big little project.</span>
+            </h1>
+            <p className="text-ink-soft mt-6 max-w-xl text-base leading-relaxed sm:text-lg">
+              Make time to build something beyond the assignment. Explore a new technology, work
+              alongside Ontario Tech students, and turn an idea into something you can demo.
+            </p>
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <a href="#sprint-directory" className={PRIMARY_LINK}>
+                Explore the sprints <span aria-hidden="true">&#8595;</span>
+              </a>
+              <Link to="/projects" className={SECONDARY_LINK}>
+                Explore student projects <span aria-hidden="true">&#8599;</span>
+              </Link>
+            </div>
+          </div>
+          <aside className="border-line bg-surface rounded-xl border p-6 sm:p-8">
+            <p className="text-flare font-mono text-xs tracking-widest uppercase">
+              The sprint mindset
+            </p>
+            <p className="mt-5 text-2xl leading-snug font-semibold tracking-tight">
+              Start small.
+              <br />
+              Learn out loud.
+              <br />
+              <span className="text-brand-700">Finish with a story.</span>
+            </p>
+            <div className="border-line text-ink-muted mt-6 border-t pt-5 text-sm leading-relaxed">
+              Think of it as a hackathon with breathing room: time to ask questions, try things, and
+              make the project your own.
+            </div>
+          </aside>
+        </div>
+        <div className="border-line bg-surface/80 flex flex-wrap gap-x-8 gap-y-2 border-t px-6 py-4 font-mono text-xs sm:px-10">
+          <span>Themed builds</span>
+          <span>Workshops and check-ins</span>
+          <span>Student-led learning</span>
         </div>
       </section>
 
-      <section className="border-line border-t py-16">
-        <h2 className="text-2xl font-semibold tracking-tight">What are Semester Sprints?</h2>
-        <div className="text-ink-muted mt-4 grid max-w-4xl gap-6 text-sm leading-relaxed sm:grid-cols-2">
-          <p>
-            Each term the club runs a themed sprint. Students form teams, pick an idea, and build it
-            over about three weeks with workshops and check-ins along the way.
-          </p>
-          <p>
-            Think of it as a hackathon stretched across a few weeks instead of a weekend, so there
-            is time to actually finish, and to learn the thing the sprint is themed around.
-          </p>
-        </div>
-      </section>
-
-      <section className="border-line border-t py-16">
-        <div className="mb-8 text-center">
-          <h2 className="text-2xl font-semibold tracking-tight">How a sprint works</h2>
-          <p className="text-ink-muted mt-2 text-sm">
-            Paced to fit around a full course load, not to compete with it.
+      <section aria-labelledby="journey-title">
+        <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p className="text-flare mb-3 font-mono text-xs tracking-widest uppercase">
+              From idea to demo
+            </p>
+            <h2 id="journey-title" className="text-2xl font-bold tracking-tight sm:text-3xl">
+              A little structure. A lot of possibility.
+            </h2>
+          </div>
+          <p className="text-ink-muted max-w-sm text-sm leading-relaxed">
+            A typical build journey. The pace and activities depend on each sprint.
           </p>
         </div>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <ol className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {PHASES.map((phase) => (
-            <Card key={phase.number}>
-              <div className="flex items-baseline justify-between gap-2">
-                <span className="text-accent text-2xl font-bold">{phase.number}</span>
-                <span className="text-ink-muted text-xs">{phase.window}</span>
+            <li key={phase.number} className="border-line bg-surface rounded-xl border p-6">
+              <div className="flex items-center justify-between gap-3">
+                <span className="text-brand-700 font-mono text-2xl">{phase.number}</span>
+                <span aria-hidden="true" className="text-ink-muted">
+                  &#8594;
+                </span>
               </div>
-              <h3 className="mt-3 font-semibold">{phase.title}</h3>
-              <p className="text-ink-muted mt-1 text-sm">{phase.detail}</p>
-            </Card>
-          ))}
-        </div>
-      </section>
-
-      <section className="border-line border-t py-16">
-        <h2 className="text-2xl font-semibold tracking-tight">Why join a sprint?</h2>
-        <ul className="mt-6 grid gap-6 sm:grid-cols-3">
-          {REASONS.map((reason) => (
-            <li key={reason.title} className="flex gap-3">
-              <svg
-                viewBox="0 0 20 20"
-                aria-hidden
-                className="text-accent mt-0.5 h-5 w-5 shrink-0 fill-current"
-              >
-                <path d="M10 1a9 9 0 1 0 0 18 9 9 0 0 0 0-18Zm4.2 6.7-5 5a1 1 0 0 1-1.4 0l-2.2-2.2a1 1 0 1 1 1.4-1.4l1.5 1.5 4.3-4.3a1 1 0 0 1 1.4 1.4Z" />
-              </svg>
-              <div>
-                <h3 className="font-semibold">{reason.title}</h3>
-                <p className="text-ink-muted mt-1 text-sm">{reason.detail}</p>
-              </div>
+              <p className="text-flare mt-6 font-mono text-[10px] tracking-widest uppercase">
+                {phase.label}
+              </p>
+              <h3 className="mt-2 text-lg font-semibold">{phase.title}</h3>
+              <p className="text-ink-muted mt-3 text-sm leading-relaxed">{phase.detail}</p>
             </li>
           ))}
-        </ul>
+        </ol>
       </section>
 
-      <section className="border-line border-t py-16">
-        <div className="mb-6">
-          <h2 className="text-2xl font-semibold tracking-tight">All sprints</h2>
-          {nextSprint && (
-            <p className="text-ink-muted mt-2 text-sm">
-              {nextSprint.status === 'active' ? 'Running now' : 'Up next'}: {nextSprint.title},
-              starting {formatDate(nextSprint.startDate)}.
-            </p>
-          )}
+      <section
+        aria-labelledby="reasons-title"
+        className="border-line grid gap-8 border-y py-10 lg:grid-cols-[1fr_2fr] lg:gap-16"
+      >
+        <h2 id="reasons-title" className="text-2xl font-bold tracking-tight sm:text-3xl">
+          More than another
+          <br className="hidden lg:block" /> repository.
+        </h2>
+        <div className="grid gap-7 sm:grid-cols-3">
+          {REASONS.map((reason) => (
+            <div key={reason.title}>
+              <h3 className="font-semibold">{reason.title}</h3>
+              <p className="text-ink-muted mt-3 text-sm leading-relaxed">{reason.detail}</p>
+            </div>
+          ))}
         </div>
+      </section>
 
+      <section id="sprint-directory" aria-labelledby="directory-title" className="scroll-mt-24">
+        <p className="text-flare mb-3 font-mono text-xs tracking-widest uppercase">
+          Find your next challenge
+        </p>
+        <h2 id="directory-title" className="text-2xl font-bold tracking-tight sm:text-3xl">
+          The sprint directory.
+        </h2>
+        <p className="border-line bg-surface-raised text-ink-soft mt-5 rounded-lg border px-4 py-3 text-sm leading-relaxed">
+          {isBackendConfigured ? (
+            'Explore the sprint briefs below. Team registration is not available on LaunchPad yet.'
+          ) : (
+            <>
+              <span className="font-semibold">Preview directory.</span> These are sample sprint
+              listings. Event dates and availability are not confirmed, and team registration is not
+              open here yet.
+            </>
+          )}
+        </p>
+        <div
+          role="group"
+          aria-label="Filter sprints by status"
+          className="my-6 flex flex-wrap gap-2"
+        >
+          {FILTERS.map((option) => (
+            <button
+              key={option.value}
+              type="button"
+              aria-pressed={filter === option.value}
+              onClick={() => setFilter(option.value)}
+              className={`min-h-10 rounded-lg border px-4 py-2 text-sm font-medium transition-colors ${FILTER_STYLES[filter === option.value ? 'selected' : 'idle']}`}
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
         {error ? (
           <ErrorState error={error} />
-        ) : loading || !sprints ? (
+        ) : loading || !filteredSprints ? (
           <LoadingState label="Loading sprints" />
+        ) : filteredSprints.length === 0 ? (
+          <EmptyState
+            title={filter === 'all' ? 'No sprints listed yet' : 'No sprints in this category'}
+            hint={
+              filter === 'all'
+                ? 'Check back when the sprint calendar is available.'
+                : 'Choose another status to explore the other sprints.'
+            }
+          />
         ) : (
-          <SprintGrid sprints={sprints} />
+          <>
+            <p role="status" className="text-ink-muted mb-4 text-sm">
+              {filteredSprints.length} {filteredSprints.length === 1 ? 'sprint' : 'sprints'} in this
+              view
+            </p>
+            <SprintGrid sprints={filteredSprints} />
+          </>
         )}
       </section>
-    </>
+
+      <section
+        aria-labelledby="sprint-questions-title"
+        className="grid gap-7 lg:grid-cols-[1fr_2fr] lg:gap-16"
+      >
+        <div>
+          <p className="text-flare mb-3 font-mono text-xs tracking-widest uppercase">
+            Before you begin
+          </p>
+          <h2 id="sprint-questions-title" className="text-2xl font-bold tracking-tight sm:text-3xl">
+            A few things to know.
+          </h2>
+        </div>
+        <div className="divide-line border-line divide-y border-y">
+          {QUESTIONS.map((item) => (
+            <details key={item.question} className="py-5">
+              <summary className="marker:text-brand-700 cursor-pointer pr-3 font-semibold">
+                {item.question}
+              </summary>
+              <p className="text-ink-muted mt-3 text-sm leading-relaxed">{item.answer}</p>
+            </details>
+          ))}
+        </div>
+      </section>
+
+      <section
+        aria-labelledby="sprint-cta-title"
+        className="border-line bg-surface-raised flex flex-col items-start justify-between gap-6 rounded-2xl border p-6 sm:p-10 md:flex-row md:items-center"
+      >
+        <div className="max-w-xl">
+          <h2 id="sprint-cta-title" className="text-2xl font-bold tracking-tight sm:text-3xl">
+            Curious? Start with what is already being built.
+          </h2>
+          <p className="text-ink-muted mt-4 text-sm leading-relaxed">
+            Explore the gallery for inspiration, or find a student project that could use another
+            pair of hands.
+          </p>
+        </div>
+        <Link to="/projects?contrib=1" className={SECONDARY_LINK}>
+          Find a project to help <span aria-hidden="true">&#8599;</span>
+        </Link>
+      </section>
+    </div>
   )
 }

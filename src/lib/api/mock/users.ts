@@ -1,4 +1,4 @@
-// Placeholder accounts used while auth is stubbed. Delete once Supabase sessions are live.
+// Base demo identities used only by the unconfigured, browser-local preview.
 
 import type { User } from '@/types'
 

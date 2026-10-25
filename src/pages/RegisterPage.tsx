@@ -1,4 +1,4 @@
-// Two-step registration: verify an Ontario Tech email with a code, then save the profile details.
+// Two-step email verification and profile registration, followed by the personal project page.
 
 import { useState, type SyntheticEvent } from 'react'
 import { Link, useNavigate } from 'react-router'
@@ -8,16 +8,9 @@ import { Wordmark } from '@/components/ui/Logo'
 import { ALLOWED_EMAIL_DOMAINS } from '@/config/site'
 import { isBackendConfigured } from '@/lib/api/client'
 import { cn } from '@/lib/cn'
+import { PROGRAMS, STUDY_YEARS } from '@/lib/profile'
 import { useAuth } from '@/lib/auth/useAuth'
 
-const PROGRAMS = [
-  'Computer Science',
-  'Software Engineering',
-  'Electrical Engineering',
-  'Mechatronics Engineering',
-  'Business & IT',
-]
-const YEARS = ['Year 1', 'Year 2', 'Year 3', 'Year 4']
 const PERKS = [
   'Share your projects with other students',
   'Upvote and join discussions on projects you like',
@@ -64,7 +57,7 @@ export function RegisterPage() {
         skills: parseSkills(skills),
         bio: bio.trim(),
       })
-      navigate('/projects')
+      navigate('/me/projects')
     } catch (cause) {
       setSaveError(cause instanceof Error ? cause.message : 'Could not save your details.')
     } finally {
@@ -155,7 +148,7 @@ export function RegisterPage() {
                   name="name"
                   autoComplete="name"
                   required
-                  maxLength={100}
+                  maxLength={80}
                   value={name}
                   onChange={(event) => setName(event.target.value)}
                   placeholder="As you want it shown on your profile"
@@ -195,7 +188,7 @@ export function RegisterPage() {
                   className={FIELD_CLASS}
                 >
                   <option value="">Select your year</option>
-                  {YEARS.map((option) => (
+                  {STUDY_YEARS.map((option) => (
                     <option key={option} value={option}>
                       {option}
                     </option>

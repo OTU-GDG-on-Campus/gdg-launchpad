@@ -1,4 +1,4 @@
-// Shared domain types for LaunchPad. These mirror the eventual Supabase table shapes.
+// Shared domain types for public discovery, private account pages, and profile inputs.
 
 export type UserRole = 'visitor' | 'student' | 'admin'
 
@@ -134,5 +134,34 @@ export interface Comment {
   authorName: string
   authorAvatarUrl: string | null
   body: string
+  createdAt: string
+}
+
+/** Public profile fields. Account email and privileges never belong in this shape. */
+export interface PublicProfile {
+  id: string
+  name: string
+  avatarUrl: string | null
+  program: string
+  studyYear: string
+  skills: string[]
+  bio: string
+  githubUrl: string | null
+}
+
+export interface AccountProfile extends PublicProfile {
+  email: string
+}
+
+export interface ProfileDetails extends RegistrationDetails {
+  githubUrl: string
+}
+
+export interface ActivityItem {
+  id: string
+  kind: 'project' | 'bookmark' | 'upvote' | 'comment'
+  projectId: string
+  title: string
+  slug: string
   createdAt: string
 }

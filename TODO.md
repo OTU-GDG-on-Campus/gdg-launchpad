@@ -32,9 +32,9 @@ The smallest set that makes the site real. Everything P0 below rolls up here.
 - [x] **P0** Separate login from registration, and save name, program, year, skills, and bio
 - [ ] **P0** Verify a personal Gmail account is actually rejected end to end
 - [ ] **P1** Session persistence across reloads and token refresh
-- [ ] **P1** Profile page: your projects, your upvotes, edit display name
-- [ ] **P2** Public profile at `/u/:handle`
-- [ ] **P2** Link a GitHub username to the profile
+- [x] **P1** Private profile, My Projects, My Activity, and edit-profile page
+- [x] **P2** Public profile at `/u/:id`, with a safe projection excluding account fields
+- [x] **P2** Optional validated GitHub profile URL
 
 ## Project submission
 
@@ -72,6 +72,17 @@ The smallest set that makes the site real. Everything P0 below rolls up here.
 - [ ] **P2** Related projects on the detail page
 - [ ] **P2** Trending from real 7-day upvote timestamps once the `upvotes` table exists
 
+## Personal workspace
+
+- [x] My Projects with status filters, Saved Projects, My Profile, profile editing, and settings
+- [x] My Sprints derived from projects, private activity timeline, and notification placeholder
+- [x] Responsive account navigation and signed-in avatar menu
+- [x] One-click local demo student with persistent fixtures and confirmed reset
+- [x] Account API regression tests and configured Supabase contract tests
+- [ ] Apply and verify the public-profile privacy migration on a local Supabase stack
+- [ ] Run pgTAP tests for public projection privileges, private profiles, projects, and bookmarks
+- [ ] Browser review of account navigation, keyboard behavior, both themes, and mobile layouts
+
 ## Comments
 
 - [x] Comment list rendered on the project detail page
@@ -84,9 +95,10 @@ The smallest set that makes the site real. Everything P0 below rolls up here.
 ## Semester Sprints
 
 - [x] Sprints landing page explaining the format
+- [x] Sprint status filters with counts and category-specific empty states
 - [x] Sprint cards with status, dates, and submission counts
 - [x] Sprint detail page listing submissions
-- [ ] **P1** `sprints` table, replacing the mock records
+- [x] **P1** Supabase sprint reads with demo fallback when unconfigured
 - [ ] **P1** Team registration flow, up to 5 members
 - [ ] **P1** Sprint montage embed once a sprint completes
 - [ ] **P2** Certificate generation for participants
@@ -113,7 +125,7 @@ The smallest set that makes the site real. Everything P0 below rolls up here.
 - [x] **P1** Seed script so a fresh local database is usable
 - [ ] **P1** Error boundary and a real error page
 - [ ] **P1** Rate limiting on submissions and comments
-- [ ] **P2** Automated tests. None exist yet, start with the data layer and `useAsync`
+- [ ] **P2** Expand automated coverage beyond account APIs, privacy, guards, and backend contracts
 - [ ] **P2** Analytics, privacy-respecting
 - [ ] **P2** Sitemap and per-project meta tags for link previews
 
@@ -139,17 +151,25 @@ The smallest set that makes the site real. Everything P0 below rolls up here.
 
 Things a reader might mistake for finished work.
 
-- Everything reads from `src/lib/api/mock/`. No database exists.
-- Without `VITE_SUPABASE_*` set, `signIn()` returns a fixed demo student. Nothing is verified.
-- Upvotes and filters are in-memory only and reset on reload.
-- Bookmarks survive a reload through `sessionStorage` only, and the Featured Project of the Week
-  picker does the same. Both have real Supabase query paths in `client.ts` that are unreachable
-  until the `20261018000000` migration is applied.
-- Trending uses a derived engagement score from mock data, not real upvote timestamps.
+- Supabase paths now cover profiles, project and sprint reads, upvotes, comments, bookmarks, and activity.
+  Apply the migrations before using a configured backend. Backend contract tests intercept transport.
+- Without `VITE_SUPABASE_*`, login offers an explicit demo student. Browser-local demo sessions,
+  profile edits, saves, and votes persist, but no email ownership is verified.
+- The featured-project demo picker remains in-memory only. The configured path uses Supabase.
+- Trending uses a derived engagement score from loaded counts, not real upvote timestamps.
 - The admin Featured Project picker was never clicked in a browser, because the demo session is
   a student and `adminOnly` blocks the route.
 - No project has a real cover image or screenshot, so tinted placeholders stand in.
-- Sprint records, including the "active" Discord Bot sprint, are placeholder rows.
+- Sprint demo records, including the "active" Discord Bot sprint, are placeholders when unconfigured.
 - Comment posting is not wired up. The list renders, the composer does not exist.
 - The discovery redesign has typechecked, linted, and built, but has not been reviewed in a
   browser. Both themes and the breakpoints are unverified visually.
+
+- The Sprints and Contribute redesigns use theme tokens but still need browser review in both
+  themes and at mobile breakpoints. Sprint listings remain demonstration records.
+
+- The personal-pages migration and pgTAP ownership/privacy tests have not been run locally because
+  the Docker engine is unavailable. Browser review of account pages, both themes, and mobile layouts
+  is also pending because this session has no browser surface.
+- My Sprints derives links from owned projects; it does not represent team enrollment. Notifications
+  have no delivery or read-tracking backend and show an explicit unavailable state.
