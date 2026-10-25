@@ -59,7 +59,7 @@ typecheck clean. Data is deliberately stubbed. Auth works against a local Supaba
 | Featured project      | Done in the UI. Admin picker on /admin, stored by a migration                                     |
 | Bookmarks             | Done in the UI. Optimistic, private per user, table written not applied                           |
 | Global search         | Done: command palette on Ctrl/Cmd+K, mounted in AppShell                                          |
-| Semester Sprints      | Landing page, sprint cards, and detail page done                                                  |
+| Semester Sprints      | Original event landing, orbital artwork, lineup preview, FAQs, and detail pages done              |
 | Comments              | List renders from mock data. No composer, posting is not built                                    |
 | Upvoting              | UI done, toggles local state only                                                                 |
 | Auth                  | Email code login and registration, tested locally. Demo user when `VITE_SUPABASE_*` is unset      |
@@ -68,9 +68,8 @@ typecheck clean. Data is deliberately stubbed. Auth works against a local Supaba
 | Project cover art     | Type field exists, every mock row is null so cards show derived art                               |
 | Backend               | Supabase project created. Schema applied and tested locally, not yet pushed to the hosted project |
 | Database schema       | `supabase/migrations/` holds the schema, registration columns, and bookmarks and featured tables  |
-
-| Profile and dashboard | UI implemented. Edits, pins, and viewing history are browser-only previews |
-| Contributors | Named lists from mock project data, including project creators |
+| Profile and dashboard | UI implemented. Edits, pins, and viewing history are browser-only previews                        |
+| Contributors          | Named lists from mock project data, including project creators                                    |
 
 Before starting work, re-read this table and correct it if it has drifted.
 
@@ -319,6 +318,48 @@ publish profile changes or implement moderation. Recently Viewed records signed-
 approved sample project detail pages. All storage access stays in `src/lib/api/client.ts`.
 
 Account routes use the shared design fonts from `UI/pages/assets/fonts/`, bundled by Vite through
-`src/index.css`. The home hero and each following home section have independent, subtle grid
-fades. The projects page retains its discovery hero grid. The navbar has an accessible profile icon and an account-name
+`src/index.css`. Only the home hero has a full-width grid. Elsewhere grids stay inside cards and
+panels. Featured projects form a two-column, four-card grid on desktop. Page navigation resets
+scrolling; query-only filter changes preserve position. Decorative heading pills are removed. The navbar has an accessible profile icon and an account-name
 link. Avoid decorative text symbols next to action labels.
+
+About content lives below the home submission prompt at `/#about`. The navbar omits About;
+footer links and the legacy /about redirect lead to that section. Hash links scroll to their target.
+
+Regular text and numbers inherit the default arrow cursor. Clickable controls use a pointer;
+text entry fields retain the text cursor. Keep text selection available.
+
+Semester Sprints uses a full-width event page with scoped light/dark tokens in src/styles/sprints.css
+and a glossy, interactive bubble hero in SprintHeroBubbles. The lineup, FAQ, and stage content do not imply
+registration is live. The lineup still uses mock records, labelled as a preview with unconfirmed dates.
+The general event format follows the supplied poster (5-6 weeks, teams of 3-5); individual briefs vary.
+
+The Sprints hero and pathway share one continuous lavender grid and glossy bubble palette. SprintJourney connects interactive
+SprintBubble stops with a measured SVG curve; expanded content can grow without disconnecting the path.
+Bubbles reveal details with click/keyboard, allow up to 20px pointer displacement per axis, and spring
+back after release. Vertical touch scrolling remains available. The Sprints page has no arrow icons.
+
+useSpringBubble is the shared pointer interaction for hero and pathway bubbles; keep their tap/drag
+threshold, 20px movement bounds, touch-scroll behavior, and keyboard access consistent.
+
+useScrollBubblePop orchestrates the Sprints scroll effect with one passive listener and a single
+animation frame. A separate visual wrapper pops bubbles near the upper viewport on downward scroll
+and regrows visible bubbles on upward scroll or keyboard focus. Anchors retain their dimensions;
+drag transforms stay independent. Reduced-motion preference disables the effect entirely.
+
+Sprints bubbles use unpadded labels and translucent lavender film with crisp text. Path sections are
+measured from stable scroll anchors, not animated button bounds. Each link section is keyed to its
+destination bubble and draws with scroll progress; popping also fades its caption, details, and link.
+Keyboard focus restores the whole stop, and reduced motion keeps all information visible.
+
+The Sprints event uses near-black/deep-blue in dark mode and pearl-white/blue in light mode;
+its scoped shell tokens also theme its navigation and footer. Purple remains the bubble accent.
+FAQ bubbles pass persistent to SprintBubble, omit data-scroll-bubble, and always retain their
+visible captions and answers during scrolling. Only the hero and pathway use scroll-away effects.
+
+Bubble material is translucent but carries a fuller lavender tint. Each interactive bubble has an
+aria-hidden aura with a continuous purple halo with occasional soft flicker. Its transform is independent of
+drag/pop layers, and the flicker stops for reduced-motion preferences.
+
+The bubble aura has a continuous full ring without a circling highlight. Its occasional soft flicker
+is staggered across bubbles, never fully turns the halo off, and is disabled with reduced motion.

@@ -1,4 +1,4 @@
-// Landing-page project card: featured cover, standard tile, or compact row with existing upvotes.
+// Landing project cards link across the full card, with separate voting and contributor controls.
 
 import { Link } from 'react-router'
 import { cn } from '@/lib/cn'
@@ -36,7 +36,7 @@ export function LandingProjectCard({
   return (
     <article
       className={cn(
-        'border-line bg-surface hover:border-brand-700 overflow-hidden rounded-xl border transition-colors',
+        'border-line bg-surface hover:border-brand-700 relative overflow-hidden rounded-xl border transition-colors',
         CARD_CLASSES[variant],
       )}
     >
@@ -55,14 +55,14 @@ export function LandingProjectCard({
         ) : compact ? (
           <div
             aria-hidden="true"
-            className="bg-brand-50 text-brand-700 flex h-full w-full items-center justify-center font-mono text-lg font-bold"
+            className="landing-grid bg-brand-50 text-brand-700 flex h-full w-full items-center justify-center font-mono text-lg font-bold"
           >
             {project.title.slice(0, 2).toUpperCase()}
           </div>
         ) : (
           <div
             aria-hidden="true"
-            className="landing-cover flex h-full w-full items-center justify-center p-4 sm:p-8"
+            className="landing-grid flex h-full w-full items-center justify-center p-4 sm:p-8"
           >
             <div className="border-brand-700/30 bg-surface/90 flex h-3/4 w-4/5 flex-col overflow-hidden rounded-lg border shadow-lg">
               <div className="border-line flex items-center gap-1.5 border-b px-3 py-2">
@@ -103,7 +103,13 @@ export function LandingProjectCard({
               compact ? 'text-base' : 'text-xl sm:text-2xl',
             )}
           >
-            <Link to={projectPath} className="hover:text-brand-700">
+            <Link
+              to={projectPath}
+              className={cn(
+                'hover:text-brand-700',
+                'focus-visible:after:outline-brand-700 after:absolute after:inset-0 after:rounded-xl focus-visible:outline-none focus-visible:after:outline-2 focus-visible:after:outline-offset-2',
+              )}
+            >
               {project.title}
             </Link>
           </h3>
@@ -136,7 +142,7 @@ export function LandingProjectCard({
         )}
         {!compact && (
           <div className="border-line mt-5 flex flex-wrap items-center justify-between gap-4 border-t pt-4">
-            <div className="flex flex-wrap items-center gap-4">
+            <div className="relative z-10 flex flex-wrap items-center gap-4">
               <UpvoteButton
                 count={project.upvoteCount}
                 hasUpvoted={project.viewerHasUpvoted}
@@ -151,14 +157,11 @@ export function LandingProjectCard({
               </Link>
               <ContributorStack contributors={project.contributors} />
             </div>
-            <Link to={projectPath} className="text-brand-700 text-sm font-semibold">
-              Open project
-            </Link>
           </div>
         )}
       </div>
       {compact && (
-        <div className="shrink-0">
+        <div className="relative z-10 shrink-0">
           <UpvoteButton
             count={project.upvoteCount}
             hasUpvoted={project.viewerHasUpvoted}

@@ -88,6 +88,22 @@ The smallest set that makes the site real. Everything P0 below rolls up here.
 
 ## Semester Sprints
 
+- [x] Pearl-white/blue light palette, fuller bubble material, and subtle orbiting purple glows
+
+- [x] Persistent FAQ bubbles and captions, with a poster-inspired black/deep-blue event palette
+
+- [x] Larger translucent bubbles, simple numbering, and synchronized scrolling path/text animations
+
+- [x] Scroll-direction bubble popping with quick upward regrowth, focus recovery, and reduced-motion support
+
+- [x] Match the hero to the lavender bubble pathway, with shared springy interactions and purple actions
+
+- [x] Replace lower event sections with a lavender bubble pathway, inspectable stops, and bounded spring-back dragging
+- [x] Remove arrow graphics from the Sprints event page
+
+- [x] Original event landing page with orbital artwork, build stages, clickable lineup, and FAQs
+- [ ] Confirm event dates, team formation details, and registration destination before launch
+
 - [x] Sprints landing page explaining the format
 - [x] Sprint cards with status, dates, and submission counts
 - [x] Sprint detail page listing submissions
@@ -123,6 +139,14 @@ The smallest set that makes the site real. Everything P0 below rolls up here.
 - [ ] **P2** Sitemap and per-project meta tags for link previews
 
 ## Accessibility and polish
+
+- [x] Arrow cursor for static text and numbers, pointer for controls, text cursor for text entry
+
+- [x] Move About below the home submission prompt, with footer anchor and legacy route redirect
+
+- [x] Home hero grid, boxed grid backgrounds elsewhere, and four equal featured project cards
+- [x] Reset scroll position when navigating between page routes
+- [x] Remove decorative pills above page headings
 
 - [x] Dark, light, and system themes with tokenised colours, no flash on load
 - [x] Reduced motion support for card and palette animations

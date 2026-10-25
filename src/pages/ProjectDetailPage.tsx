@@ -6,7 +6,6 @@ import { ContributorList } from '@/components/projects/ContributorList'
 import { useAuth } from '@/lib/auth/useAuth'
 import { CommentList } from '@/components/projects/CommentList'
 import { ProjectSidebar } from '@/components/projects/ProjectSidebar'
-import { Badge } from '@/components/ui/Badge'
 import { EmptyState, ErrorState, LoadingState } from '@/components/ui/PageState'
 import { getProjectBySlug, listComments, toggleUpvote, recordProjectView } from '@/lib/api/client'
 import { cn } from '@/lib/cn'
@@ -54,7 +53,7 @@ export function ProjectDetailPage() {
       <div className="grid gap-10 lg:grid-cols-[1fr_320px] lg:items-start">
         <div className="space-y-10">
           <header>
-            <Badge tone="success">{project.category}</Badge>
+            <p className="text-ink-muted text-sm">{project.category}</p>
             <h1 className="mt-3 text-3xl font-bold tracking-tight">{project.title}</h1>
             <p className="text-ink-soft mt-4 leading-relaxed">{project.description}</p>
           </header>

@@ -9,7 +9,7 @@ interface ProjectsHeroProps {
 
 export function ProjectsHero({ onOpenSearch }: ProjectsHeroProps) {
   return (
-    <section className="discovery-hero border-line border-b">
+    <section className="border-line border-b">
       <div className="mx-auto max-w-6xl px-4 pt-14 pb-12 sm:px-6 sm:pt-20 sm:pb-14">
         <p className="text-accent-ink text-xs font-semibold tracking-[0.2em]">
           BUILT BY STUDENTS. POWERED BY IDEAS.

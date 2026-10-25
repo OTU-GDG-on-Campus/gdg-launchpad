@@ -1,4 +1,4 @@
-/* Global theme tokens, landing-page backgrounds, and discovery-page helpers. */
+/* Global theme tokens, cursor behavior, landing-page backgrounds, and discovery helpers. */
 
 @import 'tailwindcss';
 
@@ -114,12 +114,46 @@
 @layer base {
   body {
     @apply bg-surface-muted text-ink antialiased;
+    cursor: default;
   }
 
-  /* Tailwind v4 preflight resets buttons to the default arrow cursor. */
-  button:not(:disabled),
-  [role='button']:not([aria-disabled='true']) {
+  a[href],
+  button:not(:disabled):not([aria-disabled='true']),
+  [role='button']:not(:disabled):not([aria-disabled='true']),
+  [role='link']:not([aria-disabled='true']),
+  select:not(:disabled),
+  summary,
+  input:is(
+      [type='checkbox'],
+      [type='radio'],
+      [type='range'],
+      [type='button'],
+      [type='submit'],
+      [type='reset'],
+      [type='file'],
+      [type='color'],
+      [type='image']
+    ):not(:disabled),
+  label:has(input:not(:disabled), select:not(:disabled), textarea:not(:disabled)) {
     cursor: pointer;
+  }
+
+  input:not(
+      [type='checkbox'],
+      [type='radio'],
+      [type='range'],
+      [type='button'],
+      [type='submit'],
+      [type='reset'],
+      [type='file'],
+      [type='color'],
+      [type='image'],
+      [type='hidden']
+    ):not(:disabled),
+  textarea:not(:disabled),
+  [contenteditable='true'],
+  [contenteditable='plaintext-only'] {
+    cursor: text;
   }
 
   :focus-visible {

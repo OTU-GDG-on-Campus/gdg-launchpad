@@ -2,8 +2,13 @@
 
 The React pages follow the supplied profile and dashboard references using Manrope and IBM Plex
 Mono from the existing design assets. The shared navbar and footer use the reference's width,
-spacing, colors, and wordmark. The home hero is plain; only the content below it has the grid.
-Other routes have no graph-paper background. Dark and light themes remain supported.
+spacing, colors, and wordmark. The home hero has a full grid background. Below it and on other pages, grids stay inside cards
+and panels. Featured projects use four equal cards in two columns, stacking on mobile. Dark and light themes remain supported.
+
+Page navigation resets scrolling to the top. Changes to project filters keep the scroll position.
+
+About content appears below the home submission prompt at /#about. It is removed from the navbar;
+the footer links to the section, and the old /about route redirects there.
 
 ## Routes
 

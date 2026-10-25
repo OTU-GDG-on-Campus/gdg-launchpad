@@ -1,7 +1,9 @@
-// Landing page: plain hero, grid below the hero, featured projects, and named contributors.
+// Landing page: gridded hero, featured projects, contributors, submission prompt, and About.
 
 import { useState } from 'react'
 import { Link } from 'react-router'
+import { SITE } from '@/config/site'
+import { allowedDomainsLabel } from '@/lib/auth/domain'
 import { Avatar } from '@/components/ui/Avatar'
 import { listContributors } from '@/lib/api/client'
 import { useAsync } from '@/lib/useAsync'
@@ -21,8 +23,8 @@ export function HomePage() {
   })
   const contributors = useAsync(listContributors, 'landing-contributors')
   const [voteError, setVoteError] = useState<string | null>(null)
-  const featuredProjects = projects.slice(0, 3)
-  const otherProjects = projects.slice(3)
+  const featuredProjects = projects.slice(0, 4)
+  const otherProjects = projects.slice(4)
   const openCount = projects.filter((project) => project.openToContributions).length
   const categoryCount = new Set(projects.map((project) => project.category)).size
   const statistics = [
@@ -46,7 +48,7 @@ export function HomePage() {
     <div>
       <section
         aria-labelledby="landing-title"
-        className="bg-surface-muted relative flex min-h-140 flex-col items-center justify-center px-4 py-20 text-center sm:px-6 sm:py-24"
+        className="landing-grid bg-surface-muted relative flex min-h-140 flex-col items-center justify-center px-4 py-20 text-center sm:px-6 sm:py-24"
       >
         <p className="text-ink-muted mb-6 font-mono text-xs tracking-widest uppercase">
           Built by students. Made to be shared.
@@ -84,7 +86,7 @@ export function HomePage() {
         </dl>
       </section>
 
-      <div className="landing-grid border-line border-t">
+      <div className="border-line border-t">
         <div className="mx-auto max-w-335 px-6 pt-12 pb-16 sm:px-11 sm:pb-24">
           <section aria-labelledby="featured-title">
             <div className="mb-7 flex flex-wrap items-end justify-between gap-4">
@@ -116,11 +118,11 @@ export function HomePage() {
               />
             ) : (
               <div className="grid gap-6 md:grid-cols-2">
-                {featuredProjects.map((project, index) => (
+                {featuredProjects.map((project) => (
                   <LandingProjectCard
                     key={project.id}
                     project={project}
-                    variant={index === 0 ? 'featured' : 'standard'}
+                    variant="standard"
                     onUpvote={(id) => void handleUpvote(id)}
                   />
                 ))}
@@ -195,7 +197,7 @@ export function HomePage() {
           </section>
           <section
             aria-labelledby="submit-title"
-            className="border-ink-muted mt-16 flex flex-col items-start justify-between gap-6 rounded-xl border border-dashed px-6 py-10 sm:px-10 md:flex-row md:items-center"
+            className="landing-grid bg-surface border-ink-muted mt-16 flex flex-col items-start justify-between gap-6 rounded-xl border border-dashed px-6 py-10 sm:px-10 md:flex-row md:items-center"
           >
             <div>
               <h2
@@ -212,6 +214,43 @@ export function HomePage() {
             <Link to="/submit" className={PRIMARY_LINK}>
               Post your project
             </Link>
+          </section>
+          <section
+            id="about"
+            aria-labelledby="about-title"
+            className="border-line mt-16 scroll-mt-32 border-t pt-12 sm:pt-16"
+          >
+            <div className="grid gap-8 lg:grid-cols-[1.4fr_1fr] lg:gap-16">
+              <div>
+                <h2 id="about-title" className="text-3xl font-bold tracking-tight sm:text-4xl">
+                  What is {SITE.shortName}?
+                </h2>
+                <p className="text-ink-muted mt-5 max-w-2xl text-sm leading-relaxed sm:text-base">
+                  Good projects deserve an audience. LaunchPad gives Ontario Tech students a home
+                  for the things they build, with feedback from peers, opportunities to collaborate,
+                  and work they can share with employers. Browse what others are building, learn how
+                  they made it, or find a project that could use your help.
+                </p>
+                <p className="text-ink-muted mt-4 max-w-2xl text-sm leading-relaxed sm:text-base">
+                  There are only upvotes here. Share your work, encourage other builders, and help
+                  the projects you love reach more people.
+                </p>
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold">How it works</h3>
+                <ul className="text-ink-muted mt-4 list-disc space-y-3 pl-5 text-sm leading-relaxed">
+                  <li>Anyone can browse. No account needed.</li>
+                  <li>
+                    Posting and upvoting require a verified Ontario Tech email (
+                    {allowedDomainsLabel()}) and a completed registration.
+                  </li>
+                  <li>A coordinator reviews every submission before it goes live.</li>
+                </ul>
+                <p className="text-ink-muted mt-6 text-sm leading-relaxed">
+                  Built and maintained by {SITE.organization}.
+                </p>
+              </div>
+            </div>
           </section>
         </div>
       </div>

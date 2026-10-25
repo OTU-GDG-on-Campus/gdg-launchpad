@@ -42,9 +42,9 @@ export function LoginPage() {
   return (
     <section
       aria-labelledby="login-title"
-      className="landing-grid border-line grid min-h-140 place-items-center border-b px-4 py-16 sm:px-6 sm:py-20"
+      className="bg-surface-muted border-line grid min-h-140 place-items-center border-b px-4 py-16 sm:px-6 sm:py-20"
     >
-      <div className="border-line bg-surface w-full max-w-110 rounded-2xl border p-6 shadow-lg sm:p-9">
+      <div className="landing-grid border-line bg-surface w-full max-w-110 rounded-2xl border p-6 shadow-lg sm:p-9">
         <Wordmark />
         <h1 id="login-title" className="mt-5 text-3xl font-extrabold tracking-tight">
           Sign in to LaunchPad
