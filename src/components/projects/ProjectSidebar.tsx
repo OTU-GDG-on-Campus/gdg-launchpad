@@ -1,5 +1,6 @@
-// Project detail sidebar: upvote, contribution status, author, team, and repo links.
+// Project actions and builder links. Unpublished submissions cannot receive upvotes.
 
+import { Link } from 'react-router'
 import { Button } from '@/components/ui/Button'
 import { useAuth } from '@/lib/auth/useAuth'
 import { Avatar } from '@/components/ui/Avatar'
@@ -18,7 +19,7 @@ export function ProjectSidebar({ project, onUpvote }: ProjectSidebarProps) {
     <aside className="border-line bg-surface space-y-5 rounded-xl border p-5">
       <Button
         onClick={onUpvote}
-        disabled={!canParticipate}
+        disabled={!canParticipate || project.status !== 'approved'}
         variant="secondary"
         className="border-accent text-accent hover:bg-accent-soft w-full"
       >
@@ -29,7 +30,7 @@ export function ProjectSidebar({ project, onUpvote }: ProjectSidebarProps) {
       </Button>
 
       {project.openToContributions && (
-        <div className="bg-brand-500 rounded-lg px-4 py-2.5 text-center text-sm font-semibold text-white">
+        <div className="bg-brand-500 text-on-brand rounded-lg px-4 py-2.5 text-center text-sm font-semibold">
           Open for contributions
         </div>
       )}
@@ -37,7 +38,12 @@ export function ProjectSidebar({ project, onUpvote }: ProjectSidebarProps) {
       <div className="flex items-center gap-3">
         <Avatar name={project.authorName} src={project.authorAvatarUrl} size="lg" />
         <div className="min-w-0">
-          <p className="truncate font-semibold">{project.authorName}</p>
+          <Link
+            to={`/u/${project.authorId}`}
+            className="hover:text-brand-700 block truncate font-semibold"
+          >
+            {project.authorName}
+          </Link>
           <p className="text-ink-muted truncate text-xs">
             {project.authorHeadline ? `${project.authorHeadline} - ` : ''}
             Posted {formatDate(project.createdAt)}

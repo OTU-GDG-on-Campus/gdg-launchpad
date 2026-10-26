@@ -22,7 +22,8 @@ sent through Brevo. It has not been run against the hosted project yet.
   `signOutUser`, `getCurrentUser`, and `subscribeToAuthChanges`. `AuthProvider` calls only those.
 - `src/components/auth/EmailCodeForm.tsx` is the two step form used by the login and register pages.
 - When `VITE_SUPABASE_URL` or `VITE_SUPABASE_ANON_KEY` is unset, `AuthProvider` falls back to the
-  demo student in `src/lib/api/mock/users.ts`, so contributors can still run the app with no setup.
+  isolated demo store in `src/lib/api/mock/session.ts`. The login page offers Try demo account,
+  which needs no email or code and cannot be used with a configured backend.
 
 ## Login and registration
 
@@ -35,6 +36,28 @@ They are separate on purpose.
 - A student who verifies the email but stops before saving the profile is signed in but cannot post,
   upvote, or comment, because `can_participate()` requires `registered_at`. The route guard sends
   them back to finish.
+
+## Personal pages and local testing
+
+Completed login and registration open `/me/projects`. The avatar menu links to projects, saves,
+profile, sprint-linked work, activity, notifications, and settings. All `/me` routes require completed
+registration and a non-banned account. `/u/:id` is public and shows only approved work.
+
+Full profile rows are owner/admin only after `20261025000000_personal_pages.sql` is applied. Public
+reads use `public_profiles`, a read-only projection without email, role, or account flags. Apply this
+migration before using the new personal pages with Supabase. It has not been verified against a local
+stack in this change because the Docker engine was unavailable.
+
+With no Supabase variables, click **Try demo account** on `/login`. The sample student is Alex Morgan,
+`demo.student@ontariotechu.net`. This is not a real or verified account. Its profile, session, saved
+projects, and votes persist in versioned browser storage. Settings includes a confirmed reset.
+The existing email/code demo form is also available for registration previews. Demo sign-out ends
+the session without deleting sample data.
+
+`npm run test:account` runs Node regression tests and configured-backend transport contract tests.
+The latter intercept requests and do not prove live RLS behavior. Run `npx supabase test db` against a
+migrated local stack for the pgTAP ownership and privacy checks in `supabase/tests/personal_pages.sql`.
+No hosted migrations or test accounts are created by these tests.
 
 ## The flow
 

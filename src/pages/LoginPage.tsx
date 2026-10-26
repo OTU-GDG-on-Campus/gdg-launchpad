@@ -1,14 +1,19 @@
-// Login page matching the supplied card design. Existing students log in with an emailed code.
+// Passwordless sign-in and local demo entry. Registered students continue to their projects.
 
 import type { ReactNode } from 'react'
-import { Link } from 'react-router'
+import { Link, Navigate } from 'react-router'
+import { useState } from 'react'
+import { isBackendConfigured } from '@/lib/api/client'
 import { EmailCodeForm } from '@/components/auth/EmailCodeForm'
 import { Wordmark } from '@/components/ui/Logo'
 import { ALLOWED_EMAIL_DOMAINS } from '@/config/site'
 import { useAuth } from '@/lib/auth/useAuth'
 
 export function LoginPage() {
-  const { user, error } = useAuth()
+  const { user, error, demoLogin } = useAuth()
+  const [demoError, setDemoError] = useState<string | null>(null)
+  const [pending, setPending] = useState(false)
+  if (user?.registeredAt && !user.bannedAt) return <Navigate to="/me/projects" replace />
 
   let panel: ReactNode = <EmailCodeForm mode="login" />
   if (user && !user.registeredAt) {
@@ -60,6 +65,32 @@ export function LoginPage() {
           </p>
         )}
         {panel}
+        {!isBackendConfigured && !user && (
+          <div className="border-line mt-6 border-t pt-5">
+            <button
+              type="button"
+              disabled={pending}
+              onClick={() => {
+                setPending(true)
+                setDemoError(null)
+                void demoLogin()
+                  .catch(() => setDemoError('Could not start the demo. Try again.'))
+                  .finally(() => setPending(false))
+              }}
+              className="border-brand-700 bg-brand-50 text-brand-700 min-h-12 w-full rounded-lg border px-4 py-3 text-sm font-semibold disabled:opacity-50"
+            >
+              {pending ? 'Opening your workspace...' : 'Try demo account'}
+            </button>
+            <p className="text-ink-muted mt-2 text-xs leading-relaxed">
+              Explore sample projects, saves, and a complete profile. No email or code needed.
+            </p>
+            {demoError && (
+              <p role="alert" className="text-danger mt-2 text-sm">
+                {demoError}
+              </p>
+            )}
+          </div>
+        )}
         <p className="text-ink-muted mt-4 font-mono text-[10px] leading-relaxed tracking-wide uppercase">
           Allowed domains · {ALLOWED_EMAIL_DOMAINS.map((domain) => `@${domain}`).join(' · ')}
         </p>

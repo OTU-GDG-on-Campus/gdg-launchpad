@@ -20,6 +20,9 @@ export interface AuthContextValue {
   verifyCode: (email: string, code: string, mode: AuthMode) => Promise<void>
   /** Saves the registration details for the signed-in student and finishes their account. */
   completeRegistration: (details: RegistrationDetails) => Promise<void>
+  demoLogin: () => Promise<void>
+  refreshUser: () => Promise<void>
+  resetDemo: () => Promise<void>
   signOut: () => Promise<void>
   error: string | null
 }
