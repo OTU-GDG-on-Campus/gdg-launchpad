@@ -15,8 +15,9 @@ built and maintained by GDG on Campus at Ontario Tech.
 Four rules define the product. Do not quietly change them:
 
 1. **Anyone can read.** Browsing projects requires no account.
-2. **Only verified Ontario Tech students can write.** Posting, upvoting, and commenting require a
-   Google sign-in on an `ontariotechu.net` or `ontariotechu.ca` account.
+2. **Only verified Ontario Tech students can write.** Posting, upvoting, and commenting require an
+   emailed code sent to an `ontariotechu.net` or `ontariotechu.ca` address, and a finished
+   registration.
 3. **Upvotes only.** There is no downvote anywhere in the product. The default feed ordering is
    most upvoted.
 4. **This is not an official university service.** See Branding below. It is the rule most easily
@@ -45,25 +46,31 @@ are building" are accurate and stay.
 
 ## Current state
 
-The repository is a working skeleton. The layout, routing, and component structure are real and
-typecheck clean. Data and auth are deliberately stubbed.
+The repository has public discovery and private account pages. Supabase data paths are implemented,
+with an isolated browser-local demo when unconfigured. Hosted setup and migration verification remain pending.
 
-| Area                  | State                                                                  |
-| --------------------- | ---------------------------------------------------------------------- |
-| Routing and layout    | Done                                                                   |
-| Home page             | Done: hero, value points, featured grid, closing call to action        |
-| Dark and light themes | Done. Dark is the default, toggle persists to localStorage             |
-| Project listing       | Done: category pills, search, sort, pagination. Filters in memory      |
-| Project detail        | Done: cover, tech stack, screenshots slot, discussion, sidebar         |
-| Semester Sprints      | Landing page, sprint cards, and detail page done                       |
-| Comments              | List renders from mock data. No composer, posting is not built         |
-| Upvoting              | UI done, toggles local state only                                      |
-| Auth                  | Stubbed. `signIn()` returns a fixed demo user                          |
-| Submission form       | Placeholder page                                                       |
-| Admin panel           | Placeholder page listing planned sections                              |
-| Project cover art     | Type field exists, every mock row is null so cards show a tint         |
-| Backend               | Supabase project created and scaffolded. Schema written, never applied |
-| Database schema       | `supabase/migrations/` holds the initial schema. Syntax checked only   |
+| Area                  | State                                                                                                                                         |
+| --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| Routing and layout    | Done                                                                                                                                          |
+| Home page             | Done: hero, value points, featured grid, closing call to action                                                                               |
+| About page            | Mission, community principles, contribution links, and FAQ implemented. Visual review pending                                                 |
+| Dark and light themes | Done. Dark by default, light, or follow the system. Persisted                                                                                 |
+| Project listing       | Discovery with shared Supabase/demo project reads, search, facets, filters, and grid/list                                                     |
+| Project detail        | Viewer-scoped Supabase/demo detail, discussion, author profile link, and private-submission status                                            |
+| Featured project      | Done in the UI. Admin picker on /admin, stored by a migration                                                                                 |
+| Bookmarks             | Private saved-project page and optimistic controls. Supabase persistence or versioned local demo storage                                      |
+| Global search         | Done: command palette on Ctrl/Cmd+K, mounted in AppShell                                                                                      |
+| Semester Sprints      | Landing, filters, details, and project-linked personal sprints. Supabase reads or demo data. No team registration                             |
+| Contribute page       | Redesigned pathways, first-contribution guide, skills, and FAQ. Visual review pending                                                         |
+| Comments              | Supabase/demo reads and activity records. No composer or posting flow                                                                         |
+| Upvoting              | Supabase unique-constrained toggle or persistent demo votes. Configured path contract-tested, live DB test pending                            |
+| Auth                  | Email-code flow plus one-click local demo. Persistent sessions. Login and registration lead to My Projects                                    |
+| Personal pages        | Seven private pages, profile editor, public profiles, and avatar navigation. Notifications are an explicit placeholder. Visual review pending |
+| Submission form       | Placeholder page                                                                                                                              |
+| Admin panel           | Featured picker live. Moderation and user management not built                                                                                |
+| Project cover art     | Type field exists, every mock row is null so cards show derived art                                                                           |
+| Backend               | Supabase project created. Schema applied and tested locally, not yet pushed to the hosted project                                             |
+| Database schema       | Schema, registration, bookmarks, featured projects, and new public-profile privacy migration. New migration unverified locally                |
 
 Before starting work, re-read this table and correct it if it has drifted.
 
@@ -84,6 +91,7 @@ there in the same pass as the code that finishes them.
 ```bash
 npm install
 npm run dev           # dev server on http://localhost:5173
+npm run test:account  # Node account regression and configured-backend contract tests
 npm run typecheck     # tsc -b
 npm run lint          # oxlint
 npm run format        # prettier --write .
@@ -114,24 +122,31 @@ src/
   types/index.ts       Shared domain types, mirroring future DB tables
   lib/
     api/client.ts      The only seam between UI and data
+    api/supabase.ts    Supabase browser client, null without env vars. Only client.ts imports it
     api/mock/          Placeholder records, deleted once the DB is live
     auth/              AuthProvider, context, useAuth hook, domain rules
     supabase/client.ts The configured Supabase browser client
-    theme/             ThemeProvider, context, useTheme hook
+    theme/             ThemeProvider (dark, light, system), context, useTheme hook
     cn.ts              Class name joiner
     coverTint.ts       Deterministic gradient for projects with no cover image
     format.ts          Date, relative time, and count formatters
+    platform.ts        Ctrl/Cmd detection for keyboard hints
     useAsync.ts        Async loader hook with stale-result protection
+    useDebouncedValue.ts Debounce for the search palette
   hooks/               Feature hooks that compose lib primitives
+                       useProjectDiscovery, useProjectsUrlState, useProjectsView
   components/
     layout/            AppShell, Navbar, Footer, ThemeToggle
     ui/                Avatar, Badge, Button, Card, FilterPills, Logo, PageHeader,
-                       PageState, Pagination, SearchInput, Select
+                       PageState, Pagination, SearchInput, Select, Kbd, Toast, CardSkeleton
     auth/              AuthControl, RequireAuth route guard
-    projects/          ProjectCard, ProjectList, ProjectSidebar, UpvoteButton,
-                       ContributorStack, CommentList
+    projects/          ProjectCard, ProjectRowCard, ProjectList, ProjectCover, ProjectSidebar,
+                       UpvoteButton, BookmarkButton, ContributorStack, PersonTrigger,
+                       PersonPopover, CommentList, ProjectsHero, DiscoveryTabs, TechFilterChips,
+                       AdvancedFilters, ViewToggle, FeaturedProject, FeaturedProjectPicker,
+                       CommandPalette
     sprints/           SprintCard, SprintGrid
-  pages/               One file per route
+  pages/               One file per route, including the protected /me workspace and /u/:id profiles
 
 supabase/
   config.toml          Local stack config, kept in git. Comments sit inline, after the setting
@@ -227,6 +242,9 @@ Schema changes are SQL files in `supabase/migrations/`, never edits made in the 
 left there. A dashboard edit that is not captured with `npm run db:diff` is lost on the next
 `db:reset` and invisible to everyone else. See [docs/supabase.md](docs/supabase.md).
 
+Public profile reads use the `public_profiles` projection. Full `profiles` rows contain private email
+and account privileges and are readable only by their owner and admins. Never restore public access.
+
 ### Server-side enforcement is not optional
 
 `isAllowedStudentEmail` in `src/lib/auth/domain.ts` and the `RequireAuth` component are user
@@ -235,8 +253,8 @@ endpoint directly.
 
 Every rule that matters must also be enforced on the server:
 
-- the email domain restriction, checked against the `hd` claim of a signature-verified Google ID
-  token, never against a client-supplied email string
+- the email domain restriction, enforced by the trigger on `auth.users` for an address whose
+  ownership the emailed code proved, never by a client-supplied claim
 - one upvote per user per project, as a database unique constraint
 - moderation status, so unapproved projects are never returned to non-admins
 - admin role and ban checks on every write

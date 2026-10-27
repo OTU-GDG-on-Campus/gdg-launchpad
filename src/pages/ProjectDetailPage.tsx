@@ -1,6 +1,6 @@
-// Single project view: cover, write-up, tech stack, screenshots, discussion, and a detail sidebar.
+// Viewer-scoped project details and discussion with guarded upvotes and explicit write errors.
 
-import { useState } from 'react'
+import { useLayoutEffect, useRef, useState } from 'react'
 import { useParams } from 'react-router'
 import { CommentList } from '@/components/projects/CommentList'
 import { ProjectSidebar } from '@/components/projects/ProjectSidebar'
@@ -9,14 +9,32 @@ import { EmptyState, ErrorState, LoadingState } from '@/components/ui/PageState'
 import { getProjectBySlug, listComments, toggleUpvote } from '@/lib/api/client'
 import { cn } from '@/lib/cn'
 import { coverTint } from '@/lib/coverTint'
+import { useAuth } from '@/lib/auth/useAuth'
 import { useAsync } from '@/lib/useAsync'
 import type { Project } from '@/types'
 
 export function ProjectDetailPage() {
   const { slug = '' } = useParams()
-  const { data, loading, error } = useAsync(() => getProjectBySlug(slug), slug)
-  const comments = useAsync(() => listComments(data?.id ?? ''), data?.id ?? 'none')
+  const { user } = useAuth()
+  const viewerKey = `${slug}|${user?.id ?? 'signed-out'}`
+  const activeViewer = useRef(viewerKey)
+  useLayoutEffect(() => {
+    activeViewer.current = viewerKey
+  }, [viewerKey])
+  const { data, loading, error } = useAsync(() => getProjectBySlug(slug), viewerKey)
+  const comments = useAsync(
+    () => listComments(data?.id ?? ''),
+    `${viewerKey}|${data?.id ?? 'none'}`,
+  )
+  const [voteError, setVoteError] = useState<string | null>(null)
+  const [overrideKey, setOverrideKey] = useState(viewerKey)
   const [override, setOverride] = useState<Project | null>(null)
+
+  if (overrideKey !== viewerKey) {
+    setOverrideKey(viewerKey)
+    setOverride(null)
+    setVoteError(null)
+  }
 
   if (error) return <ErrorState error={error} />
   if (loading) return <LoadingState label="Loading project" />
@@ -25,11 +43,30 @@ export function ProjectDetailPage() {
   const project = override ?? data
 
   async function upvote() {
-    setOverride(await toggleUpvote(project.id))
+    setVoteError(null)
+    try {
+      const updated = await toggleUpvote(project.id)
+      if (activeViewer.current === viewerKey) setOverride(updated)
+    } catch (cause) {
+      if (activeViewer.current === viewerKey)
+        setVoteError(cause instanceof Error ? cause.message : 'Could not update your upvote.')
+    }
   }
 
   return (
     <article className="space-y-10">
+      {project.status !== 'approved' && (
+        <p className="border-line bg-surface-raised rounded-lg border p-4 text-sm">
+          Private submission:{' '}
+          {project.status === 'pending' ? 'awaiting coordinator review' : 'not approved'}. This
+          project is not on the public feed.
+        </p>
+      )}
+      {voteError && (
+        <p role="alert" className="border-danger rounded-lg border p-4 text-sm">
+          {voteError}
+        </p>
+      )}
       {project.coverImageUrl ? (
         <img
           src={project.coverImageUrl}
@@ -92,7 +129,9 @@ export function ProjectDetailPage() {
             <h2 className="mb-3 text-lg font-semibold">
               Student discussion ({comments.data?.length ?? project.commentCount})
             </h2>
-            {comments.loading ? (
+            {comments.error ? (
+              <ErrorState error={comments.error} />
+            ) : comments.loading ? (
               <LoadingState label="Loading discussion" />
             ) : (
               <CommentList comments={comments.data ?? []} />

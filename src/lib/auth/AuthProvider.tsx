@@ -1,48 +1,149 @@
-// Auth provider. Currently backed by a local demo session so the UI can be built before
-// Supabase Google OAuth is wired in. Swap the body of signIn/signOut only - the context
-// shape and every consumer stay the same. See docs/auth.md for the real flow.
+// Session provider for verified Supabase accounts and an isolated, persistent local demo login.
 
-import { useCallback, useMemo, useState, type ReactNode } from 'react'
-import { AuthContext, type AuthContextValue, type AuthStatus } from './auth-context'
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import {
+  getCurrentUser,
+  signInDemo,
+  resetDemoData,
+  isBackendConfigured,
+  saveRegistration,
+  sendEmailCode,
+  signOutUser,
+  startDemoRegistration,
+  subscribeToAuthChanges,
+  verifyEmailCode,
+} from '@/lib/api/client'
+import type { RegistrationDetails, User } from '@/types'
+import { AuthContext, type AuthContextValue, type AuthMode, type AuthStatus } from './auth-context'
 import { allowedDomainsLabel, isAllowedStudentEmail } from './domain'
-import { DEMO_USER } from '@/lib/api/mock/users'
+
+function domainError(): string {
+  return `Use your Ontario Tech email address (${allowedDomainsLabel()}).`
+}
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [status, setStatus] = useState<AuthStatus>('signed-out')
-  const [user, setUser] = useState<AuthContextValue['user']>(null)
+  const [status, setStatus] = useState<AuthStatus>('loading')
+  const [user, setUser] = useState<User | null>(null)
   const [error, setError] = useState<string | null>(null)
 
-  const signIn = useCallback(async () => {
-    setStatus('loading')
-    setError(null)
+  const revision = useRef(0)
 
-    if (!isAllowedStudentEmail(DEMO_USER.email)) {
+  const applyUser = useCallback((next: User | null) => {
+    revision.current += 1
+    if (next && !isAllowedStudentEmail(next.email)) {
+      setUser(null)
       setStatus('signed-out')
-      setError(`Sign in with your Ontario Tech account (${allowedDomainsLabel()}).`)
+      setError(domainError())
       return
     }
-
-    setUser(DEMO_USER)
-    setStatus('signed-in')
+    setUser(next)
+    setStatus(next ? 'signed-in' : 'signed-out')
   }, [])
+
+  useEffect(() => {
+    let active = true
+    const refresh = () => {
+      const request = ++revision.current
+      return getCurrentUser()
+        .then((next) => {
+          if (active && request === revision.current) applyUser(next)
+        })
+        .catch(() => {
+          if (!active || request !== revision.current) return
+          applyUser(null)
+          setError('Could not load your account. Try signing in again.')
+        })
+    }
+    void refresh()
+    const unsubscribe = subscribeToAuthChanges(() => void refresh())
+    return () => {
+      active = false
+      unsubscribe()
+    }
+  }, [applyUser])
+
+  const sendCode = useCallback(async (email: string, mode: AuthMode) => {
+    if (!isAllowedStudentEmail(email)) throw new Error(domainError())
+    await sendEmailCode(email, mode)
+  }, [])
+
+  const verifyCode = useCallback(
+    async (email: string, code: string, mode: AuthMode) => {
+      await verifyEmailCode(email, code)
+      const next =
+        !isBackendConfigured && mode === 'register'
+          ? startDemoRegistration(email)
+          : await getCurrentUser()
+      if (!next) throw new Error('Your account could not be loaded. Try again.')
+      setError(null)
+      applyUser(next)
+    },
+    [applyUser],
+  )
+
+  const demoLogin = useCallback(async () => {
+    applyUser(await signInDemo())
+    setError(null)
+  }, [applyUser])
+
+  const refreshUser = useCallback(async () => {
+    const request = ++revision.current
+    const next = await getCurrentUser()
+    if (request === revision.current) applyUser(next)
+  }, [applyUser])
+
+  const resetDemo = useCallback(async () => {
+    applyUser(await resetDemoData())
+  }, [applyUser])
+
+  const completeRegistration = useCallback(
+    async (details: RegistrationDetails) => {
+      if (!user) throw new Error('Verify your email first.')
+      const request = revision.current
+      const next = await saveRegistration(user, details)
+      if (request === revision.current) applyUser(next)
+    },
+    [user, applyUser],
+  )
 
   const signOut = useCallback(async () => {
-    setUser(null)
-    setStatus('signed-out')
+    revision.current += 1
+    await signOutUser()
+    applyUser(null)
     setError(null)
-  }, [])
+  }, [applyUser])
 
   const value = useMemo<AuthContextValue>(
     () => ({
       status,
       user,
-      canParticipate: status === 'signed-in' && user !== null && user.bannedAt === null,
+      canParticipate:
+        status === 'signed-in' &&
+        user !== null &&
+        user.bannedAt === null &&
+        user.registeredAt !== null,
       isAdmin: user?.role === 'admin',
-      signIn,
+      sendCode,
+      verifyCode,
+      completeRegistration,
+      demoLogin,
+      refreshUser,
+      resetDemo,
       signOut,
       error,
     }),
-    [status, user, signIn, signOut, error],
+    [
+      status,
+      user,
+      sendCode,
+      verifyCode,
+      completeRegistration,
+      demoLogin,
+      refreshUser,
+      resetDemo,
+      signOut,
+      error,
+    ],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

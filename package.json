@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "test:account": "node --test tests/account.test.mjs tests/account-backend.test.mjs",
     "typecheck": "tsc -b",
     "lint": "oxlint",
     "format": "prettier --write .",

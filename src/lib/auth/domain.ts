@@ -1,7 +1,7 @@
 // Email domain rules for student sign-in. The browser copy is a UX guard only.
 //
-// SECURITY: anything a client sends can be forged. The real check runs server-side against the
-// "hd" claim of a Google ID token that has already been signature-verified. See docs/auth.md.
+// SECURITY: anything a client sends can be forged. The real check is the sign-up trigger on
+// auth.users, which runs in the database. See docs/auth.md.
 
 import { ALLOWED_EMAIL_DOMAINS } from '@/config/site'
 

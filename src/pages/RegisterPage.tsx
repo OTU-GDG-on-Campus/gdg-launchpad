@@ -1,0 +1,276 @@
+// Two-step email verification and profile registration, followed by the personal project page.
+
+import { useState, type SyntheticEvent } from 'react'
+import { Link, useNavigate } from 'react-router'
+import { EmailCodeForm } from '@/components/auth/EmailCodeForm'
+import { Button } from '@/components/ui/Button'
+import { Wordmark } from '@/components/ui/Logo'
+import { ALLOWED_EMAIL_DOMAINS } from '@/config/site'
+import { isBackendConfigured } from '@/lib/api/client'
+import { cn } from '@/lib/cn'
+import { PROGRAMS, STUDY_YEARS } from '@/lib/profile'
+import { useAuth } from '@/lib/auth/useAuth'
+
+const PERKS = [
+  'Share your projects with other students',
+  'Upvote and join discussions on projects you like',
+  'Find inspiration and collaborators for your next project',
+]
+const FIELD_CLASS =
+  'border-line bg-surface-muted text-ink focus:border-brand-700 mt-2 min-h-12 w-full rounded-lg border px-3 py-3 text-sm'
+const MAX_SKILLS = 20
+
+function parseSkills(value: string): string[] {
+  const skills = value
+    .split(',')
+    .map((skill) => skill.trim().slice(0, 40))
+    .filter(Boolean)
+  return [...new Set(skills)].slice(0, MAX_SKILLS)
+}
+
+export function RegisterPage() {
+  const { user, error, completeRegistration } = useAuth()
+  const navigate = useNavigate()
+  const [showIntro, setShowIntro] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [saveError, setSaveError] = useState<string | null>(null)
+  const [name, setName] = useState('')
+  const [program, setProgram] = useState('')
+  const [year, setYear] = useState('')
+  const [skills, setSkills] = useState('')
+  const [bio, setBio] = useState('')
+  const [agreed, setAgreed] = useState(false)
+  const needsDetails = user !== null && user.registeredAt === null
+  const step = needsDetails && !showIntro ? 2 : 1
+  const detailsComplete = Boolean(name.trim() && program && year && agreed)
+
+  async function handleSubmit(event: SyntheticEvent<HTMLFormElement>) {
+    event.preventDefault()
+    if (!detailsComplete || saving) return
+    setSaveError(null)
+    setSaving(true)
+    try {
+      await completeRegistration({
+        name: name.trim(),
+        program,
+        studyYear: year,
+        skills: parseSkills(skills),
+        bio: bio.trim(),
+      })
+      navigate('/me/projects')
+    } catch (cause) {
+      setSaveError(cause instanceof Error ? cause.message : 'Could not save your details.')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  return (
+    <section
+      aria-labelledby="register-title"
+      className="landing-grid border-line grid min-h-140 place-items-center border-b px-4 py-16 sm:px-6 sm:py-20"
+    >
+      <div className="border-line bg-surface w-full max-w-135 rounded-2xl border p-6 shadow-lg sm:p-9">
+        <Wordmark />
+        <p className="text-ink-muted mt-6 font-mono text-xs tracking-wide uppercase">
+          Create account · Step {step} of 2
+        </p>
+        <h1 id="register-title" className="mt-3 text-3xl font-extrabold tracking-tight">
+          {step === 1 ? 'Join LaunchPad' : 'Set up your profile'}
+        </h1>
+        <div aria-hidden="true" className="mt-5 flex gap-2">
+          <span className="bg-brand-700 h-1 flex-1 rounded-full" />
+          <span
+            className={cn('h-1 flex-1 rounded-full', step === 2 ? 'bg-brand-700' : 'bg-line')}
+          />
+        </div>
+        {error && (
+          <p role="alert" className="border-flare text-ink mt-5 rounded-lg border p-3 text-sm">
+            {error}
+          </p>
+        )}
+
+        {step === 1 ? (
+          <div>
+            <p className="text-ink-soft mt-5 text-sm leading-relaxed">
+              Enter your Ontario Tech email and we will send you a six digit code, so there is no
+              password to create. Browsing never needs an account.
+            </p>
+            <ul className="mt-5 space-y-3">
+              {PERKS.map((perk) => (
+                <li key={perk} className="text-ink-soft flex gap-3 text-sm leading-relaxed">
+                  <span
+                    aria-hidden="true"
+                    className="bg-flare mt-2 h-1.5 w-1.5 shrink-0 rounded-full"
+                  />
+                  {perk}
+                </li>
+              ))}
+            </ul>
+            {needsDetails && (
+              <Button size="lg" className="mt-6 w-full" onClick={() => setShowIntro(false)}>
+                Continue to profile
+              </Button>
+            )}
+            {user && !needsDetails && (
+              <p
+                role="status"
+                className="border-line bg-brand-50 mt-6 rounded-lg border p-4 text-sm leading-relaxed"
+              >
+                You already have an account.{' '}
+                <Link to="/projects" className="text-brand-700 font-semibold">
+                  Explore projects
+                </Link>
+              </p>
+            )}
+            {!user && <EmailCodeForm mode="register" onVerified={() => setShowIntro(false)} />}
+            <p className="text-ink-muted mt-4 font-mono text-[10px] leading-relaxed tracking-wide uppercase">
+              Allowed domains · {ALLOWED_EMAIL_DOMAINS.map((domain) => `@${domain}`).join(' · ')}
+            </p>
+          </div>
+        ) : (
+          <div>
+            <div className="border-line bg-accent-soft mt-5 flex flex-wrap items-center justify-between gap-2 rounded-lg border p-3 text-sm">
+              <span className="min-w-0 font-semibold break-all">{user?.email}</span>
+              {!isBackendConfigured && (
+                <span className="text-accent font-mono text-[10px] tracking-wide uppercase">
+                  Demo account
+                </span>
+              )}
+            </div>
+            <form onSubmit={(event) => void handleSubmit(event)} className="mt-6 space-y-5">
+              <div>
+                <label htmlFor="register-name" className="text-sm font-semibold">
+                  Full name <span className="text-ink-muted">(required)</span>
+                </label>
+                <input
+                  id="register-name"
+                  name="name"
+                  autoComplete="name"
+                  required
+                  maxLength={80}
+                  value={name}
+                  onChange={(event) => setName(event.target.value)}
+                  placeholder="As you want it shown on your profile"
+                  className={FIELD_CLASS}
+                />
+              </div>
+              <div>
+                <label htmlFor="register-program" className="text-sm font-semibold">
+                  Program <span className="text-ink-muted">(required)</span>
+                </label>
+                <select
+                  id="register-program"
+                  name="program"
+                  required
+                  value={program}
+                  onChange={(event) => setProgram(event.target.value)}
+                  className={FIELD_CLASS}
+                >
+                  <option value="">Select your program</option>
+                  {PROGRAMS.map((option) => (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label htmlFor="register-year" className="text-sm font-semibold">
+                  Year <span className="text-ink-muted">(required)</span>
+                </label>
+                <select
+                  id="register-year"
+                  name="year"
+                  required
+                  value={year}
+                  onChange={(event) => setYear(event.target.value)}
+                  className={FIELD_CLASS}
+                >
+                  <option value="">Select your year</option>
+                  {STUDY_YEARS.map((option) => (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label htmlFor="register-skills" className="text-sm font-semibold">
+                  Skills <span className="text-ink-muted">(optional)</span>
+                </label>
+                <input
+                  id="register-skills"
+                  name="skills"
+                  maxLength={250}
+                  value={skills}
+                  onChange={(event) => setSkills(event.target.value)}
+                  placeholder="React, Python, CAD..."
+                  aria-describedby="skills-hint"
+                  className={FIELD_CLASS}
+                />
+                <p id="skills-hint" className="text-ink-muted mt-2 text-xs">
+                  Separate skills with commas.
+                </p>
+              </div>
+              <div>
+                <label htmlFor="register-bio" className="text-sm font-semibold">
+                  Short bio <span className="text-ink-muted">(optional)</span>
+                </label>
+                <textarea
+                  id="register-bio"
+                  name="bio"
+                  rows={3}
+                  maxLength={500}
+                  value={bio}
+                  onChange={(event) => setBio(event.target.value)}
+                  placeholder="What do you like to build?"
+                  className={cn(FIELD_CLASS, 'resize-y')}
+                />
+              </div>
+              <label className="text-ink-soft flex items-start gap-3 text-sm leading-relaxed">
+                <input
+                  type="checkbox"
+                  name="guidelines"
+                  checked={agreed}
+                  onChange={(event) => setAgreed(event.target.checked)}
+                  className="accent-brand-700 mt-1 h-4 w-4 shrink-0"
+                />
+                I agree to the community guidelines. Projects are reviewed by a moderator before
+                they appear publicly.
+              </label>
+              <div className="border-line flex flex-wrap justify-between gap-3 border-t pt-5">
+                <button
+                  type="button"
+                  onClick={() => setShowIntro(true)}
+                  className="border-line bg-surface text-ink hover:border-brand-700 min-h-11 rounded-lg border px-5 py-3 text-sm font-semibold"
+                >
+                  Back
+                </button>
+                <button
+                  type="submit"
+                  disabled={!detailsComplete || saving}
+                  aria-busy={saving}
+                  className="bg-brand-500 text-on-brand min-h-11 rounded-lg px-5 py-3 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {saving ? 'Saving...' : 'Create account'}
+                </button>
+              </div>
+              {saveError && (
+                <p role="alert" className="border-flare text-ink rounded-lg border p-3 text-sm">
+                  {saveError}
+                </p>
+              )}
+            </form>
+          </div>
+        )}
+        <p className="border-line text-ink-soft mt-6 border-t pt-5 text-sm">
+          Already have an account?{' '}
+          <Link to="/login" className="text-brand-700 hover:text-flare font-semibold">
+            Sign in
+          </Link>
+        </p>
+      </div>
+    </section>
+  )
+}

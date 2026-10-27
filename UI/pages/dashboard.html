@@ -214,25 +214,27 @@
                       <path d="M4 6.5a4 4 0 1 1 8 0c0 3 1 4 1 4H3s1-1 1-4Z"></path>
                       <path d="M6.6 13a1.6 1.6 0 0 0 2.8 0"></path>
                     </svg>
-                    <span
-                      style="
-                        position: absolute;
-                        top: -4px;
-                        right: -4px;
-                        min-width: min(16px, 100%);
-                        height: 16px;
-                        padding: 0 4px;
-                        background: #e2572a;
-                        color: #fff;
-                        border-radius: 99px;
-                        font-family: 'IBM Plex Mono', monospace;
-                        font-size: 10px;
-                        font-weight: 500;
-                        display: grid;
-                        place-items: center;
-                      "
-                      >{{ notifCount }}</span
-                    >
+                    <sc-if value="{{ hasUnread }}" hint-placeholder-val="{{ true }}">
+                      <span
+                        style="
+                          position: absolute;
+                          top: -4px;
+                          right: -4px;
+                          min-width: 16px;
+                          height: 16px;
+                          padding: 0 4px;
+                          background: #e2572a;
+                          color: #fff;
+                          border-radius: 99px;
+                          font-family: 'IBM Plex Mono', monospace;
+                          font-size: 10px;
+                          font-weight: 500;
+                          display: grid;
+                          place-items: center;
+                        "
+                        >{{ notifCount }}</span
+                      >
+                    </sc-if>
                   </button>
                   <button
                     sc-camel-on-click="{{ toggleMenu }}"
@@ -282,7 +284,8 @@
                         position: absolute;
                         top: 46px;
                         right: 0;
-                        width: 340px;
+                        width: 344px;
+                        max-width: calc(100vw - 32px);
                         background: #fff;
                         border: 1px solid #e6e4de;
                         border-radius: 12px;
@@ -293,42 +296,68 @@
                     >
                       <div
                         style="
+                          display: flex;
+                          align-items: center;
+                          justify-content: space-between;
+                          gap: 10px;
                           padding: 13px 16px;
                           border-bottom: 1px solid #efede7;
-                          font-size: 13px;
-                          font-weight: 700;
                         "
                       >
-                        Notifications
+                        <span style="font-size: 13px; font-weight: 700">Notifications</span>
+                        <span
+                          style="
+                            font-family: 'IBM Plex Mono', monospace;
+                            font-size: 10.5px;
+                            color: #5a6470;
+                          "
+                          >{{ unreadCountLabel }}</span
+                        >
                       </div>
-                      <sc-for list="{{ notifications }}" as="nt" hint-placeholder-count="3">
-                        <div
+                      <sc-for list="{{ notifications }}" as="nt" hint-placeholder-count="4">
+                        <button
+                          sc-camel-on-click="{{ nt.open }}"
                           style="
                             display: flex;
                             gap: 11px;
-                            padding: 13px 16px;
+                            width: 100%;
+                            text-align: left;
+                            background: none;
+                            border: 0;
                             border-bottom: 1px solid #f3f1eb;
+                            padding: 13px 16px;
+                            cursor: pointer;
+                            transition: background 0.15s;
                           "
+                          style-hover="background:#FBF9F5"
                         >
                           <span
-                            style="
-                              width: 7px;
-                              height: 7px;
-                              border-radius: 99px;
-                              background: #e2572a;
-                              margin-top: 6px;
-                              flex: none;
-                            "
+                            sc-camel-style="width:7px;height:7px;border-radius:99px;flex:none;margin-top:6px;background:{{ nt.dot }};transition:background .25s"
                           ></span>
-                          <div>
-                            <div style="font-size: 13.5px; font-weight: 600; color: #10151b">
-                              {{ nt.title }}
-                            </div>
-                            <div style="font-size: 12.5px; color: #55606c; margin-top: 2px">
-                              {{ nt.body }}
-                            </div>
-                            <div
+                          <span style="flex: 1; min-width: 0">
+                            <span
                               style="
+                                display: block;
+                                font-size: 13.5px;
+                                font-weight: 600;
+                                color: #10151b;
+                              "
+                            >
+                              {{ nt.title }}
+                            </span>
+                            <span
+                              style="
+                                display: block;
+                                font-size: 12.5px;
+                                color: #55606c;
+                                margin-top: 2px;
+                              "
+                            >
+                              {{ nt.body }}
+                            </span>
+                            <span
+                              style="
+                                display: block;
                                 font-family: 'IBM Plex Mono', monospace;
                                 font-size: 10.5px;
                                 color: #5a6470;
@@ -336,9 +365,9 @@
                               "
                             >
                               {{ nt.when }}
-                            </div>
-                          </div>
-                        </div>
+                            </span>
+                          </span>
+                        </button>
                       </sc-for>
                     </div>
                   </sc-if>
@@ -513,238 +542,811 @@
         </sc-if>
 
         <main id="otu-main" style="flex: 1">
-          <div style="max-width: 1340px; margin: 0 auto; padding: 52px clamp(24px, 4vw, 44px) 96px">
-            <h1
-              style="
-                margin: 0;
-                font-size: clamp(32px, 4.2vw, 46px);
-                letter-spacing: -0.035em;
-                font-weight: 800;
-              "
-            >
-              Welcome back, {{ meFirst }}
-            </h1>
+          <section
+            style="
+              border-bottom: 1px solid #e6e4de;
+              background-color: #fdfdfc;
+              background-image:
+                linear-gradient(rgba(0, 65, 122, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 65, 122, 0.05) 1px, transparent 1px),
+                linear-gradient(rgba(0, 65, 122, 0.085) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 65, 122, 0.085) 1px, transparent 1px);
+              background-size:
+                24px 24px,
+                24px 24px,
+                120px 120px,
+                120px 120px;
+            "
+          >
             <div
-              style="
-                display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
-                gap: 2px;
-                margin-top: 32px;
-                background: #e6e4de;
-                border: 1px solid #e6e4de;
-                border-radius: 12px;
-                overflow: hidden;
-              "
+              style="max-width: 1340px; margin: 0 auto; padding: 40px clamp(24px, 4vw, 44px) 42px"
             >
-              <sc-for list="{{ dashStats }}" as="s" hint-placeholder-count="3">
-                <div style="background: #fff; padding: 26px 28px">
-                  <div style="font-size: 38px; font-weight: 800; letter-spacing: -0.04em">
-                    {{ s.value }}
-                  </div>
+              <div
+                style="
+                  display: flex;
+                  align-items: flex-end;
+                  justify-content: space-between;
+                  gap: 24px;
+                  flex-wrap: wrap;
+                "
+              >
+                <div style="min-width: min(360px, 100%)">
                   <div
                     style="
+                      display: flex;
+                      align-items: center;
+                      gap: 8px;
                       font-family: 'IBM Plex Mono', monospace;
-                      font-size: 11.5px;
-                      letter-spacing: 0.08em;
-                      color: #55606c;
-                      margin-top: 6px;
+                      font-size: 11px;
+                      letter-spacing: 0.1em;
+                      color: #00417a;
                     "
                   >
-                    {{ s.label }}
+                    <span
+                      style="width: 6px; height: 6px; background: #e2572a; border-radius: 1px"
+                    ></span>
+                    DASHBOARD · FALL 2026
                   </div>
+                  <h1
+                    style="
+                      margin: 10px 0 0;
+                      font-size: clamp(28px, 3.4vw, 38px);
+                      letter-spacing: -0.035em;
+                      font-weight: 800;
+                      line-height: 1.05;
+                      text-wrap: balance;
+                    "
+                  >
+                    Welcome back, {{ meFirst }}
+                  </h1>
+                  <p
+                    style="
+                      margin: 10px 0 0;
+                      font-size: 15.5px;
+                      line-height: 1.55;
+                      color: #3d4855;
+                      max-width: 48ch;
+                      text-wrap: pretty;
+                    "
+                  >
+                    Your projects, collaborations, and activity in one place.
+                  </p>
                 </div>
-              </sc-for>
-            </div>
-            <div
-              style="
-                display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
-                gap: 26px;
-                margin-top: 38px;
-              "
-            >
-              <div>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap">
+                  <button
+                    sc-camel-on-click="{{ goSubmit }}"
+                    style="
+                      display: inline-flex;
+                      align-items: center;
+                      gap: 8px;
+                      background: #00417a;
+                      color: #fff;
+                      border: 0;
+                      border-radius: 9px;
+                      padding: 11px 18px;
+                      font-size: 14px;
+                      font-weight: 700;
+                      cursor: pointer;
+                      transition: background 0.18s;
+                    "
+                    style-hover="background:#002C52"
+                  >
+                    <svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 14 14"
+                      fill="none"
+                      stroke="#fff"
+                      stroke-width="1.8"
+                      stroke-linecap="round"
+                      aria-hidden="true"
+                    >
+                      <path d="M7 2.5v9M2.5 7h9"></path>
+                    </svg>
+                    New project
+                  </button>
+                  <button
+                    sc-camel-on-click="{{ goProjects }}"
+                    style="
+                      background: #fff;
+                      color: #10151b;
+                      border: 1px solid #d2cec4;
+                      border-radius: 9px;
+                      padding: 11px 18px;
+                      font-size: 14px;
+                      font-weight: 700;
+                      cursor: pointer;
+                      transition:
+                        border-color 0.18s,
+                        color 0.18s;
+                    "
+                    style-hover="border-color:#00417A;color:#00417A"
+                  >
+                    Browse projects
+                  </button>
+                </div>
+              </div>
+
+              <div
+                style="
+                  display: grid;
+                  grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr));
+                  gap: 14px;
+                  margin-top: 30px;
+                "
+              >
                 <div
                   style="
                     display: flex;
                     align-items: center;
-                    justify-content: space-between;
-                    margin-bottom: 16px;
+                    gap: 14px;
+                    background: #fff;
+                    border: 1px solid #e6e4de;
+                    border-radius: 12px;
+                    padding: 18px 20px;
+                    box-shadow: 0 1px 2px rgba(16, 21, 27, 0.03);
                   "
                 >
-                  <h2
-                    style="margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -0.025em"
-                  >
-                    My Projects
-                  </h2>
-                  <button
-                    sc-camel-on-click="{{ goSubmit }}"
+                  <span
                     style="
-                      background: #00417a;
-                      color: #fff;
-                      border: 0;
-                      border-radius: 8px;
-                      padding: 9px 16px;
-                      font-size: 13.5px;
-                      font-weight: 700;
-                      cursor: pointer;
+                      width: 42px;
+                      height: 42px;
+                      border-radius: 10px;
+                      background: #f2f7fc;
+                      border: 1px solid #dce7f1;
+                      display: grid;
+                      place-items: center;
+                      flex: none;
                     "
                   >
-                    New project
-                  </button>
+                    <svg
+                      width="19"
+                      height="19"
+                      viewBox="0 0 20 20"
+                      fill="none"
+                      stroke="#00417A"
+                      stroke-width="1.6"
+                      stroke-linejoin="round"
+                      aria-hidden="true"
+                    >
+                      <path
+                        d="M3 5.5A1.5 1.5 0 0 1 4.5 4h3L9 6h6.5A1.5 1.5 0 0 1 17 7.5v7A1.5 1.5 0 0 1 15.5 16h-11A1.5 1.5 0 0 1 3 14.5Z"
+                      ></path>
+                    </svg>
+                  </span>
+                  <div style="min-width: 0">
+                    <div
+                      style="
+                        font-size: 30px;
+                        font-weight: 800;
+                        letter-spacing: -0.03em;
+                        line-height: 1;
+                        font-variant-numeric: tabular-nums;
+                      "
+                    >
+                      {{ projectCount }}
+                    </div>
+                    <div
+                      style="
+                        font-family: 'IBM Plex Mono', monospace;
+                        font-size: 11px;
+                        letter-spacing: 0.09em;
+                        color: #5a6470;
+                        margin-top: 6px;
+                      "
+                    >
+                      PROJECTS
+                    </div>
+                  </div>
+                </div>
+                <div
+                  style="
+                    display: flex;
+                    align-items: center;
+                    gap: 14px;
+                    background: #fff;
+                    border: 1px solid #e6e4de;
+                    border-radius: 12px;
+                    padding: 18px 20px;
+                    box-shadow: 0 1px 2px rgba(16, 21, 27, 0.03);
+                  "
+                >
+                  <span
+                    style="
+                      width: 42px;
+                      height: 42px;
+                      border-radius: 10px;
+                      background: #fdf2ee;
+                      border: 1px solid #f3ddd3;
+                      display: grid;
+                      place-items: center;
+                      flex: none;
+                    "
+                  >
+                    <svg
+                      width="19"
+                      height="19"
+                      viewBox="0 0 20 20"
+                      fill="none"
+                      stroke="#E2572A"
+                      stroke-width="1.7"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      aria-hidden="true"
+                    >
+                      <path d="M10 16.5V4M5 9l5-5 5 5"></path>
+                    </svg>
+                  </span>
+                  <div style="min-width: 0">
+                    <div
+                      style="
+                        font-size: 30px;
+                        font-weight: 800;
+                        letter-spacing: -0.03em;
+                        line-height: 1;
+                        font-variant-numeric: tabular-nums;
+                      "
+                    >
+                      {{ upvoteTotal }}
+                    </div>
+                    <div
+                      style="
+                        font-family: 'IBM Plex Mono', monospace;
+                        font-size: 11px;
+                        letter-spacing: 0.09em;
+                        color: #5a6470;
+                        margin-top: 6px;
+                      "
+                    >
+                      UPVOTES
+                    </div>
+                  </div>
+                </div>
+                <div
+                  style="
+                    display: flex;
+                    align-items: center;
+                    gap: 14px;
+                    background: #fff;
+                    border: 1px solid #e6e4de;
+                    border-radius: 12px;
+                    padding: 18px 20px;
+                    box-shadow: 0 1px 2px rgba(16, 21, 27, 0.03);
+                  "
+                >
+                  <span
+                    style="
+                      width: 42px;
+                      height: 42px;
+                      border-radius: 10px;
+                      background: #f2f7fc;
+                      border: 1px solid #dce7f1;
+                      display: grid;
+                      place-items: center;
+                      flex: none;
+                    "
+                  >
+                    <svg
+                      width="19"
+                      height="19"
+                      viewBox="0 0 20 20"
+                      fill="none"
+                      stroke="#00417A"
+                      stroke-width="1.6"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      aria-hidden="true"
+                    >
+                      <path
+                        d="M2.5 10S5.5 4.8 10 4.8 17.5 10 17.5 10 14.5 15.2 10 15.2 2.5 10 2.5 10Z"
+                      ></path>
+                      <circle cx="10" cy="10" r="2.4"></circle>
+                    </svg>
+                  </span>
+                  <div style="min-width: 0">
+                    <div
+                      style="
+                        font-size: 30px;
+                        font-weight: 800;
+                        letter-spacing: -0.03em;
+                        line-height: 1;
+                        font-variant-numeric: tabular-nums;
+                      "
+                    >
+                      {{ profileViews }}
+                    </div>
+                    <div
+                      style="
+                        font-family: 'IBM Plex Mono', monospace;
+                        font-size: 11px;
+                        letter-spacing: 0.09em;
+                        color: #5a6470;
+                        margin-top: 6px;
+                      "
+                    >
+                      PROFILE VIEWS
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <div style="max-width: 1340px; margin: 0 auto; padding: 36px clamp(24px, 4vw, 44px) 96px">
+            <div sc-camel-style="{{ dashCols }}">
+              <div>
+                <div
+                  style="
+                    display: flex;
+                    align-items: baseline;
+                    justify-content: space-between;
+                    gap: 12px;
+                    margin-bottom: 14px;
+                  "
+                >
+                  <h2 style="margin: 0; font-size: 20px; font-weight: 800; letter-spacing: -0.02em">
+                    My Projects
+                  </h2>
+                  <span sc-camel-style="{{ projectMetaStyle }}">{{ projectMeta }}</span>
                 </div>
                 <div
                   style="
                     border: 1px solid #e6e4de;
                     border-radius: 12px;
                     background: #fff;
-                    overflow: hidden;
+                    box-shadow: 0 1px 2px rgba(16, 21, 27, 0.03);
                   "
                 >
                   <sc-for list="{{ myProjects }}" as="p" hint-placeholder-count="4">
-                    <div
-                      style="
-                        display: flex;
-                        align-items: center;
-                        gap: 14px;
-                        padding: 18px 20px;
-                        border-bottom: 1px solid #f1efe9;
-                      "
+                    <button
+                      sc-camel-on-click="{{ p.open }}"
+                      sc-camel-style="{{ p.row }}"
+                      style-hover="background:#FBF9F5"
                     >
-                      <div
+                      <span
                         style="
-                          width: 52px;
-                          height: 38px;
-                          border-radius: 6px;
+                          position: relative;
+                          width: 58px;
+                          height: 42px;
+                          border-radius: 8px;
                           overflow: hidden;
                           flex: none;
-                          position: relative;
+                          border: 1px solid #eeebe4;
                         "
                       >
-                        <div sc-camel-style="{{ p.art }}"></div>
-                      </div>
-                      <div style="flex: 1; min-width: 0">
-                        <div style="font-size: 15.5px; font-weight: 700">{{ p.title }}</div>
-                        <div
+                        <span sc-camel-style="{{ p.art }}"></span>
+                      </span>
+                      <span style="flex: 1; min-width: 0">
+                        <span
                           style="
+                            display: block;
+                            font-size: 15.5px;
+                            font-weight: 700;
+                            letter-spacing: -0.01em;
+                            color: #10151b;
+                          "
+                          >{{ p.title }}</span
+                        >
+                        <span
+                          style="
+                            display: block;
                             font-family: 'IBM Plex Mono', monospace;
                             font-size: 11px;
                             color: #55606c;
-                            margin-top: 3px;
+                            margin-top: 4px;
                           "
+                          >{{ p.meta }}</span
                         >
-                          {{ p.meta }}
-                        </div>
-                      </div>
+                      </span>
+                      <span sc-camel-style="{{ p.statusStyle }}">
+                        <span
+                          sc-camel-style="width:6px;height:6px;border-radius:99px;flex:none;background:{{ p.statusDot }}"
+                        ></span
+                        >{{ p.status }}
+                      </span>
+                      <svg
+                        width="15"
+                        height="15"
+                        viewBox="0 0 16 16"
+                        fill="none"
+                        stroke="#8A93A0"
+                        stroke-width="1.6"
+                        stroke-linecap="round"
+                        style="flex: none"
+                        aria-hidden="true"
+                      >
+                        <path d="M6 3.5 10.5 8 6 12.5"></path>
+                      </svg>
+                    </button>
+                  </sc-for>
+                  <sc-if value="{{ noProjects }}" hint-placeholder-val="{{ false }}">
+                    <div style="padding: 34px 24px; text-align: center">
                       <span
-                        sc-camel-style="background:{{ p.statusBg }};color:{{ p.statusFg }};border-radius:6px;padding:5px 10px;font-size:12px;font-weight:700;white-space:nowrap"
-                        >{{ p.status }}</span
+                        style="
+                          width: 44px;
+                          height: 44px;
+                          border-radius: 12px;
+                          background: #f2f7fc;
+                          border: 1px solid #dce7f1;
+                          display: inline-grid;
+                          place-items: center;
+                        "
                       >
-                    </div>
-                  </sc-for>
-                </div>
-              </div>
-              <div>
-                <h2
-                  style="
-                    margin: 0 0 16px;
-                    font-size: 24px;
-                    font-weight: 800;
-                    letter-spacing: -0.025em;
-                  "
-                >
-                  Collaboration requests
-                </h2>
-                <div
-                  style="
-                    border: 1px solid #e6e4de;
-                    border-radius: 12px;
-                    background: #fff;
-                    overflow: hidden;
-                    margin-bottom: 26px;
-                  "
-                >
-                  <sc-for list="{{ collabRequests }}" as="c" hint-placeholder-count="2">
-                    <div style="padding: 18px 20px; border-bottom: 1px solid #f1efe9">
-                      <div style="font-size: 15px; font-weight: 700">{{ c.name }}</div>
+                        <svg
+                          width="21"
+                          height="21"
+                          viewBox="0 0 20 20"
+                          fill="none"
+                          stroke="#00417A"
+                          stroke-width="1.6"
+                          stroke-linejoin="round"
+                          aria-hidden="true"
+                        >
+                          <path
+                            d="M3 5.5A1.5 1.5 0 0 1 4.5 4h3L9 6h6.5A1.5 1.5 0 0 1 17 7.5v7A1.5 1.5 0 0 1 15.5 16h-11A1.5 1.5 0 0 1 3 14.5Z"
+                          ></path>
+                          <path d="M10 9v5M7.5 11.5h5"></path>
+                        </svg>
+                      </span>
+                      <div style="font-size: 14.5px; font-weight: 700; margin-top: 12px">
+                        No projects yet
+                      </div>
                       <div
-                        style="font-size: 13.5px; color: #3d4855; margin-top: 4px; line-height: 1.5"
+                        style="
+                          font-size: 13px;
+                          line-height: 1.55;
+                          color: #55606c;
+                          margin-top: 5px;
+                          max-width: 38ch;
+                          margin-left: auto;
+                          margin-right: auto;
+                        "
                       >
-                        {{ c.body }}
+                        Submit your first project and it will show up here while it moves through
+                        review.
                       </div>
-                      <div style="display: flex; gap: 8px; margin-top: 12px">
-                        <button
-                          sc-camel-on-click="{{ c.accept }}"
-                          style="
-                            background: #00417a;
-                            color: #fff;
-                            border: 0;
-                            border-radius: 7px;
-                            padding: 7px 14px;
-                            font-size: 12.5px;
-                            font-weight: 700;
-                            cursor: pointer;
-                          "
-                        >
-                          Accept
-                        </button>
-                        <button
-                          sc-camel-on-click="{{ c.decline }}"
-                          style="
-                            background: #fff;
-                            border: 1px solid #d9d6ce;
-                            border-radius: 7px;
-                            padding: 7px 14px;
-                            font-size: 12.5px;
-                            font-weight: 700;
-                            color: #3d4855;
-                            cursor: pointer;
-                          "
-                        >
-                          Decline
-                        </button>
-                      </div>
-                    </div>
-                  </sc-for>
-                  <sc-if value="{{ noRequests }}" hint-placeholder-val="{{ false }}">
-                    <div style="padding: 18px 20px; font-size: 14px; color: #55606c">
-                      No pending requests. New ones show up here and in your notifications.
+                      <button
+                        sc-camel-on-click="{{ goSubmit }}"
+                        style="
+                          margin-top: 16px;
+                          background: #00417a;
+                          color: #fff;
+                          border: 0;
+                          border-radius: 8px;
+                          padding: 10px 18px;
+                          font-size: 13.5px;
+                          font-weight: 700;
+                          cursor: pointer;
+                          transition: background 0.16s;
+                        "
+                        style-hover="background:#002C52"
+                      >
+                        New project
+                      </button>
                     </div>
                   </sc-if>
                 </div>
-                <h2
-                  style="
-                    margin: 0 0 16px;
-                    font-size: 24px;
-                    font-weight: 800;
-                    letter-spacing: -0.025em;
-                  "
-                >
-                  Notifications
-                </h2>
+              </div>
+              <div>
                 <div
                   style="
-                    border: 1px solid #e6e4de;
-                    border-radius: 12px;
-                    background: #fff;
-                    overflow: hidden;
+                    display: flex;
+                    align-items: baseline;
+                    justify-content: space-between;
+                    gap: 12px;
+                    margin-bottom: 14px;
                   "
                 >
-                  <sc-for list="{{ notifications }}" as="n" hint-placeholder-count="4">
-                    <div style="padding: 15px 20px; border-bottom: 1px solid #f1efe9">
-                      <div style="font-size: 14.5px; font-weight: 600">{{ n.title }}</div>
+                  <h2 style="margin: 0; font-size: 20px; font-weight: 800; letter-spacing: -0.02em">
+                    Collaboration requests
+                  </h2>
+                  <span
+                    style="
+                      font-family: 'IBM Plex Mono', monospace;
+                      font-size: 11px;
+                      letter-spacing: 0.06em;
+                      color: #5a6470;
+                    "
+                    >{{ requestMeta }}</span
+                  >
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 12px">
+                  <sc-for list="{{ collabRequests }}" as="c" hint-placeholder-count="2">
+                    <article
+                      style="
+                        background: #fff;
+                        border: 1px solid #e6e4de;
+                        border-radius: 12px;
+                        padding: 16px;
+                        box-shadow: 0 1px 2px rgba(16, 21, 27, 0.03);
+                      "
+                    >
+                      <div style="display: flex; gap: 12px">
+                        <span
+                          style="
+                            width: 38px;
+                            height: 38px;
+                            border-radius: 99px;
+                            background: #eef4fa;
+                            border: 1px solid #dce7f1;
+                            color: #00417a;
+                            font-size: 13px;
+                            font-weight: 700;
+                            display: grid;
+                            place-items: center;
+                            flex: none;
+                          "
+                          >{{ c.initials }}</span
+                        >
+                        <div style="flex: 1; min-width: 0">
+                          <div
+                            style="
+                              display: flex;
+                              align-items: baseline;
+                              justify-content: space-between;
+                              gap: 8px;
+                            "
+                          >
+                            <span style="font-size: 14.5px; font-weight: 700; color: #10151b"
+                              >{{ c.name }}</span
+                            >
+                            <span
+                              style="
+                                font-family: 'IBM Plex Mono', monospace;
+                                font-size: 10.5px;
+                                color: #5a6470;
+                                white-space: nowrap;
+                              "
+                              >{{ c.when }}</span
+                            >
+                          </div>
+                          <div
+                            style="
+                              font-family: 'IBM Plex Mono', monospace;
+                              font-size: 10.5px;
+                              letter-spacing: 0.04em;
+                              color: #00417a;
+                              margin-top: 5px;
+                            "
+                          >
+                            RE: {{ c.project }}
+                          </div>
+                          <p
+                            style="
+                              margin: 8px 0 0;
+                              font-size: 13.5px;
+                              line-height: 1.55;
+                              color: #3d4855;
+                            "
+                          >
+                            {{ c.body }}
+                          </p>
+                          <div style="display: flex; gap: 8px; margin-top: 13px">
+                            <button
+                              sc-camel-on-click="{{ c.accept }}"
+                              sc-camel-style="{{ c.acceptStyle }}"
+                              sc-camel-disabled="{{ c.busy }}"
+                              style-hover="background:#002C52"
+                            >
+                              {{ c.acceptLabel }}
+                            </button>
+                            <button
+                              sc-camel-on-click="{{ c.decline }}"
+                              sc-camel-style="{{ c.declineStyle }}"
+                              sc-camel-disabled="{{ c.busy }}"
+                              style-hover="border-color:#00417A;color:#00417A"
+                            >
+                              {{ c.declineLabel }}
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </article>
+                  </sc-for>
+                  <sc-if value="{{ noRequests }}" hint-placeholder-val="{{ false }}">
+                    <div
+                      style="
+                        border: 1px dashed #dcd8ce;
+                        border-radius: 12px;
+                        background: #fdfdfc;
+                        padding: 28px 22px;
+                        text-align: center;
+                      "
+                    >
+                      <span
+                        style="
+                          width: 42px;
+                          height: 42px;
+                          border-radius: 11px;
+                          background: #f2f7fc;
+                          border: 1px solid #dce7f1;
+                          display: inline-grid;
+                          place-items: center;
+                        "
+                      >
+                        <svg
+                          width="20"
+                          height="20"
+                          viewBox="0 0 20 20"
+                          fill="none"
+                          stroke="#00417A"
+                          stroke-width="1.6"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          aria-hidden="true"
+                        >
+                          <circle cx="7.5" cy="7" r="3"></circle>
+                          <path d="M2.5 16.5a5 5 0 0 1 10 0"></path>
+                          <path d="M13.2 5.6a2.8 2.8 0 0 1 0 5.4"></path>
+                          <path d="M14 12.4a4.2 4.2 0 0 1 3.5 4.1"></path>
+                        </svg>
+                      </span>
+                      <div style="font-size: 14.5px; font-weight: 700; margin-top: 12px">
+                        No pending requests
+                      </div>
                       <div
+                        style="
+                          font-size: 13px;
+                          line-height: 1.55;
+                          color: #55606c;
+                          margin-top: 5px;
+                          max-width: 34ch;
+                          margin-left: auto;
+                          margin-right: auto;
+                        "
+                      >
+                        When a classmate offers to help on one of your projects, it shows up here.
+                      </div>
+                    </div>
+                  </sc-if>
+                </div>
+
+                <div id="otu-notifications" style="margin-top: 30px">
+                  <div
+                    style="
+                      display: flex;
+                      align-items: baseline;
+                      justify-content: space-between;
+                      gap: 12px;
+                      margin-bottom: 14px;
+                    "
+                  >
+                    <h2
+                      style="margin: 0; font-size: 20px; font-weight: 800; letter-spacing: -0.02em"
+                    >
+                      Notifications
+                    </h2>
+                    <div style="display: flex; align-items: baseline; gap: 12px">
+                      <span
                         style="
                           font-family: 'IBM Plex Mono', monospace;
                           font-size: 11px;
+                          letter-spacing: 0.06em;
                           color: #5a6470;
-                          margin-top: 4px;
                         "
+                        >{{ unreadCountLabel }}</span
                       >
-                        {{ n.when }}
-                      </div>
+                      <sc-if value="{{ hasUnread }}" hint-placeholder-val="{{ false }}">
+                        <button
+                          sc-camel-on-click="{{ markAllRead }}"
+                          style="
+                            background: none;
+                            border: 0;
+                            padding: 0;
+                            font-family: 'IBM Plex Mono', monospace;
+                            font-size: 10.5px;
+                            letter-spacing: 0.06em;
+                            font-weight: 500;
+                            color: #00417a;
+                            cursor: pointer;
+                            text-decoration: underline;
+                            text-decoration-color: #c9d6e3;
+                            text-underline-offset: 3px;
+                            transition:
+                              color 0.16s,
+                              text-decoration-color 0.16s;
+                          "
+                          style-hover="color:#002C52;text-decoration-color:#00417A"
+                        >
+                          Mark all read
+                        </button>
+                      </sc-if>
                     </div>
-                  </sc-for>
+                  </div>
+                  <div
+                    style="
+                      background: #fff;
+                      border: 1px solid #e6e4de;
+                      border-radius: 12px;
+                      box-shadow: 0 1px 2px rgba(16, 21, 27, 0.03);
+                    "
+                  >
+                    <sc-for list="{{ notifications }}" as="n" hint-placeholder-count="4">
+                      <button
+                        sc-camel-on-click="{{ n.open }}"
+                        sc-camel-style="{{ n.row }}"
+                        style-hover="background:#FBF9F5"
+                      >
+                        <span
+                          sc-camel-style="width:7px;height:7px;border-radius:99px;flex:none;margin-top:5px;background:{{ n.dot }};transition:background .25s"
+                        ></span>
+                        <span style="flex: 1; min-width: 0">
+                          <span
+                            sc-camel-style="display:block;font-size:13.5px;color:#10151b;{{ n.titleStyle }}"
+                            >{{ n.title }}</span
+                          >
+                          <span
+                            style="
+                              display: block;
+                              font-size: 12.5px;
+                              line-height: 1.45;
+                              color: #55606c;
+                              margin-top: 3px;
+                            "
+                            >{{ n.body }}</span
+                          >
+                          <span
+                            style="
+                              display: block;
+                              font-family: 'IBM Plex Mono', monospace;
+                              font-size: 10.5px;
+                              color: #5a6470;
+                              margin-top: 5px;
+                            "
+                            >{{ n.when }}</span
+                          >
+                        </span>
+                      </button>
+                    </sc-for>
+                    <sc-if value="{{ noNotifs }}" hint-placeholder-val="{{ false }}">
+                      <div style="padding: 28px 22px; text-align: center">
+                        <span
+                          style="
+                            width: 42px;
+                            height: 42px;
+                            border-radius: 11px;
+                            background: #f1efe9;
+                            border: 1px solid #e2dfd6;
+                            display: inline-grid;
+                            place-items: center;
+                          "
+                        >
+                          <svg
+                            width="20"
+                            height="20"
+                            viewBox="0 0 20 20"
+                            fill="none"
+                            stroke="#3D4855"
+                            stroke-width="1.6"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            aria-hidden="true"
+                          >
+                            <path
+                              d="M5 8a5 5 0 1 1 10 0c0 3.5 1.2 4.6 1.2 4.6H3.8S5 11.5 5 8Z"
+                            ></path>
+                            <path d="M8.2 15.5a1.9 1.9 0 0 0 3.6 0"></path>
+                          </svg>
+                        </span>
+                        <div style="font-size: 14.5px; font-weight: 700; margin-top: 12px">
+                          You are all caught up
+                        </div>
+                        <div
+                          style="
+                            font-size: 13px;
+                            line-height: 1.55;
+                            color: #55606c;
+                            margin-top: 5px;
+                            max-width: 32ch;
+                            margin-left: auto;
+                            margin-right: auto;
+                          "
+                        >
+                          Approvals, upvotes, and collaboration requests appear here.
+                        </div>
+                      </div>
+                    </sc-if>
+                  </div>
                 </div>
               </div>
             </div>
@@ -865,36 +1467,137 @@
       </div>
     </x-dc>
     <script type="text/x-dc" data-dc-script="">
-      const DASH_STATS = [{ value: '3', label: 'PROJECTS' }, { value: '306', label: 'UPVOTES' }, { value: '1,284', label: 'PROFILE VIEWS' }]
-      const COLLAB_REQUESTS = [
-        { key: 'priya', name: 'Priya Nandakumar', body: 'Wants to help with the routing service on Campus Nav AR.' },
-        { key: 'daniel', name: 'Daniel Kovac', body: 'Offering IMU calibration work for the basement drift issue.' },
+      const PROFILE_VIEWS = 1284
+
+      // The signed-in student's own projects, with the live statuses from the approval workflow.
+      const MY_PROJECTS = [
+        { slug: 'campus-nav-ar', title: 'Campus Nav AR', meta: 'PUBLISHED · 142 UPVOTES · UPDATED 4 DAYS AGO', upvotes: 142, status: 'Published', tone: 'published', a: OTU.BLUE, b: '#FFB893', kind: 'nodes' },
+        { slug: 'notecrate', title: 'Notecrate', meta: 'SUBMITTED 2 DAYS AGO · IN REVIEW', upvotes: 0, status: 'Under Review', tone: 'review', a: OTU.BLUE, b: '#9EC7E8', kind: 'stack' },
+        { slug: 'sensor-log-viewer', title: 'Sensor Log Viewer', meta: 'DRAFT · LAST EDITED 6 DAYS AGO', upvotes: 0, status: 'Draft', tone: 'draft', a: '#2A3B4C', b: '#FFD2BC', kind: 'bars' },
+        { slug: 'study-room-finder', title: 'Study Room Finder', meta: 'NEEDS CHANGES · 1 NOTE FROM REVIEW', upvotes: 0, status: 'Rejected', tone: 'rejected', a: '#3A2C4C', b: '#FFB893', kind: 'wave' },
       ]
 
+      const COLLAB_REQUESTS = [
+        { key: 'priya', name: 'Priya Nandakumar', initials: 'PN', when: '2 HOURS AGO', project: 'Campus Nav AR', body: 'Wants to help with the routing service on Campus Nav AR.' },
+        { key: 'daniel', name: 'Daniel Kovac', initials: 'DK', when: 'YESTERDAY', project: 'Rover Sim', body: 'Offering IMU calibration work for the basement drift issue.' },
+      ]
+
+      const NOTIFICATIONS = [
+        { id: 'approve-nav', title: 'Campus Nav AR was approved', body: 'Your project is now public.', when: '2 HOURS AGO', unread: true, route: 'detail', slug: 'campus-nav-ar' },
+        { id: 'upvote-nav', title: 'Marcus Oyelaran upvoted Campus Nav AR', body: 'You have 142 upvotes total.', when: 'YESTERDAY', unread: true, route: 'detail', slug: 'campus-nav-ar' },
+        { id: 'collab-labqueue', title: 'Collaboration request on LabQueue', body: 'Priya wants to help with routing.', when: '2 DAYS AGO', unread: true, route: 'detail', slug: 'labqueue' },
+        { id: 'sprint-fall', title: 'Fall 2026 Sprint starts in 14 days', body: 'Build for Campus · registration open.', when: '3 DAYS AGO', unread: false, route: 'sprints', slug: null },
+      ]
+
+      const STATUS_TONES = {
+        published: { bg: '#E8F3EC', fg: '#1C6B42', dot: '#1F9D5C', border: '#CFE6D8' },
+        review: { bg: '#FBF3E4', fg: '#8A5A12', dot: '#D69A2D', border: '#EDDFC2' },
+        draft: { bg: '#F1EFE9', fg: '#3D4855', dot: '#8A93A0', border: '#E2DFD6' },
+        rejected: { bg: '#FBE9E4', fg: '#A83B15', dot: '#C0452A', border: '#F0D3C7' },
+      }
+
+      // Busy buttons stay dimmed and drop the pointer so a second click cannot fire mid-request.
+      const collabBtnStyle = (bg, fg, border, busy) =>
+        'background:' + bg + ';color:' + fg + ';border:' + border + ';border-radius:8px;padding:9px 16px;font-size:13px;font-weight:700;cursor:' + (busy ? 'default' : 'pointer') + ';opacity:' + (busy ? '0.6' : '1') + ';transition:background .16s,border-color .16s,color .16s,opacity .16s'
+
       class Component extends DCLogic {
-        state = OTU.state({ answered: {} })
+        state = OTU.state({ answered: {}, read: {}, pending: null })
         componentDidMount() { OTU.mount(this) }
         componentDidUpdate() { OTU.motion(this) }
-        componentWillUnmount() { OTU.unmount(this) }
+        componentWillUnmount() { OTU.unmount(this); clearTimeout(this._answerT) }
 
         renderVals() {
           const s = this.state
           const art = OTU.art
+
+          const myProjects = MY_PROJECTS.map((p, i, arr) => {
+            const t = STATUS_TONES[p.tone]
+            const radius = i === 0 ? '11px 11px 0 0' : i === arr.length - 1 ? '0 0 11px 11px' : '0'
+            return Object.assign({}, p, {
+              art: art(p.a, p.b, p.kind),
+              row: 'display:flex;align-items:center;gap:14px;width:100%;text-align:left;background:#fff;border:0;border-bottom:' + (i === arr.length - 1 ? '0' : '1px solid #F1EFE9') + ';border-radius:' + radius + ';padding:15px 18px;cursor:pointer;transition:background .15s',
+              statusStyle: 'display:inline-flex;align-items:center;gap:6px;flex:none;background:' + t.bg + ';color:' + t.fg + ';border:1px solid ' + t.border + ';border-radius:99px;padding:4px 10px;font-size:11.5px;font-weight:700;white-space:nowrap',
+              statusDot: t.dot,
+              open: () => OTU.go('detail', { slug: p.slug }),
+            })
+          })
+
+          // Demo only: the pending timer stands in for the request round-trip so the button shows a loading state.
           const answer = (c, verb) => () => {
-            this.setState({ answered: Object.assign({}, s.answered, { [c.key]: true }) })
-            OTU.flash(this, verb + ' · ' + c.name + ' has been notified')
+            this.setState({ pending: { key: c.key, verb } })
+            clearTimeout(this._answerT)
+            this._answerT = setTimeout(() => {
+              this.setState({ answered: Object.assign({}, this.state.answered, { [c.key]: true }), pending: null })
+              OTU.flash(this, (verb === 'accept' ? 'Accepted' : 'Declined') + ' · ' + c.name + ' has been notified')
+            }, 550)
           }
+
           const requests = COLLAB_REQUESTS.filter((c) => !s.answered[c.key])
+          const collabRequests = requests.map((c) => {
+            const busy = !!(s.pending && s.pending.key === c.key)
+            const busyVerb = busy ? s.pending.verb : null
+            return Object.assign({}, c, {
+              busy,
+              acceptLabel: busyVerb === 'accept' ? 'Accepting…' : 'Accept',
+              declineLabel: busyVerb === 'decline' ? 'Declining…' : 'Decline',
+              accept: busy ? () => {} : answer(c, 'accept'),
+              decline: busy ? () => {} : answer(c, 'decline'),
+              acceptStyle: collabBtnStyle('#00417A', '#fff', '0', busy),
+              declineStyle: collabBtnStyle('#fff', '#3D4855', '1px solid #D9D6CE', busy),
+            })
+          })
+
+          const read = s.read
+          const notifications = NOTIFICATIONS.map((n, i, arr) => {
+            const isRead = !!read[n.id] || !n.unread
+            const radius = i === 0 ? '11px 11px 0 0' : i === arr.length - 1 ? '0 0 11px 11px' : '0'
+            return {
+              id: n.id,
+              title: n.title,
+              body: n.body,
+              when: n.when,
+              dot: isRead ? '#D9D6CE' : '#E2572A',
+              titleStyle: isRead ? 'font-weight:600' : 'font-weight:700',
+              row: 'display:flex;gap:11px;width:100%;text-align:left;background:' + (isRead ? '#fff' : '#FFFCFA') + ';border:0;border-bottom:' + (i === arr.length - 1 ? '0' : '1px solid #F1EFE9') + ';border-radius:' + radius + ';padding:14px 16px;cursor:pointer;transition:background .15s',
+              open: () => {
+                this.setState({ read: Object.assign({}, this.state.read, { [n.id]: true }) })
+                if (n.slug) OTU.go(n.route, { slug: n.slug })
+                else OTU.go(n.route)
+              },
+            }
+          })
+
+          const unreadCount = NOTIFICATIONS.filter((n) => n.unread && !read[n.id]).length
+          const attention = myProjects.filter((p) => p.tone === 'review' || p.tone === 'rejected').length
+
           return Object.assign(OTU.chrome(this, 'dashboard'), {
-            dashStats: DASH_STATS,
-            myProjects: [
-              { title: 'Campus Nav AR', meta: 'PUBLISHED · 142 UPVOTES', status: 'Published', statusBg: '#E8F3EC', statusFg: '#1C6B42', art: art(OTU.BLUE, '#FFB893', 'nodes') },
-              { title: 'Notecrate', meta: 'SUBMITTED 2 DAYS AGO', status: 'Under Review', statusBg: '#FDEFE9', statusFg: '#A83B15', art: art(OTU.BLUE, '#9EC7E8', 'stack') },
-              { title: 'Sensor Log Viewer', meta: 'LAST EDITED 6 DAYS AGO', status: 'Draft', statusBg: '#F1EFE9', statusFg: '#3D4855', art: art('#2A3B4C', '#FFD2BC', 'bars') },
-              { title: 'Study Room Finder', meta: 'NEEDS CHANGES · SEE NOTES', status: 'Rejected', statusBg: '#FBE9E4', statusFg: '#A83B15', art: art('#3A2C4C', '#FFB893', 'wave') },
-            ],
-            collabRequests: requests.map((c) => Object.assign({}, c, { accept: answer(c, 'Accepted'), decline: answer(c, 'Declined') })),
+            notifCount: unreadCount,
+            hasUnread: unreadCount > 0,
+            unreadCountLabel: unreadCount > 0 ? unreadCount + ' UNREAD' : 'ALL CAUGHT UP',
+            markAllRead: () => {
+              const next = Object.assign({}, this.state.read)
+              NOTIFICATIONS.forEach((n) => {
+                next[n.id] = true
+              })
+              this.setState({ read: next })
+            },
+            notifications,
+            dashCols: s.isMobile
+              ? 'display:grid;grid-template-columns:minmax(0,1fr);gap:26px'
+              : 'display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:30px;align-items:start',
+            projectCount: myProjects.length,
+            projectMeta: attention > 0 ? attention + ' NEED ATTENTION' : myProjects.length + ' TOTAL',
+            projectMetaStyle:
+              'font-family:\'IBM Plex Mono\', monospace;font-size:11px;letter-spacing:.06em;color:' +
+              (attention > 0 ? '#A83B15' : '#5a6470'),
+            upvoteTotal: myProjects.reduce((sum, p) => sum + p.upvotes, 0),
+            profileViews: PROFILE_VIEWS.toLocaleString('en-US'),
+            myProjects,
+            noProjects: myProjects.length === 0,
+            collabRequests,
             noRequests: requests.length === 0,
+            requestMeta: requests.length + ' OPEN',
+            noNotifs: notifications.length === 0,
           })
         }
       }

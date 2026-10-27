@@ -1,4 +1,4 @@
-// Shared domain types for LaunchPad. These mirror the eventual Supabase table shapes.
+// Shared domain types for public discovery, private account pages, and profile inputs.
 
 export type UserRole = 'visitor' | 'student' | 'admin'
 
@@ -9,6 +9,17 @@ export interface User {
   avatarUrl: string | null
   role: UserRole
   bannedAt: string | null
+  /** Null until the student finishes creating their account after verifying their email. */
+  registeredAt: string | null
+}
+
+/** What a student fills in to finish creating their account. */
+export interface RegistrationDetails {
+  name: string
+  program: string
+  studyYear: string
+  skills: string[]
+  bio: string
 }
 
 export type ProjectStatus = 'pending' | 'approved' | 'rejected'
@@ -59,6 +70,9 @@ export interface ProjectQuery {
   sprintId?: string
   category?: ProjectCategory | 'All'
   search?: string
+  /** Every listed technology must appear in the project's tags. */
+  technologies?: string[]
+  openToContributions?: boolean
   page?: number
   perPage?: number
 }
@@ -87,7 +101,31 @@ export interface Sprint {
   projectCount: number
 }
 
-export type ProjectSort = 'top' | 'new'
+/** Trending ranks by recent engagement, top by total upvotes, new by creation date. */
+export type ProjectSort = 'trending' | 'top' | 'new'
+
+export interface TechnologyFacet {
+  name: string
+  projectCount: number
+}
+
+/** An admin-picked project shown above the feed, valid for a date window. */
+export interface FeaturedSelection {
+  project: Project
+  startsAt: string
+  endsAt: string
+}
+
+/** Public details about a builder, shown when their name or avatar is selected. */
+export interface PersonPreview {
+  name: string
+  avatarUrl: string | null
+  /** Academic program or year, for example "CS Year 3". Null when unspecified. */
+  headline: string | null
+  /** What they did on the project the preview was opened from. Null for project authors. */
+  roleOnProject: string | null
+  projectCount: number
+}
 
 export interface Comment {
   id: string
@@ -96,5 +134,34 @@ export interface Comment {
   authorName: string
   authorAvatarUrl: string | null
   body: string
+  createdAt: string
+}
+
+/** Public profile fields. Account email and privileges never belong in this shape. */
+export interface PublicProfile {
+  id: string
+  name: string
+  avatarUrl: string | null
+  program: string
+  studyYear: string
+  skills: string[]
+  bio: string
+  githubUrl: string | null
+}
+
+export interface AccountProfile extends PublicProfile {
+  email: string
+}
+
+export interface ProfileDetails extends RegistrationDetails {
+  githubUrl: string
+}
+
+export interface ActivityItem {
+  id: string
+  kind: 'project' | 'bookmark' | 'upvote' | 'comment'
+  projectId: string
+  title: string
+  slug: string
   createdAt: string
 }
