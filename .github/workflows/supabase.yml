@@ -11,6 +11,9 @@ on:
   pull_request:
     paths: ['supabase/**']
 
+permissions:
+  contents: read
+
 jobs:
   verify:
     if: github.event_name == 'pull_request'
