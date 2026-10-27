@@ -25,7 +25,11 @@ jobs:
         run: supabase db diff --local
 
   deploy:
-    if: github.event_name == 'push'
+    if: >-
+      github.event_name == 'push' &&
+      startsWith(secrets.SUPABASE_ACCESS_TOKEN, 'sbp_') &&
+      secrets.SUPABASE_DB_PASSWORD != '' &&
+      secrets.SUPABASE_PROJECT_REF != ''
     runs-on: ubuntu-latest
     environment: production
     env:
