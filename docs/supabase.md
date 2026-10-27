@@ -95,7 +95,8 @@ The deploy job needs three repository secrets under Settings > Secrets and varia
 | `SUPABASE_DB_PASSWORD`  | Project Settings > Database                                |
 | `SUPABASE_PROJECT_REF`  | `eavnzbmsfpslwdgpjfjv`                                     |
 
-Until all three exist the deploy job fails on every merge to main. The PR job needs none of them.
+The deploy job runs only when all three are set and `SUPABASE_ACCESS_TOKEN` starts with `sbp_`.
+Without that configuration the deploy job is skipped, while the PR job still runs normally.
 
 ## Still to do
 
