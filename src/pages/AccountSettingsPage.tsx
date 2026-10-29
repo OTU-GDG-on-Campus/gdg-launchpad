@@ -71,7 +71,7 @@ export function AccountSettingsPage() {
             to="/me/settings/profile"
             className="text-brand-700 mt-4 inline-flex min-h-10 items-center text-sm font-semibold"
           >
-            Edit public profile &#8599;
+            Edit profile, images, skills &amp; social links &#8599;
           </Link>
         </section>
         <section

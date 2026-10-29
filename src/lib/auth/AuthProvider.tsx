@@ -5,15 +5,13 @@ import {
   getCurrentUser,
   signInDemo,
   resetDemoData,
-  isBackendConfigured,
-  saveRegistration,
+  publishDeveloperProfile,
   sendEmailCode,
   signOutUser,
-  startDemoRegistration,
   subscribeToAuthChanges,
   verifyEmailCode,
 } from '@/lib/api/client'
-import type { RegistrationDetails, User } from '@/types'
+import type { OnboardingDetails, User } from '@/types'
 import { AuthContext, type AuthContextValue, type AuthMode, type AuthStatus } from './auth-context'
 import { allowedDomainsLabel, isAllowedStudentEmail } from './domain'
 
@@ -68,12 +66,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const verifyCode = useCallback(
-    async (email: string, code: string, mode: AuthMode) => {
+    async (email: string, code: string) => {
       await verifyEmailCode(email, code)
-      const next =
-        !isBackendConfigured && mode === 'register'
-          ? startDemoRegistration(email)
-          : await getCurrentUser()
+      const next = await getCurrentUser()
       if (!next) throw new Error('Your account could not be loaded. Try again.')
       setError(null)
       applyUser(next)
@@ -97,10 +92,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [applyUser])
 
   const completeRegistration = useCallback(
-    async (details: RegistrationDetails) => {
+    async (details: OnboardingDetails, draftRevision: number) => {
       if (!user) throw new Error('Verify your email first.')
       const request = revision.current
-      const next = await saveRegistration(user, details)
+      await publishDeveloperProfile(details, draftRevision)
+      const next = await getCurrentUser()
       if (request === revision.current) applyUser(next)
     },
     [user, applyUser],

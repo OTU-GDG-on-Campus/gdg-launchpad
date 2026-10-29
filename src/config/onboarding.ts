@@ -1,0 +1,98 @@
+// Maintainable onboarding choices; custom programs and skill labels are also supported.
+
+export const ONBOARDING_STEPS = [
+  'University email',
+  'Verify email',
+  'About you',
+  'Developer identity',
+  'Profile images',
+  'Your links',
+  'Review & finish',
+]
+
+export const SKILL_OPTIONS = {
+  languages: [
+    'Python',
+    'Java',
+    'JavaScript',
+    'TypeScript',
+    'C++',
+    'C',
+    'C#',
+    'SQL',
+    'Go',
+    'Rust',
+    'HTML',
+    'CSS',
+  ],
+  frameworks: [
+    'React',
+    'Next.js',
+    'Node.js',
+    'Express',
+    'Django',
+    'Flask',
+    'FastAPI',
+    'Spring Boot',
+    'Tailwind CSS',
+  ],
+  tools: [
+    'Git',
+    'GitHub',
+    'Docker',
+    'Supabase',
+    'Firebase',
+    'MongoDB',
+    'PostgreSQL',
+    'AWS',
+    'Azure',
+    'Figma',
+  ],
+  interests: [
+    'Artificial Intelligence',
+    'Machine Learning',
+    'Data Science',
+    'Cybersecurity',
+    'Web Development',
+    'Mobile Development',
+    'Cloud Computing',
+    'Game Development',
+    'UI/UX',
+    'Open Source',
+    'Robotics',
+  ],
+  roles: [
+    'Frontend developer',
+    'Backend developer',
+    'Full-stack developer',
+    'Designer',
+    'Data scientist',
+    'Project lead',
+    'Researcher',
+  ],
+}
+
+export const COLLABORATION_OPTIONS = [
+  'Looking for teammates',
+  'Open to contributing to projects',
+  'Interested in hackathons',
+  'Looking for mentors',
+  'Willing to mentor other students',
+]
+
+export const LINK_PLATFORMS = [
+  { id: 'github', label: 'GitHub', hosts: ['github.com'] },
+  { id: 'linkedin', label: 'LinkedIn', hosts: ['linkedin.com'] },
+  { id: 'portfolio', label: 'Portfolio', hosts: [] },
+  { id: 'discord', label: 'Discord', hosts: [] },
+  { id: 'instagram', label: 'Instagram', hosts: ['instagram.com'] },
+  { id: 'x', label: 'X (Twitter)', hosts: ['x.com', 'twitter.com'] },
+  { id: 'gitlab', label: 'GitLab', hosts: ['gitlab.com'] },
+  { id: 'leetcode', label: 'LeetCode', hosts: ['leetcode.com'] },
+  { id: 'stackoverflow', label: 'Stack Overflow', hosts: ['stackoverflow.com'] },
+  { id: 'devto', label: 'Dev.to', hosts: ['dev.to'] },
+  { id: 'youtube', label: 'YouTube', hosts: ['youtube.com', 'youtu.be'] },
+  { id: 'behance', label: 'Behance', hosts: ['behance.net'] },
+  { id: 'dribbble', label: 'Dribbble', hosts: ['dribbble.com'] },
+  { id: 'custom', label: 'Custom website', hosts: [] },
+]

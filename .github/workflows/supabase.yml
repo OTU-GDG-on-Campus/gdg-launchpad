@@ -24,6 +24,7 @@ jobs:
         with:
           version: latest
       - run: supabase db start
+      - run: supabase test db
       - name: Confirm migrations leave no undeclared schema drift
         run: supabase db diff --local
 

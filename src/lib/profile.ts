@@ -5,11 +5,13 @@ import type { ProfileDetails } from '@/types'
 export const PROGRAMS = [
   'Computer Science',
   'Software Engineering',
+  'Information Technology',
+  'Computer Engineering',
   'Electrical Engineering',
   'Mechatronics Engineering',
   'Business & IT',
 ]
-export const STUDY_YEARS = ['Year 1', 'Year 2', 'Year 3', 'Year 4']
+export const STUDY_YEARS = ['Year 1', 'Year 2', 'Year 3', 'Year 4', 'Year 5+', 'Graduate']
 
 export function normalizeProfile(details: ProfileDetails): ProfileDetails {
   const result = {
@@ -22,7 +24,8 @@ export function normalizeProfile(details: ProfileDetails): ProfileDetails {
   }
   if (!result.name || result.name.length > 80)
     throw new Error('Name must be between 1 and 80 characters.')
-  if (!PROGRAMS.includes(result.program)) throw new Error('Choose a program from the list.')
+  if (!result.program || result.program.length > 80)
+    throw new Error('Enter a program of up to 80 characters.')
   if (!STUDY_YEARS.includes(result.studyYear)) throw new Error('Choose a study year from the list.')
   if (result.bio.length > 500) throw new Error('Bio must be 500 characters or fewer.')
   if (result.skills.length > 20 || result.skills.some((skill) => skill.length > 40))

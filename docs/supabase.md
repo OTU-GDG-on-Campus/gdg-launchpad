@@ -4,6 +4,9 @@ How the database and auth backend is wired into this repo, and what is left to d
 
 Read [auth.md](auth.md) first. It explains the product rules this schema exists to enforce.
 
+The seven-step registration, private drafts, profile-link policies, media buckets, and full local/hosted
+verification procedure are documented in [onboarding.md](onboarding.md).
+
 ## What is already here
 
 | Piece                            | State                                                                |
@@ -63,6 +66,7 @@ Sign-in emails a six digit code, so the Email provider is the only one in use. O
    Confirm signup and `supabase/templates/magic_link.html` into Magic Link. They contain
    `{{ .Token }}`, which is the code. Without it the email carries a link instead.
 5. Add the production and Vercel preview URLs under Authentication > URL Configuration.
+6. Set the email OTP length to 6, expiry to 600 seconds, and resend interval to 60 seconds.
 
 Brevo SMTP keys expire after 90 days without use, so a quiet stretch can silently stop sign-in
 emails.
@@ -73,14 +77,15 @@ restart the stack. Keep `enabled = false` in anything you commit. See [local-dev
 
 ## How the domain rule is actually enforced
 
-`public.handle_new_user()` runs on insert into `auth.users` and raises if the verified email is
-not on `ontariotechu.net` or `ontariotechu.ca`. That rejects the sign-up, so no profile row and
-no write access. Every write policy then requires a profile row with `banned_at is null`.
+`public.handle_new_user()` runs on insert into `auth.users` and rejects addresses outside
+`ontariotechu.net` or `ontariotechu.ca`. Auth may create this row before the OTP is verified.
+`can_edit_profile()` separately checks `auth.users.email_confirmed_at`, the university domain, and
+the profile ban state. `can_participate()` additionally requires completed registration.
 
 The allowed domain list is duplicated in two places that must be changed together:
 
 - `ALLOWED_EMAIL_DOMAINS` in `src/config/site.ts`
-- `public.is_allowed_student_email()` in the initial migration
+- `public.is_allowed_student_email()` as replaced in the developer-onboarding migration
 
 Confirm it works by signing in with a personal Gmail account and watching it be refused. Until
 that test has been run against the hosted project, treat the rule as unproven.
@@ -105,4 +110,5 @@ Without that configuration the deploy job is skipped, while the PR job still run
 - [ ] Generate `src/types/database.ts` and type the queries in `lib/api/client.ts` against it
 - [ ] Replace each mock read in `lib/api/client.ts` with a real query, one function at a time
 - [ ] Storage buckets and policies for cover images and screenshots
+- [x] Private profile-avatar/banner buckets, ownership policies, draft persistence, and atomic onboarding migration
 - [x] Seed script for local development, so a fresh `db:reset` is not an empty site

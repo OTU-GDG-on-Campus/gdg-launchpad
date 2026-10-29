@@ -35,6 +35,12 @@ The smallest set that makes the site real. Everything P0 below rolls up here.
 - [x] **P1** Private profile, My Projects, My Activity, and edit-profile page
 - [x] **P2** Public profile at `/u/:id`, with a safe projection excluding account fields
 - [x] **P2** Optional validated GitHub profile URL
+- [x] Seven-step registration with real OTP, academic/developer fields, and review
+- [x] Private resumable drafts with serialized autosave and conflicting-tab protection
+- [x] Atomic profile/link persistence and server-controlled registration completion
+- [x] Profile picture/banner cropping, private Storage uploads, progress, and ownership policies
+- [x] Optional social links and custom websites with individual visibility and full profile editing
+- [ ] Verify hosted onboarding migration, Storage policies, and Brevo email delivery end to end
 
 ## Project submission
 
@@ -79,7 +85,7 @@ The smallest set that makes the site real. Everything P0 below rolls up here.
 - [x] Responsive account navigation and signed-in avatar menu
 - [x] One-click local demo student with persistent fixtures and confirmed reset
 - [x] Account API regression tests and configured Supabase contract tests
-- [ ] Apply and verify the public-profile privacy migration on a local Supabase stack
+- [x] Apply and verify the public-profile privacy migration on a local Supabase stack
 - [ ] Run pgTAP tests for public projection privileges, private profiles, projects, and bookmarks
 - [ ] Browser review of account navigation, keyboard behavior, both themes, and mobile layouts
 
@@ -168,8 +174,10 @@ Things a reader might mistake for finished work.
 - The Sprints and Contribute redesigns use theme tokens but still need browser review in both
   themes and at mobile breakpoints. Sprint listings remain demonstration records.
 
-- The personal-pages migration and pgTAP ownership/privacy tests have not been run locally because
-  the Docker engine is unavailable. Browser review of account pages, both themes, and mobile layouts
-  is also pending because this session has no browser surface.
+- The personal-pages and onboarding migrations replay locally. The onboarding browser suite uses
+  intercepted transport; hosted email, migration, and Storage configuration still need verification.
+  Broader visual review of personal pages outside the onboarding/profile editor remains pending.
+- Profile media uses one-hour signed URLs. Cleanup is best effort for unreferenced files older than
+  24 hours after publication; no scheduled abandoned-account media cleanup job exists yet.
 - My Sprints derives links from owned projects; it does not represent team enrollment. Notifications
   have no delivery or read-tracking backend and show an explicit unavailable state.
