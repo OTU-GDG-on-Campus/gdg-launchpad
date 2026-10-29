@@ -170,6 +170,8 @@ async function verify(page, mode = 'register') {
       exact: true,
     })
     .click()
+  if (mode === 'login') await expect(page).toHaveURL(/\/me\/projects/)
+  else await expect(page.getByRole('heading', { name: 'About you', exact: true })).toBeVisible()
 }
 
 async function academic(page) {
@@ -178,6 +180,7 @@ async function academic(page) {
   await page.getByLabel('Academic program', { exact: true }).selectOption('Computer Science')
   await page.getByLabel('Current year of study', { exact: true }).selectOption('Year 2')
   await page.getByRole('button', { name: 'Continue →', exact: true }).click()
+  await expect(page.getByRole('heading', { name: 'Developer identity', exact: true })).toBeVisible()
 }
 
 test('OTP validation, cooldown, paste, focus, email changes, and login never creates accounts', async ({
@@ -226,6 +229,7 @@ for (const theme of ['dark', 'light']) {
     await page.getByLabel('Professional headline').fill('Building together')
     await page.getByRole('button', { name: 'Python', exact: true }).click()
     await page.getByRole('button', { name: 'Continue →', exact: true }).click()
+    await expect(page.getByRole('heading', { name: 'Profile images', exact: true })).toBeVisible()
     await page.reload()
     await expect(page.getByRole('heading', { name: 'Profile images', exact: true })).toBeVisible()
     await page.getByRole('button', { name: 'Skip for now', exact: true }).click()
@@ -293,10 +297,13 @@ test('incomplete accounts redirect, profile drafts retain values, and upload fai
   await page.getByRole('button', { name: 'Crop & upload', exact: true }).click()
   await expect(page.getByRole('button', { name: 'Remove image', exact: true })).toBeVisible()
   await page.getByRole('button', { name: 'Continue →', exact: true }).click()
+  await expect(page.getByRole('heading', { name: 'Your links', exact: true })).toBeVisible()
   expect(state.draft.details.avatarPath).toMatch(new RegExp('^' + uid + '/'))
+  const avatarPath = state.draft.details.avatarPath
   await page.getByRole('button', { name: 'Skip for now', exact: true }).click()
   await page.getByRole('button', { name: 'Complete Registration', exact: true }).click()
   await expect(page).toHaveURL(/\/me\/projects/)
+  expect(state.profile.avatar_path).toBe(avatarPath)
   await page.goto('/me/settings/profile')
   await expect(page.getByLabel('First name', { exact: true })).toHaveValue('Taylor')
   await page.getByRole('button', { name: '4. Your links', exact: true }).click()
@@ -345,6 +352,7 @@ test('failed draft saves retry without losing input and expired sessions restore
   await page.getByRole('button', { name: 'Retry save', exact: true }).click()
   await expect(page.getByText('All changes saved privately', { exact: true })).toBeVisible()
   await page.getByRole('button', { name: 'Continue →', exact: true }).click()
+  await expect(page.getByRole('heading', { name: 'Profile images', exact: true })).toBeVisible()
   await page.evaluate(() => localStorage.clear())
   await page.reload()
   await expect(page.getByLabel('Ontario Tech email')).toBeVisible()

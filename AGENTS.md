@@ -239,6 +239,8 @@ import { SprintCard } from './SprintCard' // same folder
   Qualify `storage.objects.name` inside policy subqueries: bare `name` can bind to the profile name.
 - Browser tests intercept a separate local API on port 54329. They do not verify hosted delivery or RLS.
   Run the SQL and opt-in local integration tests for those local backend behaviors. See `docs/onboarding.md`.
+- In browser tests, await the destination step or URL after navigation before reading saved state,
+  reloading, or changing failure flags. A completed click does not mean the async save has finished.
 
 ## Architectural rules
 
@@ -281,6 +283,9 @@ See [docs/auth.md](docs/auth.md) for the full flow.
 Only `VITE_`-prefixed environment variables reach the browser, and everything with that prefix is
 public. Never put a service role key, client secret, or API key behind `VITE_`. Server-only values
 go in Vercel project environment variables. See [.env.example](.env.example).
+
+GitHub Actions job conditions cannot reference secrets. Map secrets into job environment variables
+and check them in step conditions when deployment should skip without credentials.
 
 ## Recipes
 

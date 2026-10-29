@@ -100,8 +100,10 @@ The deploy job needs three repository secrets under Settings > Secrets and varia
 | `SUPABASE_DB_PASSWORD`  | Project Settings > Database                                |
 | `SUPABASE_PROJECT_REF`  | `eavnzbmsfpslwdgpjfjv`                                     |
 
-The deploy job runs only when all three are set and `SUPABASE_ACCESS_TOKEN` starts with `sbp_`.
-Without that configuration the deploy job is skipped, while the PR job still runs normally.
+On pushes to main, deployment steps run only when all three are set and `SUPABASE_ACCESS_TOKEN`
+starts with `sbp_`. The job checks credentials through environment variables at step level because
+GitHub does not allow secrets in job conditions. Missing credentials skip deployment steps;
+the PR verification job still runs normally.
 
 ## Still to do
 
