@@ -12,13 +12,14 @@ inbox can enter the code, so a working code proves they own an `ontariotechu.net
 
 ## Current state
 
-Email code sign-in through Supabase is built and tested on the local stack, including real emails
-sent through Brevo. It has not been run against the hosted project yet.
+Email code sign-in and seven-step onboarding use Supabase Auth, private database drafts, and Storage.
+Local tests use Mailpit. Hosted email and Brevo delivery require the deployment checks in
+[onboarding.md](onboarding.md).
 
 - `supabase/migrations/` creates `profiles`, the sign-up trigger that enforces the domain rule, the
   registration columns, RLS on every table, and the `is_admin()` and `can_participate()` helpers
   that the policies on `projects`, `upvotes`, and `comments` call.
-- `src/lib/api/client.ts` exposes `sendEmailCode`, `verifyEmailCode`, `saveRegistration`,
+- `src/lib/api/client.ts` exposes `sendEmailCode`, `verifyEmailCode`, `publishDeveloperProfile`,
   `signOutUser`, `getCurrentUser`, and `subscribeToAuthChanges`. `AuthProvider` calls only those.
 - `src/components/auth/EmailCodeForm.tsx` is the two step form used by the login and register pages.
 - When `VITE_SUPABASE_URL` or `VITE_SUPABASE_ANON_KEY` is unset, `AuthProvider` falls back to the
@@ -29,8 +30,10 @@ sent through Brevo. It has not been run against the hosted project yet.
 
 They are separate on purpose.
 
-- **Register** (`/register`): verify an Ontario Tech email with a code, which creates the account,
-  then fill in name, program, year, skills, and a bio. Saving sets `profiles.registered_at`.
+- **Register** (`/register`): request and verify a university-email code, add academic details, then
+  optionally add developer skills, images, and social links. Review and publish atomically before
+  `profiles.registered_at` is set. Auth can create the bare account before verification; confirmed
+  email is separately required for draft/profile writes.
 - **Login** (`/login`): only works for an existing account. The client sends
   `shouldCreateUser: false`, so an unknown email is refused and logging in can never create one.
 - A student who verifies the email but stops before saving the profile is signed in but cannot post,
@@ -45,14 +48,14 @@ registration and a non-banned account. `/u/:id` is public and shows only approve
 
 Full profile rows are owner/admin only after `20261025000000_personal_pages.sql` is applied. Public
 reads use `public_profiles`, a read-only projection without email, role, or account flags. Apply this
-migration before using the new personal pages with Supabase. It has not been verified against a local
-stack in this change because the Docker engine was unavailable.
+migration and the developer-onboarding migration before using the current application with Supabase.
+The safe projection excludes private first/last-name fields as well as email and account flags.
 
 With no Supabase variables, click **Try demo account** on `/login`. The sample student is Alex Morgan,
 `demo.student@ontariotechu.net`. This is not a real or verified account. Its profile, session, saved
 projects, and votes persist in versioned browser storage. Settings includes a confirmed reset.
-The existing email/code demo form is also available for registration previews. Demo sign-out ends
-the session without deleting sample data.
+Email/code forms require a configured backend and never accept fake verification codes. Demo sign-out
+ends the session without deleting sample data. Demo image uploads are explicitly unavailable.
 
 `npm run test:account` runs Node regression tests and configured-backend transport contract tests.
 The latter intercept requests and do not prove live RLS behavior. Run `npx supabase test db` against a

@@ -14,6 +14,7 @@ export function LoginPage() {
   const [demoError, setDemoError] = useState<string | null>(null)
   const [pending, setPending] = useState(false)
   if (user?.registeredAt && !user.bannedAt) return <Navigate to="/me/projects" replace />
+  if (user && !user.registeredAt && !user.bannedAt) return <Navigate to="/register" replace />
 
   let panel: ReactNode = <EmailCodeForm mode="login" />
   if (user && !user.registeredAt) {

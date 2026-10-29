@@ -151,7 +151,7 @@ const server = await createServer({
   },
 })
 const api = await server.ssrLoadModule('/src/lib/api/client.ts')
-const { supabase } = await server.ssrLoadModule('/src/lib/api/supabase.ts')
+const { supabase } = await server.ssrLoadModule('/src/lib/supabase/client.ts')
 const encode = (value) => Buffer.from(JSON.stringify(value)).toString('base64url')
 const token = `${encode({ alg: 'HS256', typ: 'JWT' })}.${encode({ sub: userId, exp: Math.floor(Date.now() / 1000) + 3600, aud: 'authenticated', role: 'authenticated' })}.test-signature`
 const session = await supabase.auth.setSession({

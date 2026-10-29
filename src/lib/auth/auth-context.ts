@@ -1,7 +1,7 @@
 // Auth context shape shared by AuthProvider and the useAuth hook.
 
 import { createContext } from 'react'
-import type { RegistrationDetails, User } from '@/types'
+import type { OnboardingDetails, User } from '@/types'
 
 export type AuthStatus = 'loading' | 'signed-out' | 'signed-in'
 
@@ -19,7 +19,7 @@ export interface AuthContextValue {
   /** Verifies the emailed code and signs the student in. Throws a message safe to show. */
   verifyCode: (email: string, code: string, mode: AuthMode) => Promise<void>
   /** Saves the registration details for the signed-in student and finishes their account. */
-  completeRegistration: (details: RegistrationDetails) => Promise<void>
+  completeRegistration: (details: OnboardingDetails, draftRevision: number) => Promise<void>
   demoLogin: () => Promise<void>
   refreshUser: () => Promise<void>
   resetDemo: () => Promise<void>

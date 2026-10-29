@@ -5,7 +5,7 @@ here is unclear, that is a bug in this document. Say so in Discord and we will f
 
 ## Setup
 
-Requires Node 20 or newer.
+Requires Node 22.22 or newer.
 
 ```bash
 git clone https://github.com/gdg-otu/launchpad.git

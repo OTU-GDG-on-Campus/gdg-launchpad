@@ -1,8 +1,6 @@
-name: Supabase
+# Validates migrations locally on pull requests and deploys main changes when credentials are configured.
 
-# Applies any new supabase/migrations/*.sql to the hosted project once a change lands on main.
-# Pull requests only validate that the migrations replay cleanly on a throwaway local database,
-# so a broken migration is caught before it can touch production data.
+name: Supabase
 
 on:
   push:
@@ -24,15 +22,12 @@ jobs:
         with:
           version: latest
       - run: supabase db start
+      - run: supabase test db
       - name: Confirm migrations leave no undeclared schema drift
         run: supabase db diff --local
 
   deploy:
-    if: >-
-      github.event_name == 'push' &&
-      startsWith(secrets.SUPABASE_ACCESS_TOKEN, 'sbp_') &&
-      secrets.SUPABASE_DB_PASSWORD != '' &&
-      secrets.SUPABASE_PROJECT_REF != ''
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     environment: production
     env:
@@ -40,9 +35,20 @@ jobs:
       SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
       SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
     steps:
+      - name: Check deployment credentials
+        id: credentials
+        if: >-
+          startsWith(env.SUPABASE_ACCESS_TOKEN, 'sbp_') &&
+          env.SUPABASE_DB_PASSWORD != '' &&
+          env.SUPABASE_PROJECT_REF != ''
+        run: echo "ready=true" >> "$GITHUB_OUTPUT"
       - uses: actions/checkout@v4
+        if: steps.credentials.outputs.ready == 'true'
       - uses: supabase/setup-cli@v1
+        if: steps.credentials.outputs.ready == 'true'
         with:
           version: latest
       - run: supabase link --project-ref "$SUPABASE_PROJECT_REF"
+        if: steps.credentials.outputs.ready == 'true'
       - run: supabase db push
+        if: steps.credentials.outputs.ready == 'true'
