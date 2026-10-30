@@ -7,6 +7,10 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "test:account": "node --test tests/account.test.mjs tests/account-backend.test.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "test:browser": "playwright test",
+    "test:db": "supabase test db",
+    "test:onboarding:local": "node tests/local/onboarding.mjs",
     "typecheck": "tsc -b",
     "lint": "oxlint",
     "format": "prettier --write .",
@@ -30,6 +34,7 @@
     "tailwindcss": "^4.3.3"
   },
   "devDependencies": {
+    "@playwright/test": "^1.64.1",
     "@types/node": "^24.13.3",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.7",

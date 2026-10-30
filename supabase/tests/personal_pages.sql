@@ -20,6 +20,8 @@ insert into auth.users (id, email, raw_app_meta_data, raw_user_meta_data) values
   ('99999999-2222-4222-8222-222222222222', 'personal.other@ontariotechu.net', '{"provider":"email","providers":["email"]}', '{"full_name":"Other Test"}');
 update public.profiles set program = 'Computer Science', study_year = 'Year 2', registered_at = now()
 where id in ('99999999-1111-4111-8111-111111111111', '99999999-2222-4222-8222-222222222222');
+update auth.users set email_confirmed_at = now()
+where id in ('99999999-1111-4111-8111-111111111111', '99999999-2222-4222-8222-222222222222');
 insert into public.projects (id, slug, title, summary, category, author_id, status) values
   ('99999999-aaaa-4aaa-8aaa-aaaaaaaaaaaa', 'personal-test-pending', 'Private Test Project', 'A pending fixture for ownership tests.', 'Web App', '99999999-1111-4111-8111-111111111111', 'pending'),
   ('99999999-bbbb-4bbb-8bbb-bbbbbbbbbbbb', 'personal-test-public', 'Public Test Project', 'An approved fixture for ownership tests.', 'Web App', '99999999-1111-4111-8111-111111111111', 'approved');

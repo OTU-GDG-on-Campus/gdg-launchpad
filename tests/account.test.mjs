@@ -116,7 +116,18 @@ test('public profiles expose exactly the public fields, without email or account
   const profile = await api.getPublicProfile(user.id)
   assert.deepEqual(
     Object.keys(profile).sort(),
-    ['avatarUrl', 'bio', 'githubUrl', 'id', 'name', 'program', 'skills', 'studyYear'].sort(),
+    [
+      'avatarUrl',
+      'bio',
+      'developer',
+      'githubUrl',
+      'id',
+      'links',
+      'name',
+      'program',
+      'skills',
+      'studyYear',
+    ].sort(),
   )
   const projects = await api.listPublicProfileProjects(user.id)
   assert.ok(projects.length)
@@ -201,20 +212,16 @@ test('reset restores demo data and sign-out ends access without deleting samples
   await assert.rejects(api.listMyActivity(), /Sign in/)
 })
 
-test('unfinished registration stays blocked until profile completion', async () => {
-  await api.verifyEmailCode('new@ontariotechu.net', '123456')
-  const user = api.startDemoRegistration('new@ontariotechu.net')
-  assert.equal(user.registeredAt, null)
-  await assert.rejects(api.listMyProjects(), /Sign in/)
-  await api.saveRegistration(user, details)
-  assert.ok((await api.getCurrentUser()).registeredAt)
+test('email verification cannot create a fake demo registration', async () => {
+  await assert.rejects(api.verifyEmailCode('new@ontariotechu.net', '123456'), /configured Supabase/)
+  assert.equal(await api.getCurrentUser(), null)
 })
 
 test('route guards distinguish signed-out, unfinished, banned, student, and admin accounts', () => {
   assert.match(guard({ status: 'signed-out', user: null, canParticipate: false }), /Students only/)
-  assert.match(
+  assert.equal(
     guard({ status: 'signed-in', user: { registeredAt: null }, canParticipate: false }),
-    /Finish creating/,
+    '',
   )
   assert.match(
     guard({ status: 'signed-in', user: { bannedAt: '2026-10-20' }, canParticipate: false }),

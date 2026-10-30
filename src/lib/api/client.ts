@@ -4,6 +4,10 @@
 import type { AuthError } from '@supabase/supabase-js'
 import type {
   AccountProfile,
+  OnboardingDetails,
+  OnboardingDraft,
+  ProfileLink,
+  ProfileMediaKind,
   ActivityItem,
   ProfileDetails,
   PublicProfile,
@@ -13,7 +17,6 @@ import type {
   Project,
   ProjectPage,
   ProjectQuery,
-  RegistrationDetails,
   Sprint,
   TechnologyFacet,
   User,
@@ -27,25 +30,261 @@ import {
   writeDemo,
 } from './mock/session'
 import { normalizeProfile } from '@/lib/profile'
+import {
+  emptyOnboarding,
+  normalizeOnboarding,
+  profileToOnboarding,
+  publicDeveloperDetails,
+} from '@/lib/onboarding'
+import { isAllowedStudentEmail } from '@/lib/auth/domain'
+import { validateProfileImage } from '@/lib/profileImage'
 import { MOCK_SPRINTS } from './mock/sprints'
-import { supabase } from './supabase'
+import { isSupabaseConfigured, supabase as configuredClient } from '@/lib/supabase/client'
+
+const supabase = isSupabaseConfigured ? configuredClient : null
 
 export const DEFAULT_PER_PAGE = 9
 
 /** False when Supabase env vars are unset. Auth then falls back to a local demo student. */
 export const isBackendConfigured = supabase !== null
 
+async function requireProfileOwner(): Promise<User> {
+  const user = await getCurrentUser()
+  if (!user || user.bannedAt)
+    throw new Error(
+      'Your session expired or your account is unavailable. Sign in again to continue.',
+    )
+  return user
+}
+
+export async function profileMediaUrl(
+  kind: ProfileMediaKind,
+  path: string | null,
+): Promise<string | null> {
+  if (!path || !supabase) return null
+  const { data, error } = await supabase.storage
+    .from(kind === 'avatar' ? 'profile-avatars' : 'profile-banners')
+    .createSignedUrl(path, 3600)
+  if (error) throw new Error('Could not load a profile image. Try refreshing the page.')
+  return data.signedUrl
+}
+
+async function hydrateProfile(profile: PublicProfile, publicOnly: boolean): Promise<PublicProfile> {
+  if (!supabase) return profile
+  let query = supabase
+    .from('profile_links')
+    .select('id, platform, label, value, is_public')
+    .eq('user_id', profile.id)
+    .order('position')
+  if (publicOnly) query = query.eq('is_public', true)
+  const { data, error } =
+    await query.returns<
+      { id: string; platform: string; label: string; value: string; is_public: boolean }[]
+    >()
+  if (error)
+    throw new Error('Could not load profile links. Check your connection and database migrations.')
+  const developer = profile.developer
+  return {
+    ...profile,
+    avatarUrl: developer?.avatarPath
+      ? await profileMediaUrl('avatar', developer.avatarPath)
+      : profile.avatarUrl,
+    developer: developer
+      ? { ...developer, bannerUrl: await profileMediaUrl('banner', developer.bannerPath) }
+      : undefined,
+    links: (data ?? []).map((link): ProfileLink => ({
+      id: link.id,
+      platform: link.platform,
+      label: link.label,
+      value: link.value,
+      isPublic: link.is_public,
+    })),
+  }
+}
+
+export async function loadOnboardingDraft(): Promise<OnboardingDraft> {
+  const user = await requireProfileOwner()
+  if (!supabase) throw new Error('Saved onboarding requires a configured Supabase backend.')
+  const { data, error } = await supabase
+    .from('onboarding_drafts')
+    .select('details, step, revision')
+    .eq('user_id', user.id)
+    .maybeSingle<{ details: Partial<OnboardingDetails>; step: number; revision: number }>()
+  if (error)
+    throw new Error(
+      'Could not restore your saved progress. Check your connection and database migrations, then retry.',
+    )
+  let details = data
+    ? { ...emptyOnboarding(), ...data.details }
+    : user.registeredAt
+      ? profileToOnboarding(await getMyProfile())
+      : emptyOnboarding()
+  // Expiring signed URLs are derived at read time and never stored in the private draft.
+  details = {
+    ...details,
+    avatarUrl: details.avatarPath
+      ? await profileMediaUrl('avatar', details.avatarPath)
+      : details.avatarUrl,
+    bannerUrl: await profileMediaUrl('banner', details.bannerPath),
+  }
+  return { details, step: data?.step ?? 3, revision: data?.revision ?? 0 }
+}
+
+export async function saveOnboardingDraft(
+  details: OnboardingDetails,
+  step: number,
+  revision: number,
+): Promise<number> {
+  await requireProfileOwner()
+  if (!supabase) throw new Error('Saving onboarding requires a configured Supabase backend.')
+  const { data, error } = await supabase.rpc('save_onboarding_draft', {
+    p_details: { ...details, avatarUrl: null, bannerUrl: null },
+    p_step: step,
+    p_revision: revision,
+  })
+  if (error)
+    throw new Error(
+      error.message.includes('another tab')
+        ? error.message
+        : 'Progress could not be saved. Check your connection or sign in again, then retry.',
+    )
+  return data as number
+}
+
+export async function publishDeveloperProfile(
+  details: OnboardingDetails,
+  revision: number,
+): Promise<void> {
+  const user = await requireProfileOwner()
+  const normalized = normalizeOnboarding(details)
+  if (!supabase) {
+    if (!user.registeredAt) throw new Error('Registration requires a configured Supabase backend.')
+    const state = readDemo()
+    const name = normalized.displayName || `${normalized.firstName} ${normalized.lastName}`
+    writeDemo({
+      ...state,
+      user: { ...user, name },
+      profile: {
+        ...state.profile,
+        name,
+        program: normalized.program,
+        studyYear: normalized.studyYear,
+        bio: normalized.bio,
+        skills: normalized.skills,
+        developer: publicDeveloperDetails(normalized),
+        links: normalized.links,
+        onboarding: normalized,
+        githubUrl: null,
+      },
+    })
+    return
+  }
+  const { error } = await supabase.rpc('publish_developer_profile', {
+    p_details: { ...normalized, avatarUrl: null, bannerUrl: null },
+    p_revision: revision,
+  })
+  if (error)
+    throw new Error(
+      error.message.includes('another tab')
+        ? error.message
+        : 'Your profile could not be saved. Check your connection, sign in again if needed, and retry.',
+    )
+  void cleanupProfileMedia(normalized).catch(() => {})
+}
+
+export async function removeProfileMedia(kind: ProfileMediaKind, path: string): Promise<void> {
+  const user = await requireProfileOwner()
+  if (!supabase || path.split('/')[0] !== user.id)
+    throw new Error('You can only remove your own images.')
+  const { error } = await supabase.storage
+    .from(kind === 'avatar' ? 'profile-avatars' : 'profile-banners')
+    .remove([path])
+  if (error) throw new Error('Could not remove the old image. You can retry later.')
+}
+
+async function cleanupProfileMedia(details: OnboardingDetails) {
+  const user = await requireProfileOwner()
+  if (!supabase) return
+  for (const kind of ['avatar', 'banner'] as const) {
+    const bucket = supabase.storage.from(kind === 'avatar' ? 'profile-avatars' : 'profile-banners')
+    const { data, error } = await bucket.list(user.id, { limit: 100 })
+    if (error) continue
+    const unused = (data ?? [])
+      .filter(
+        (file) =>
+          file.created_at &&
+          `${user.id}/${file.name}` !== details[`${kind}Path`] &&
+          Date.now() - Date.parse(file.created_at) > 24 * 60 * 60 * 1000,
+      )
+      .map((file) => `${user.id}/${file.name}`)
+    if (unused.length) await bucket.remove(unused)
+  }
+}
+
+export async function uploadProfileMedia(
+  file: File,
+  kind: ProfileMediaKind,
+  onProgress: (percent: number) => void,
+): Promise<{ path: string; url: string }> {
+  validateProfileImage(file, kind)
+  const user = await requireProfileOwner()
+  if (!supabase)
+    throw new Error('Image uploads require Supabase Storage. Demo accounts cannot upload files.')
+  const bucket = supabase.storage.from(kind === 'avatar' ? 'profile-avatars' : 'profile-banners')
+  const extension = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' }[file.type]
+  const path = `${user.id}/${crypto.randomUUID()}.${extension}`
+  const { data, error } = await bucket.createSignedUploadUrl(path)
+  if (error)
+    throw new Error(
+      'Could not authorize this upload. Check your session and Storage configuration.',
+    )
+  try {
+    await new Promise<void>((resolve, reject) => {
+      const request = new XMLHttpRequest()
+      request.open('PUT', data.signedUrl)
+      request.timeout = 120_000
+      request.setRequestHeader('x-upsert', 'false')
+      request.upload.onprogress = (event) => {
+        if (event.lengthComputable) onProgress(Math.round((event.loaded / event.total) * 100))
+      }
+      request.onload = () =>
+        request.status >= 200 && request.status < 300
+          ? resolve()
+          : reject(
+              new Error('Image upload failed. Check the file size, session, and Storage policies.'),
+            )
+      request.onerror =
+        request.ontimeout =
+        request.onabort =
+          () =>
+            reject(new Error('The image upload was interrupted. Check your connection and retry.'))
+      const body = new FormData()
+      body.append('cacheControl', '3600')
+      body.append('', file)
+      request.send(body)
+    })
+    const url = await profileMediaUrl(kind, path)
+    if (!url) throw new Error('Could not preview the uploaded image.')
+    onProgress(100)
+    return { path, url }
+  } catch (cause) {
+    await bucket.remove([path]).catch(() => {})
+    throw cause
+  }
+}
+
 interface ProfileRow {
   id: string
   email: string
   name: string
   avatar_url: string | null
+  avatar_path?: string | null
   role: 'student' | 'admin'
   banned_at: string | null
   registered_at: string | null
 }
 
-const PROFILE_COLUMNS = 'id, email, name, avatar_url, role, banned_at, registered_at'
+const PROFILE_COLUMNS = 'id, email, name, avatar_url, avatar_path, role, banned_at, registered_at'
 
 function toUser(row: ProfileRow): User {
   return {
@@ -75,7 +314,12 @@ function authMessage(error: AuthError, fallback: string): string {
 
 /** Emails a six digit code. Only registering may create an account, logging in never does. */
 export async function sendEmailCode(email: string, mode: 'login' | 'register'): Promise<void> {
-  if (!supabase) return
+  if (!isAllowedStudentEmail(email))
+    throw new Error('Use a valid Ontario Tech student email address.')
+  if (!supabase)
+    throw new Error(
+      'Email authentication requires a configured Supabase backend. You can use the separate demo account on the login page.',
+    )
   const { error } = await supabase.auth.signInWithOtp({
     email: email.trim().toLowerCase(),
     options: { shouldCreateUser: mode === 'register' },
@@ -85,11 +329,9 @@ export async function sendEmailCode(email: string, mode: 'login' | 'register'): 
 
 /** Exchanges the emailed code for a session. */
 export async function verifyEmailCode(email: string, code: string): Promise<void> {
-  if (!supabase) {
-    const state = readDemo()
-    writeDemo({ ...state, signedIn: true })
-    return
-  }
+  if (!isAllowedStudentEmail(email) || !/^\d{6}$/.test(code.trim()))
+    throw new Error('Enter your university email and six-digit verification code.')
+  if (!supabase) throw new Error('Email verification requires a configured Supabase backend.')
   const { error } = await supabase.auth.verifyOtp({
     email: email.trim().toLowerCase(),
     token: code.trim(),
@@ -126,56 +368,26 @@ export async function getCurrentUser(): Promise<User | null> {
     .eq('id', userId)
     .maybeSingle<ProfileRow>()
   if (error) throw error
-  return data ? toUser(data) : null
-}
-
-/** Demo mode only: an unregistered demo student for `email`, so the register flow can be previewed. */
-export function startDemoRegistration(email: string): User {
-  const address = email.trim().toLowerCase()
-  const state = readDemo()
-  const user = { ...state.user, email: address, name: address.split('@')[0], registeredAt: null }
-  writeDemo({
-    ...state,
-    signedIn: true,
-    user,
-    profile: { ...state.profile, email: address, name: user.name },
-  })
-  return user
-}
-
-/** Saves the registration details onto the signed-in student's profile and marks it finished. */
-export async function saveRegistration(user: User, details: RegistrationDetails): Promise<User> {
-  const normalized = normalizeProfile({ ...details, githubUrl: '' })
-  details = normalized
-  if (!supabase) {
-    const state = readDemo()
-    const next = { ...user, name: details.name, registeredAt: new Date().toISOString() }
-    writeDemo({ ...state, signedIn: true, user: next, profile: { ...state.profile, ...details } })
-    return next
-  }
-
-  const { data, error } = await supabase
-    .from('profiles')
-    .update({
-      name: details.name,
-      program: details.program,
-      study_year: details.studyYear,
-      skills: details.skills,
-      bio: details.bio || null,
-      registered_at: new Date().toISOString(),
-    })
-    .eq('id', user.id)
-    .select(PROFILE_COLUMNS)
-    .single<ProfileRow>()
-  if (error) throw new Error('Could not save your details. Try again.')
-  return toUser(data)
+  return data
+    ? toUser({
+        ...data,
+        avatar_url: data.avatar_path
+          ? await profileMediaUrl('avatar', data.avatar_path).catch(() => null)
+          : data.avatar_url,
+      })
+    : null
 }
 
 /** Calls `onChange` whenever the session changes. Returns an unsubscribe function. */
 export function subscribeToAuthChanges(onChange: () => void): () => void {
   if (!supabase) return () => {}
   const { data } = supabase.auth.onAuthStateChange((event) => {
-    if (event === 'SIGNED_IN' || event === 'SIGNED_OUT' || event === 'USER_UPDATED') {
+    if (
+      event === 'SIGNED_IN' ||
+      event === 'SIGNED_OUT' ||
+      event === 'USER_UPDATED' ||
+      event === 'TOKEN_REFRESHED'
+    ) {
       // Deferred because awaiting Supabase calls inside this callback can deadlock the client.
       setTimeout(onChange, 0)
     }
@@ -575,9 +787,21 @@ interface PublicProfileRow {
   skills: string[]
   bio: string | null
   github_url: string | null
+  introduction?: string
+  graduation_year?: number | null
+  languages?: string[]
+  frameworks?: string[]
+  tools?: string[]
+  interests?: string[]
+  preferred_roles?: string[]
+  collaboration?: string[]
+  avatar_path?: string | null
+  banner_path?: string | null
 }
 interface AccountProfileRow extends PublicProfileRow {
   email: string
+  first_name?: string
+  last_name?: string
 }
 interface ProjectRow {
   id: string
@@ -626,7 +850,7 @@ interface SprintRow {
 }
 
 const PUBLIC_PROFILE_COLUMNS =
-  'id, name, avatar_url, headline, program, study_year, skills, bio, github_url'
+  'id, name, avatar_url, headline, program, study_year, skills, bio, github_url, introduction, graduation_year, languages, frameworks, tools, interests, preferred_roles, collaboration, avatar_path, banner_path'
 
 function toPublicProfile(row: PublicProfileRow): PublicProfile {
   return {
@@ -638,6 +862,20 @@ function toPublicProfile(row: PublicProfileRow): PublicProfile {
     skills: row.skills,
     bio: row.bio ?? '',
     githubUrl: row.github_url,
+    developer: {
+      headline: row.headline ?? '',
+      introduction: row.introduction ?? '',
+      graduationYear: row.graduation_year?.toString() ?? '',
+      languages: row.languages ?? [],
+      frameworks: row.frameworks ?? [],
+      tools: row.tools ?? [],
+      interests: row.interests ?? [],
+      roles: row.preferred_roles ?? [],
+      collaboration: row.collaboration ?? [],
+      avatarPath: row.avatar_path ?? null,
+      bannerPath: row.banner_path ?? null,
+      bannerUrl: null,
+    },
   }
 }
 
@@ -652,7 +890,14 @@ async function publicProfiles(ids: string[]): Promise<PublicProfileRow[]> {
     throw new Error(
       'Could not load public profiles. Apply the personal-pages database migration and try again.',
     )
-  return data ?? []
+  return Promise.all(
+    (data ?? []).map(async (row) => ({
+      ...row,
+      avatar_url: row.avatar_path
+        ? await profileMediaUrl('avatar', row.avatar_path)
+        : row.avatar_url,
+    })),
+  )
 }
 
 async function requireParticipant(): Promise<User> {
@@ -771,14 +1016,23 @@ export async function getMyProfile(): Promise<AccountProfile> {
   if (!supabase) return readDemo().profile
   const { data, error } = await supabase
     .from('profiles')
-    .select(`${PUBLIC_PROFILE_COLUMNS}, email`)
+    .select(`${PUBLIC_PROFILE_COLUMNS}, email, first_name, last_name`)
     .eq('id', user.id)
     .single<AccountProfileRow>()
   if (error)
     throw new Error(
       'Could not load your profile. Check that the personal-pages migration is applied.',
     )
-  return { ...toPublicProfile(data), email: data.email }
+  const profile = await hydrateProfile(toPublicProfile(data), false)
+  const account = { ...profile, email: data.email }
+  return {
+    ...account,
+    onboarding: {
+      ...profileToOnboarding(account),
+      firstName: data.first_name ?? '',
+      lastName: data.last_name ?? '',
+    },
+  }
 }
 
 export async function updateMyProfile(details: ProfileDetails): Promise<AccountProfile> {
@@ -826,10 +1080,13 @@ export async function getPublicProfile(id: string): Promise<PublicProfile | null
       skills: profile.skills,
       bio: profile.bio,
       githubUrl: profile.githubUrl,
+      developer: profile.developer,
+      links: profile.links?.filter((link) => link.isPublic),
     }
   }
   if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) return null
-  return (await publicProfiles([id])).map(toPublicProfile)[0] ?? null
+  const profile = (await publicProfiles([id])).map(toPublicProfile)[0]
+  return profile ? hydrateProfile(profile, true) : null
 }
 
 export async function listMyProjects(): Promise<Project[]> {
