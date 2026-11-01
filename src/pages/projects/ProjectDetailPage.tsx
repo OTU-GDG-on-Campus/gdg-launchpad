@@ -2,8 +2,8 @@
 
 import { useLayoutEffect, useRef, useState } from 'react'
 import { useParams } from 'react-router'
-import { CommentList } from '@/components/projects/CommentList'
-import { ProjectSidebar } from '@/components/projects/ProjectSidebar'
+import { CommentList } from '@/components/projects/detail/CommentList'
+import { ProjectSidebar } from '@/components/projects/detail/ProjectSidebar'
 import { Badge } from '@/components/ui/Badge'
 import { EmptyState, ErrorState, LoadingState } from '@/components/ui/PageState'
 import { getProjectBySlug, listComments, toggleUpvote } from '@/lib/api/client'

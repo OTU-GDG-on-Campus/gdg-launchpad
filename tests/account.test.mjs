@@ -27,7 +27,7 @@ const { normalizeProfile } = await server.ssrLoadModule('/src/lib/profile.ts')
 const { AuthContext } = await server.ssrLoadModule('/src/lib/auth/auth-context.ts')
 const { RequireAuth } = await server.ssrLoadModule('/src/components/auth/RequireAuth.tsx')
 const { ProfileSummary } = await server.ssrLoadModule('/src/components/account/ProfileSummary.tsx')
-const { NotificationsPage } = await server.ssrLoadModule('/src/pages/NotificationsPage.tsx')
+const { NotificationsPage } = await server.ssrLoadModule('/src/pages/account/NotificationsPage.tsx')
 
 after(async () => {
   await server.close()

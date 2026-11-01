@@ -1,7 +1,7 @@
 // Remembers whether the visitor last browsed projects as a grid or a list.
 
 import { useEffect, useState } from 'react'
-import type { ProjectView } from '@/components/projects/ProjectList'
+import type { ProjectView } from '@/components/projects/cards/ProjectList'
 
 const STORAGE_KEY = 'launchpad-projects-view'
 

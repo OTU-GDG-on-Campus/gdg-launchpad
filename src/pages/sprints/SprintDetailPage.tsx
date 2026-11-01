@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useParams } from 'react-router'
-import { ProjectList } from '@/components/projects/ProjectList'
+import { ProjectList } from '@/components/projects/cards/ProjectList'
 import { Card } from '@/components/ui/Card'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { EmptyState, ErrorState, LoadingState } from '@/components/ui/PageState'

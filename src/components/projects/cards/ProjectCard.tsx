@@ -4,11 +4,11 @@
 
 import { Link } from 'react-router'
 import { cn } from '@/lib/cn'
-import { BookmarkButton } from './BookmarkButton'
-import { ContributorStack } from './ContributorStack'
-import { PersonTrigger } from './PersonTrigger'
+import { BookmarkButton } from '@/components/projects/actions/BookmarkButton'
+import { ContributorStack } from '@/components/projects/people/ContributorStack'
+import { PersonTrigger } from '@/components/projects/people/PersonTrigger'
 import { ProjectCover } from './ProjectCover'
-import { UpvoteButton } from './UpvoteButton'
+import { UpvoteButton } from '@/components/projects/actions/UpvoteButton'
 import type { Project } from '@/types'
 
 interface ProjectCardProps {
@@ -52,9 +52,6 @@ export function ProjectCard({
         )}
       >
         <ProjectCover project={project} emphasis={lead} />
-        <span className="border-line bg-surface/85 absolute top-3 left-3 rounded-full border px-2.5 py-1 text-[11px] font-semibold backdrop-blur">
-          {project.category}
-        </span>
         {project.openToContributions && (
           <span className="border-line bg-surface/85 absolute top-3 right-3 flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-semibold backdrop-blur">
             <span className="bg-accent h-1.5 w-1.5 rounded-full" />
@@ -118,7 +115,7 @@ export function ProjectCard({
         </ul>
 
         {project.contributors.length > 0 && (
-          <div className="mt-3.5 flex items-center gap-2">
+          <div className="mt-3.5 mb-4 flex items-center gap-2">
             <ContributorStack contributors={project.contributors} />
             <span className="text-ink-muted truncate text-xs">
               {project.contributors.length === 1

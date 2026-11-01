@@ -1,7 +1,7 @@
 // Admin panel shell: the featured project picker is live, and moderation, user management, and
 // bans land here next.
 
-import { FeaturedProjectPicker } from '@/components/projects/FeaturedProjectPicker'
+import { FeaturedProjectPicker } from '@/components/projects/admin/FeaturedProjectPicker'
 import { RequireAuth } from '@/components/auth/RequireAuth'
 import { Card } from '@/components/ui/Card'
 import { PageHeader } from '@/components/ui/PageHeader'

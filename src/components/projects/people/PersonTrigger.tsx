@@ -9,7 +9,6 @@ interface PersonTriggerProps {
   name: string
   avatarUrl?: string | null
   profileId?: string | null
-  /** Short program line, for example "CS Year 3". */
   headline?: string | null
   role?: string | null
   size?: 'sm' | 'md'

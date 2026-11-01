@@ -11,7 +11,7 @@ import { cn } from '@/lib/cn'
 import { useAsync } from '@/lib/useAsync'
 import { useDebouncedValue } from '@/lib/useDebouncedValue'
 import { commandKeyLabel } from '@/lib/platform'
-import { ProjectCover } from './ProjectCover'
+import { ProjectCover } from '@/components/projects/cards/ProjectCover'
 import type { Project } from '@/types'
 
 const DEBOUNCE_MS = 180
