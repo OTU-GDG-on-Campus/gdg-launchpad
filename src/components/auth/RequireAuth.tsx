@@ -1,9 +1,7 @@
-// Route guard for pages that need a signed-in student, or an admin when adminOnly is set.
-//
-// This hides UI only. Every protected action is re-checked server-side.
+// UI guard for registered student and admin routes. Database policies enforce real access.
 
 import type { ReactNode } from 'react'
-import { Link } from 'react-router'
+import { Link, Navigate } from 'react-router'
 import { EmptyState, LoadingState } from '@/components/ui/PageState'
 import { allowedDomainsLabel } from '@/lib/auth/domain'
 import { useAuth } from '@/lib/auth/useAuth'
@@ -18,8 +16,17 @@ export function RequireAuth({ children, adminOnly = false }: RequireAuthProps) {
 
   if (status === 'loading') return <LoadingState label="Checking your session" />
 
+  if (user?.bannedAt)
+    return (
+      <EmptyState
+        title="Account unavailable"
+        hint="This account cannot access participation features."
+      />
+    )
+
   if (!canParticipate) {
     const unfinished = user !== null && user.registeredAt === null
+    if (unfinished) return <Navigate to="/register" replace />
     return (
       <div className="space-y-4">
         <EmptyState

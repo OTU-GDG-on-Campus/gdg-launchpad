@@ -32,14 +32,15 @@ The smallest set that makes the site real. Everything P0 below rolls up here.
 - [x] **P0** Separate login from registration, and save name, program, year, skills, and bio
 - [ ] **P0** Verify a personal Gmail account is actually rejected end to end
 - [ ] **P1** Session persistence across reloads and token refresh
-- [x] Profile page UI: name, About me, pinned projects, recent projects, and browser-only editor
-- [x] Dashboard UI matching the supplied reference, with Recently Viewed and a profile checklist
-- [x] Per-account browser-only profile previews and signed-in project viewing history
-- [ ] **P1** Persist approved profiles and pinned projects in the backend
-- [ ] **P1** Submit profile edits for moderator review and display approved changes publicly
-- [ ] **P1** Real dashboard project data, upvote totals, and cross-device viewing history
-- [ ] **P2** Public profile at `/u/:handle`
-- [ ] **P2** Link a GitHub username to the profile
+- [x] **P1** Private profile, My Projects, My Activity, and edit-profile page
+- [x] **P2** Public profile at `/u/:id`, with a safe projection excluding account fields
+- [x] **P2** Optional validated GitHub profile URL
+- [x] Seven-step registration with real OTP, academic/developer fields, and review
+- [x] Private resumable drafts with serialized autosave and conflicting-tab protection
+- [x] Atomic profile/link persistence and server-controlled registration completion
+- [x] Profile picture/banner cropping, private Storage uploads, progress, and ownership policies
+- [x] Optional social links and custom websites with individual visibility and full profile editing
+- [ ] Verify hosted onboarding migration, Storage policies, and Brevo email delivery end to end
 
 ## Project submission
 
@@ -77,6 +78,17 @@ The smallest set that makes the site real. Everything P0 below rolls up here.
 - [ ] **P2** Related projects on the detail page
 - [ ] **P2** Trending from real 7-day upvote timestamps once the `upvotes` table exists
 
+## Personal workspace
+
+- [x] My Projects with status filters, Saved Projects, My Profile, profile editing, and settings
+- [x] My Sprints derived from projects, private activity timeline, and notification placeholder
+- [x] Responsive account navigation and signed-in avatar menu
+- [x] One-click local demo student with persistent fixtures and confirmed reset
+- [x] Account API regression tests and configured Supabase contract tests
+- [x] Apply and verify the public-profile privacy migration on a local Supabase stack
+- [ ] Run pgTAP tests for public projection privileges, private profiles, projects, and bookmarks
+- [ ] Browser review of account navigation, keyboard behavior, both themes, and mobile layouts
+
 ## Comments
 
 - [x] Comment list rendered on the project detail page
@@ -105,9 +117,10 @@ The smallest set that makes the site real. Everything P0 below rolls up here.
 - [ ] Confirm event dates, team formation details, and registration destination before launch
 
 - [x] Sprints landing page explaining the format
+- [x] Sprint status filters with counts and category-specific empty states
 - [x] Sprint cards with status, dates, and submission counts
 - [x] Sprint detail page listing submissions
-- [ ] **P1** `sprints` table, replacing the mock records
+- [x] **P1** Supabase sprint reads with demo fallback when unconfigured
 - [ ] **P1** Team registration flow, up to 5 members
 - [ ] **P1** Sprint montage embed once a sprint completes
 - [ ] **P2** Certificate generation for participants
@@ -134,7 +147,7 @@ The smallest set that makes the site real. Everything P0 below rolls up here.
 - [x] **P1** Seed script so a fresh local database is usable
 - [ ] **P1** Error boundary and a real error page
 - [ ] **P1** Rate limiting on submissions and comments
-- [ ] **P2** Automated tests. None exist yet, start with the data layer and `useAsync`
+- [ ] **P2** Expand automated coverage beyond account APIs, privacy, guards, and backend contracts
 - [ ] **P2** Analytics, privacy-respecting
 - [ ] **P2** Sitemap and per-project meta tags for link previews
 
@@ -168,27 +181,34 @@ The smallest set that makes the site real. Everything P0 below rolls up here.
 
 Things a reader might mistake for finished work.
 
-- Project feeds, contributor lists, and project-derived dashboard counts use mock records. Supabase auth is wired when configured; live setup is not verified by these UI changes.
-- Without `VITE_SUPABASE_*` set, `signIn()` returns a fixed demo student. Nothing is verified.
-- Upvotes and filters are in-memory only and reset on reload.
-- Bookmarks survive a reload through `sessionStorage` only, and the Featured Project of the Week
-  picker does the same. Both have real Supabase query paths in `client.ts` that are unreachable
-  until the `20261018000000` migration is applied.
-- Trending uses a derived engagement score from mock data, not real upvote timestamps.
+- Supabase paths now cover profiles, project and sprint reads, upvotes, comments, bookmarks, and activity.
+  Apply the migrations before using a configured backend. Backend contract tests intercept transport.
+- Without `VITE_SUPABASE_*`, login offers an explicit demo student. Browser-local demo sessions,
+  profile edits, saves, and votes persist, but no email ownership is verified.
+- The featured-project demo picker remains in-memory only. The configured path uses Supabase.
+- Trending uses a derived engagement score from loaded counts, not real upvote timestamps.
 - The admin Featured Project picker was never clicked in a browser, because the demo session is
   a student and `adminOnly` blocks the route.
 - No project has a real cover image or screenshot, so tinted placeholders stand in.
-- Sprint records, including the "active" Discord Bot sprint, are placeholder rows.
+- Sprint demo records, including the "active" Discord Bot sprint, are placeholders when unconfigured.
 - Comment posting is not wired up. The list renders, the composer does not exist.
 - The discovery redesign has typechecked, linted, and built, but has not been reviewed in a
   browser. Both themes and the breakpoints are unverified visually.
 
-## Workspace UI handoff
+- The Sprints and Contribute redesigns use theme tokens but still need browser review in both
+  themes and at mobile breakpoints. Sprint listings remain demonstration records.
 
-- Profile edits and pin choices are private previews on the current browser, keyed by signed-in
-  account. They do not update auth names or public profiles and do not send moderation requests.
-- Recently Viewed lists actual signed-in visits to approved sample project pages, newest first,
-  with duplicates removed. Clearing removes that account's local history only.
-- The dashboard uses project status summaries, not fabricated notification events. Profile views
-  are not tracked. The third statistics card counts locally viewed projects instead.
-- Login/register notices distinguish configured Supabase sign-in from the demo fallback.
+- The personal-pages and onboarding migrations replay locally. The onboarding browser suite uses
+  intercepted transport; hosted email, migration, and Storage configuration still need verification.
+  Broader visual review of personal pages outside the onboarding/profile editor remains pending.
+- Profile media uses one-hour signed URLs. Cleanup is best effort for unreferenced files older than
+  24 hours after publication; no scheduled abandoned-account media cleanup job exists yet.
+- My Sprints derives links from owned projects; it does not represent team enrollment. Notifications
+  have no delivery or read-tracking backend and show an explicit unavailable state.
+
+## Custom UI integration
+
+- [x] Preserve the landing About section, four-card featured grid, full-card links, cursor rules,
+      and bubble Sprints experience while adopting the upstream page folders and account backend.
+- [x] Retain /profile and /dashboard as browser-preview views alongside persistent /me pages.
+- [ ] Visually review the integrated account menu and custom event page in both themes.

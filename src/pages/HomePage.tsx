@@ -7,7 +7,7 @@ import { allowedDomainsLabel } from '@/lib/auth/domain'
 import { Avatar } from '@/components/ui/Avatar'
 import { listContributors } from '@/lib/api/client'
 import { useAsync } from '@/lib/useAsync'
-import { LandingProjectCard } from '@/components/projects/LandingProjectCard'
+import { LandingProjectCard } from '@/components/projects/cards/LandingProjectCard'
 import { EmptyState, ErrorState, LoadingState } from '@/components/ui/PageState'
 import { useProjectFeed } from '@/hooks/useProjectFeed'
 
@@ -50,9 +50,6 @@ export function HomePage() {
         aria-labelledby="landing-title"
         className="landing-grid bg-surface-muted relative flex min-h-140 flex-col items-center justify-center px-4 py-20 text-center sm:px-6 sm:py-24"
       >
-        <p className="text-ink-muted mb-6 font-mono text-xs tracking-widest uppercase">
-          Built by students. Made to be shared.
-        </p>
         <h1
           id="landing-title"
           className="mx-auto max-w-290 text-5xl leading-[0.98] font-extrabold tracking-[-0.045em] sm:text-7xl lg:text-[96px]"
@@ -60,7 +57,7 @@ export function HomePage() {
           Where <span className="text-brand-700">Ontario Tech's</span>
           <br /> students ship<span className="text-flare">.</span>
         </h1>
-        <p className="text-ink-muted mx-auto mt-7 max-w-xl text-base leading-relaxed sm:text-lg">
+        <p className="text-ink-muted mx-auto mt-8 max-w-2xl text-base leading-relaxed sm:text-xl">
           Discover projects built by students, contribute to the ones you love, and build something
           of your own.
         </p>
@@ -72,13 +69,13 @@ export function HomePage() {
             Launch Your Project
           </Link>
         </div>
-        <dl className="border-line mt-12 grid w-full max-w-2xl grid-cols-3 border-t pt-6">
+        <dl className="border-line mt-16 grid w-full max-w-3xl grid-cols-3 border-t pt-8">
           {statistics.map((statistic) => (
             <div key={statistic.label} className="px-2 sm:px-5">
-              <dt className="text-ink-muted text-[10px] leading-relaxed sm:text-xs">
+              <dt className="text-ink-muted text-[10px] leading-relaxed sm:text-sm">
                 {statistic.label}
               </dt>
-              <dd className="mt-2 font-mono text-2xl font-bold sm:text-3xl">
+              <dd className="mt-2 font-mono text-2xl font-bold sm:text-4xl">
                 {loading || error ? '-' : statistic.value}
               </dd>
             </div>

@@ -1,4 +1,4 @@
-// Shared domain types, including browser-only profile previews and project viewing history.
+// Shared domain types for public discovery, private account pages, and profile inputs.
 
 export type UserRole = 'visitor' | 'student' | 'admin'
 
@@ -11,9 +11,6 @@ export interface User {
   bannedAt: string | null
   /** Null until the student finishes creating their account after verifying their email. */
   registeredAt: string | null
-  program?: string | null
-  studyYear?: string | null
-  bio?: string | null
 }
 
 /** What a student fills in to finish creating their account. */
@@ -137,6 +134,81 @@ export interface Comment {
   authorName: string
   authorAvatarUrl: string | null
   body: string
+  createdAt: string
+}
+
+/** Public profile fields. Account email and privileges never belong in this shape. */
+export interface PublicProfile {
+  id: string
+  name: string
+  avatarUrl: string | null
+  program: string
+  studyYear: string
+  skills: string[]
+  bio: string
+  githubUrl: string | null
+  developer?: DeveloperProfile
+  links?: ProfileLink[]
+}
+
+export interface AccountProfile extends PublicProfile {
+  email: string
+  onboarding?: OnboardingDetails
+}
+
+export type ProfileMediaKind = 'avatar' | 'banner'
+
+export interface ProfileLink {
+  id: string
+  platform: string
+  label: string
+  value: string
+  isPublic: boolean
+}
+
+export interface DeveloperProfile {
+  headline: string
+  introduction: string
+  graduationYear: string
+  languages: string[]
+  frameworks: string[]
+  tools: string[]
+  interests: string[]
+  roles: string[]
+  collaboration: string[]
+  avatarPath: string | null
+  bannerPath: string | null
+  bannerUrl: string | null
+}
+
+export interface OnboardingDetails extends DeveloperProfile {
+  firstName: string
+  lastName: string
+  displayName: string
+  program: string
+  studyYear: string
+  bio: string
+  skills: string[]
+  links: ProfileLink[]
+  avatarUrl: string | null
+}
+
+export interface OnboardingDraft {
+  details: OnboardingDetails
+  step: number
+  revision: number
+}
+
+export interface ProfileDetails extends RegistrationDetails {
+  githubUrl: string
+}
+
+export interface ActivityItem {
+  id: string
+  kind: 'project' | 'bookmark' | 'upvote' | 'comment'
+  projectId: string
+  title: string
+  slug: string
   createdAt: string
 }
 

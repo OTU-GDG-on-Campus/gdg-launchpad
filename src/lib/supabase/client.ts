@@ -1,5 +1,4 @@
-// The one configured Supabase browser client. Only lib/api/client.ts and lib/auth may import it,
-// so the data seam described in AGENTS.md stays intact.
+// The single Supabase client, consumed only by the API seam or auth infrastructure.
 
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 
@@ -22,6 +21,11 @@ function createStub(): SupabaseClient {
 
 export const supabase: SupabaseClient = isSupabaseConfigured
   ? createClient(url, anonKey, {
-      auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true },
+      auth: {
+        flowType: 'pkce',
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true,
+      },
     })
   : createStub()

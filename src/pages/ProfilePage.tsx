@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router'
 import { AccountProjectRow } from '@/components/account/AccountProjectRow'
-import { ProfileEditor } from '@/components/account/ProfileEditor'
+import { PreviewProfileEditor } from '@/components/account/PreviewProfileEditor'
 import { ProfileProjectTile } from '@/components/account/ProfileProjectTile'
 import { ErrorState, LoadingState } from '@/components/ui/PageState'
 import { getAccountWorkspace } from '@/lib/api/client'
@@ -94,7 +94,7 @@ export function ProfilePage() {
           need moderator review when connected.
         </p>
         {editing && (
-          <ProfileEditor
+          <PreviewProfileEditor
             key={user.id}
             profile={profile}
             projects={projects}

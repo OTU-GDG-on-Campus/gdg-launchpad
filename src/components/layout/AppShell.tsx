@@ -3,7 +3,7 @@
 
 import { useCallback, useEffect, useLayoutEffect, useState } from 'react'
 import { Outlet, useLocation } from 'react-router'
-import { CommandPalette } from '@/components/projects/CommandPalette'
+import { CommandPalette } from '@/components/projects/discovery/CommandPalette'
 import { cn } from '@/lib/cn'
 import { Footer } from './Footer'
 import { Navbar } from './Navbar'
@@ -49,7 +49,6 @@ export function AppShell() {
         setSearchOpen((current) => !current)
       }
     }
-    // Pages ask for the palette through this event, so no prop has to cross the router outlet.
     function onOpenSearch() {
       setSearchOpen(true)
     }

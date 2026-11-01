@@ -1,7 +1,6 @@
-// Loads one page of the discovery feed and layers optimistic upvote and bookmark overrides on
-// top, so what is on screen updates immediately while the data layer confirms.
+// Viewer-scoped discovery data with optimistic saves and upvote overrides that reset on sign-out.
 
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useMemo, useLayoutEffect, useRef, useState } from 'react'
 import { listBookmarkedIds, listProjects, toggleBookmark, toggleUpvote } from '@/lib/api/client'
 import { useAsync } from '@/lib/useAsync'
 import type { Project, ProjectQuery } from '@/types'
@@ -17,7 +16,12 @@ export function useProjectDiscovery(query: ProjectQuery, viewerKey: string) {
     perPage,
   } = query
 
+  const activeViewer = useRef(viewerKey)
+  useLayoutEffect(() => {
+    activeViewer.current = viewerKey
+  }, [viewerKey])
   const key = [
+    viewerKey,
     sort,
     category,
     search,
@@ -37,6 +41,13 @@ export function useProjectDiscovery(query: ProjectQuery, viewerKey: string) {
   const [upvoteOverrides, setUpvoteOverrides] = useState<Record<string, Project>>({})
   const [savedOverrides, setSavedOverrides] = useState<Record<string, boolean>>({})
 
+  const [overrideViewer, setOverrideViewer] = useState(viewerKey)
+  if (overrideViewer !== viewerKey) {
+    setOverrideViewer(viewerKey)
+    setUpvoteOverrides({})
+    setSavedOverrides({})
+  }
+
   const savedIds = useMemo(() => {
     const ids = new Set(bookmarks.data ?? [])
     for (const [id, saved] of Object.entries(savedOverrides)) {
@@ -51,10 +62,14 @@ export function useProjectDiscovery(query: ProjectQuery, viewerKey: string) {
     [data, upvoteOverrides],
   )
 
-  const upvote = useCallback(async (projectId: string) => {
-    const updated = await toggleUpvote(projectId)
-    setUpvoteOverrides((current) => ({ ...current, [projectId]: updated }))
-  }, [])
+  const upvote = useCallback(
+    async (projectId: string) => {
+      const updated = await toggleUpvote(projectId)
+      if (activeViewer.current === viewerKey)
+        setUpvoteOverrides((current) => ({ ...current, [projectId]: updated }))
+    },
+    [viewerKey],
+  )
 
   const toggleSaved = useCallback(
     async (projectId: string) => {
@@ -62,13 +77,15 @@ export function useProjectDiscovery(query: ProjectQuery, viewerKey: string) {
       setSavedOverrides((current) => ({ ...current, [projectId]: !previous }))
       try {
         const saved = await toggleBookmark(projectId)
-        setSavedOverrides((current) => ({ ...current, [projectId]: saved }))
+        if (activeViewer.current === viewerKey)
+          setSavedOverrides((current) => ({ ...current, [projectId]: saved }))
       } catch (cause) {
-        setSavedOverrides((current) => ({ ...current, [projectId]: previous }))
+        if (activeViewer.current === viewerKey)
+          setSavedOverrides((current) => ({ ...current, [projectId]: previous }))
         throw cause
       }
     },
-    [savedIds],
+    [savedIds, viewerKey],
   )
 
   return {

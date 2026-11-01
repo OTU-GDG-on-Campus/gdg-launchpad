@@ -16,8 +16,9 @@ the footer links to the section, and the old /about route redirects there.
   projects, and an inline editor.
 - `/dashboard`: guarded workspace with owned projects, real local Recently Viewed history,
   project status summaries, and a profile checklist filling the lower-left area.
-- `/contributors`: public names and project counts derived from approved sample projects.
-- The account name and profile icon both open `/profile`; Dashboard is beside the account links.
+- `/contributors`: public names and project counts derived from approved projects through the shared Supabase/demo seam.
+- The account avatar opens the upstream account menu. Dashboard and Profile preview remain available
+  alongside the persistent `/me` account pages.
 - Project detail pages list the creator and named contributors, including their roles.
 
 ## Persistence boundaries
@@ -25,7 +26,7 @@ the footer links to the section, and the old /about route redirects there.
 `AuthProvider` and the existing Supabase authentication functions are preserved. No migrations,
 credentials, environment changes, or public profile writes are included.
 
-All project feeds still use the existing mock records. Own-project lists filter by the current
+Project feeds use the configured Supabase backend or the isolated browser-local demo. Own-project lists filter by the current
 account ID rather than showing another account's sample work. Profile and dashboard routes are
 UI-guarded using RequireAuth. Future protected APIs must enforce the same rules server-side.
 
@@ -41,7 +42,7 @@ Browsing remains usable if storage is unavailable. History is not recorded for s
 
 ## Backend work still needed
 
-- Replace mock project and contributor queries in client.ts with approved backend queries.
+- Verify project and contributor reads against the hosted backend after applying migrations.
 - Load approved profile fields and submit edit requests to the moderation workflow.
 - Persist pinned choices and recently viewed projects if cross-device behavior is wanted.
 - Add real notifications or profile-view tracking before displaying those as completed features.
@@ -49,3 +50,10 @@ Browsing remains usable if storage is unavailable. History is not recorded for s
 The lower-left dashboard section is a profile checklist, avoiding an empty drafts section before
 a project draft model and editor exist. Project activity is derived from existing record status;
 it does not invent people, approvals, or collaboration events.
+
+## Development integration
+
+The persistent account editor uses the upstream onboarding fields at `/me/settings/profile`.
+The separate `/profile` preview keeps its browser-only editing and pins. PreviewProfileEditor
+implements that local editor; ProfileEditor remains the persistent onboarding editor.
+Sprints now lives in `src/pages/sprints/SprintsPage.tsx` and keeps the bubble design.

@@ -46,30 +46,31 @@ are building" are accurate and stay.
 
 ## Current state
 
-The repository is a working skeleton. The layout, routing, and component structure are real and
-typecheck clean. Data is deliberately stubbed. Auth works against a local Supabase stack.
+The repository has public discovery and private account pages. Supabase data paths are implemented,
+with an isolated browser-local demo when unconfigured. Hosted setup and migration verification remain pending.
 
-| Area                  | State                                                                                             |
-| --------------------- | ------------------------------------------------------------------------------------------------- |
-| Routing and layout    | Done                                                                                              |
-| Home page             | Done: hero, value points, featured grid, closing call to action                                   |
-| Dark and light themes | Done. Dark by default, light, or follow the system. Persisted                                     |
-| Project listing       | Done: discovery page, tabs, tech chips, URL filters, grid/list                                    |
-| Project detail        | Done: cover, tech stack, screenshots slot, discussion, sidebar                                    |
-| Featured project      | Done in the UI. Admin picker on /admin, stored by a migration                                     |
-| Bookmarks             | Done in the UI. Optimistic, private per user, table written not applied                           |
-| Global search         | Done: command palette on Ctrl/Cmd+K, mounted in AppShell                                          |
-| Semester Sprints      | Original event landing, orbital artwork, lineup preview, FAQs, and detail pages done              |
-| Comments              | List renders from mock data. No composer, posting is not built                                    |
-| Upvoting              | UI done, toggles local state only                                                                 |
-| Auth                  | Email code login and registration, tested locally. Demo user when `VITE_SUPABASE_*` is unset      |
-| Submission form       | Placeholder page                                                                                  |
-| Admin panel           | Featured picker live. Moderation and user management not built                                    |
-| Project cover art     | Type field exists, every mock row is null so cards show derived art                               |
-| Backend               | Supabase project created. Schema applied and tested locally, not yet pushed to the hosted project |
-| Database schema       | `supabase/migrations/` holds the schema, registration columns, and bookmarks and featured tables  |
-| Profile and dashboard | UI implemented. Edits, pins, and viewing history are browser-only previews                        |
-| Contributors          | Named lists from mock project data, including project creators                                    |
+| Area                  | State                                                                                                                                                                       |
+| --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Routing and layout    | Done                                                                                                                                                                        |
+| Home page             | Done: hero, value points, featured grid, closing call to action                                                                                                             |
+| About page            | Mission, community principles, contribution links, and FAQ implemented. Visual review pending                                                                               |
+| Dark and light themes | Done. Dark by default, light, or follow the system. Persisted                                                                                                               |
+| Project listing       | Discovery with shared Supabase/demo project reads, search, facets, filters, and grid/list                                                                                   |
+| Project detail        | Viewer-scoped Supabase/demo detail, discussion, author profile link, and private-submission status                                                                          |
+| Featured project      | Admin picker on /admin, stored by a migration. Not shown on any public page                                                                                                 |
+| Bookmarks             | Private saved-project page and optimistic controls. Supabase persistence or versioned local demo storage                                                                    |
+| Global search         | Done: command palette on Ctrl/Cmd+K, mounted in AppShell                                                                                                                    |
+| Semester Sprints      | Landing, filters, details, and project-linked personal sprints. Supabase reads or demo data. No team registration                                                           |
+| Contribute page       | Redesigned pathways, first-contribution guide, skills, and FAQ. Visual review pending                                                                                       |
+| Comments              | Supabase/demo reads and activity records. No composer or posting flow                                                                                                       |
+| Upvoting              | Supabase unique-constrained toggle or persistent demo votes. Configured path contract-tested, live DB test pending                                                          |
+| Auth                  | Seven-step OTP onboarding with private resumable drafts, atomic completion, and existing-user login. Separate explicit demo account. Hosted delivery unverified             |
+| Personal pages        | Shared full profile editor, cropped avatar/banner uploads, developer identity, public/private social links, and safe public profiles. Notifications remain a placeholder    |
+| Submission form       | Placeholder page                                                                                                                                                            |
+| Admin panel           | Featured picker live. Moderation and user management not built                                                                                                              |
+| Project cover art     | Type field exists, every mock row is null so cards show derived art                                                                                                         |
+| Backend               | Supabase project created. Schema applied and tested locally, not yet pushed to the hosted project                                                                           |
+| Database schema       | Existing schema plus developer onboarding, private drafts, atomic profile RPC, links, and private media policies. Local migration replay verified; hosted migration pending |
 
 Before starting work, re-read this table and correct it if it has drifted.
 
@@ -90,6 +91,11 @@ there in the same pass as the code that finishes them.
 ```bash
 npm install
 npm run dev           # dev server on http://localhost:5173
+npm run test:account  # Node account regression and configured-backend contract tests
+npm test              # All Node validation and API contract tests
+npm run test:browser  # Isolated Playwright onboarding flows (requires a browser)
+npm run test:db       # pgTAP ownership and privacy tests against local Supabase
+npm run test:onboarding:local # Real local Auth/Mailpit/Storage integration; never hosted
 npm run typecheck     # tsc -b
 npm run lint          # oxlint
 npm run format        # prettier --write .
@@ -120,7 +126,6 @@ src/
   types/index.ts       Shared domain types, mirroring future DB tables
   lib/
     api/client.ts      The only seam between UI and data
-    api/supabase.ts    Supabase browser client, null without env vars. Only client.ts imports it
     api/mock/          Placeholder records, deleted once the DB is live
     auth/              AuthProvider, context, useAuth hook, domain rules
     supabase/client.ts The configured Supabase browser client
@@ -138,13 +143,21 @@ src/
     ui/                Avatar, Badge, Button, Card, FilterPills, Logo, PageHeader,
                        PageState, Pagination, SearchInput, Select, Kbd, Toast, CardSkeleton
     auth/              AuthControl, RequireAuth route guard
-    projects/          ProjectCard, ProjectRowCard, ProjectList, ProjectCover, ProjectSidebar,
-                       UpvoteButton, BookmarkButton, ContributorStack, PersonTrigger,
-                       PersonPopover, CommentList, ProjectsHero, DiscoveryTabs, TechFilterChips,
-                       AdvancedFilters, ViewToggle, FeaturedProject, FeaturedProjectPicker,
-                       CommandPalette
+    projects/
+      cards/           ProjectCard, ProjectRowCard, LandingProjectCard, ProjectCover, ProjectList
+      actions/         UpvoteButton, BookmarkButton
+      people/          PersonTrigger, PersonPopover, ContributorStack
+      discovery/       DiscoveryTabs, ProjectSearchBar, TechFilterMenu, AdvancedFilters,
+                       ViewToggle, CommandPalette
+      detail/          ProjectSidebar, CommentList
+      admin/           FeaturedProjectPicker
     sprints/           SprintCard, SprintGrid
-  pages/               One file per route
+  pages/               One file per route. Home, About, Contribute, and NotFound sit at the top
+    account/           The protected /me workspace and /u/:id public profiles
+    auth/              Login and registration
+    projects/          Discovery, project detail, and submission
+    sprints/           Sprint landing and detail
+    admin/             Admin panel
 
 supabase/
   config.toml          Local stack config, kept in git. Comments sit inline, after the setting
@@ -222,6 +235,20 @@ import { SprintCard } from './SprintCard' // same folder
 - Variants belong in a lookup object at the top of the file, as in `Button.tsx` and `Badge.tsx`,
   not in a chain of ternaries inside JSX.
 - Prettier sorts class strings. Do not hand-order them.
+- Prettier preserves native line endings with `endOfLine: auto`; Windows CRLF alone is not a formatting failure.
+
+### Onboarding and media
+
+- `registered_at` is the existing completion marker. Only `publish_developer_profile` may set it,
+  after profile fields and links validate in the same transaction. Never set it from the browser.
+- Incomplete verified accounts may save private `onboarding_drafts`; they cannot participate yet.
+  Shared field validation lives in `lib/onboarding.ts`, and settings reuse the onboarding forms.
+- Profile media buckets are private. Public reads require a reference from `public_profiles`.
+  Qualify `storage.objects.name` inside policy subqueries: bare `name` can bind to the profile name.
+- Browser tests intercept a separate local API on port 54329. They do not verify hosted delivery or RLS.
+  Run the SQL and opt-in local integration tests for those local backend behaviors. See `docs/onboarding.md`.
+- In browser tests, await the destination step or URL after navigation before reading saved state,
+  reloading, or changing failure flags. A completed click does not mean the async save has finished.
 
 ## Architectural rules
 
@@ -239,6 +266,9 @@ and `lib/auth/` may import it. A component importing it directly is the seam lea
 Schema changes are SQL files in `supabase/migrations/`, never edits made in the dashboard and
 left there. A dashboard edit that is not captured with `npm run db:diff` is lost on the next
 `db:reset` and invisible to everyone else. See [docs/supabase.md](docs/supabase.md).
+
+Public profile reads use the `public_profiles` projection. Full `profiles` rows contain private email
+and account privileges and are readable only by their owner and admins. Never restore public access.
 
 ### Server-side enforcement is not optional
 
@@ -262,11 +292,15 @@ Only `VITE_`-prefixed environment variables reach the browser, and everything wi
 public. Never put a service role key, client secret, or API key behind `VITE_`. Server-only values
 go in Vercel project environment variables. See [.env.example](.env.example).
 
+GitHub Actions job conditions cannot reference secrets. Map secrets into job environment variables
+and check them in step conditions when deployment should skip without credentials.
+
 ## Recipes
 
 ### Add a page
 
-1. Create `src/pages/YourPage.tsx` with a header comment and a named export.
+1. Create `src/pages/<section>/YourPage.tsx` with a header comment and a named export. Only
+   site-wide pages like Home and About sit directly in `src/pages/`.
 2. Add a `<Route>` to `src/App.tsx`.
 3. If it needs a signed-in student, wrap the body in `<RequireAuth>`. Add `adminOnly` for admin
    pages.
@@ -331,7 +365,7 @@ text entry fields retain the text cursor. Keep text selection available.
 
 Semester Sprints uses a full-width event page with scoped light/dark tokens in src/styles/sprints.css
 and a glossy, interactive bubble hero in SprintHeroBubbles. The lineup, FAQ, and stage content do not imply
-registration is live. The lineup still uses mock records, labelled as a preview with unconfirmed dates.
+registration is live. The lineup uses the shared Supabase/demo seam; demo records are labelled as previews with unconfirmed dates.
 The general event format follows the supplied poster (5-6 weeks, teams of 3-5); individual briefs vary.
 
 The Sprints hero and pathway share one continuous lavender grid and glossy bubble palette. SprintJourney connects interactive
@@ -363,3 +397,12 @@ drag/pop layers, and the flicker stops for reduced-motion preferences.
 
 The bubble aura has a continuous full ring without a circling highlight. Its occasional soft flicker
 is staggered across bubbles, never fully turns the halo off, and is disabled with reduced motion.
+
+## Integrating development with the custom UI
+
+Page modules follow the upstream section folders. The bubble Sprints page lives in
+`src/pages/sprints/SprintsPage.tsx`. Keep the home About section and legacy /about redirect.
+The persistent account editor at /me/settings/profile uses ProfileEditor and onboarding fields;
+/profile retains the private browser preview through PreviewProfileEditor. Both editors are intentional.
+The /dashboard and /contributors views read through the same Supabase/demo seam as discovery.
+Only preview fields, pin choices, and recent viewing history remain separate browser-local data.

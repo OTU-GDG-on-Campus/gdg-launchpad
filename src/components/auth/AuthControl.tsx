@@ -1,98 +1,153 @@
-// Account navigation: clickable name and profile icon, dashboard link, and existing sign-out.
+// Signed-in avatar navigation with keyboard focus, outside dismissal, and sign-out feedback.
 
-import { useState } from 'react'
-import { Link } from 'react-router'
+import { useEffect, useRef, useState } from 'react'
+import { Link, useLocation } from 'react-router'
+import { Avatar } from '@/components/ui/Avatar'
+import { ACCOUNT_LINKS } from '@/config/account'
 import { useAuth } from '@/lib/auth/useAuth'
 
 export function AuthControl() {
   const { status, user, isAdmin, signOut } = useAuth()
-  const [error, setError] = useState<string | null>(null)
+  const [open, setOpen] = useState(false)
   const [pending, setPending] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const ref = useRef<HTMLDivElement>(null)
+  const trigger = useRef<HTMLButtonElement>(null)
+  const pathname = useLocation().pathname
+  const contextKey = `${pathname}|${user?.id ?? 'none'}`
+  const [menuContext, setMenuContext] = useState(contextKey)
+  if (menuContext !== contextKey) {
+    setMenuContext(contextKey)
+    setOpen(false)
+  }
+  useEffect(() => {
+    if (!open) return
+    ref.current?.querySelector<HTMLAnchorElement>('a')?.focus()
+    function outside(event: PointerEvent) {
+      if (!ref.current?.contains(event.target as Node)) setOpen(false)
+    }
+    function keyboard(event: KeyboardEvent) {
+      if (event.key === 'Escape') {
+        setOpen(false)
+        trigger.current?.focus()
+      }
+    }
+    document.addEventListener('pointerdown', outside)
+    document.addEventListener('keydown', keyboard)
+    return () => {
+      document.removeEventListener('pointerdown', outside)
+      document.removeEventListener('keydown', keyboard)
+    }
+  }, [open])
   if (status === 'loading')
-    return (
-      <span role="status" className="text-ink-muted text-xs">
-        Loading account...
-      </span>
-    )
+    return <span className="text-ink-muted text-sm">Checking session...</span>
   if (!user)
     return (
       <Link
         to="/login"
-        className="bg-brand-500 text-on-brand hover:bg-brand-600 rounded-lg px-4 py-2.5 text-sm font-bold transition-colors"
+        className="bg-brand-500 text-on-brand hover:bg-brand-600 inline-flex min-h-10 items-center justify-center rounded-lg px-4 py-2 text-sm font-medium"
       >
         Login
       </Link>
     )
-
-  async function handleSignOut() {
-    if (pending) return
-    setPending(true)
-    setError(null)
-    try {
-      await signOut()
-    } catch {
-      setError('Sign-out could not be confirmed. Please try again.')
-    } finally {
-      setPending(false)
-    }
-  }
-
   return (
-    <div className="relative flex flex-wrap items-center justify-end gap-2 sm:gap-3">
-      {isAdmin && (
-        <Link to="/admin" className="text-ink-soft hover:text-brand-700 text-xs font-semibold">
-          Admin
-        </Link>
-      )}
-      <Link
-        to="/dashboard"
-        className="text-ink-soft hover:text-brand-700 text-xs font-semibold sm:text-sm"
-      >
-        Dashboard
-      </Link>
-      <Link
-        to="/profile"
-        className="text-ink-soft hover:text-brand-700 hidden max-w-36 truncate text-sm font-semibold sm:inline"
-      >
-        {user.name}
-      </Link>
-      <Link
-        to="/profile"
-        aria-label="View your profile"
-        title="Your profile"
-        className="border-line text-brand-700 hover:border-brand-700 flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full border"
-      >
-        {user.avatarUrl ? (
-          <img src={user.avatarUrl} alt="" className="h-full w-full object-cover" />
-        ) : (
-          <svg
-            aria-hidden="true"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.6"
-            className="h-5 w-5"
-          >
-            <circle cx="12" cy="8" r="3.5" />
-            <path d="M5 21v-2a7 7 0 0 1 14 0v2" />
-          </svg>
-        )}
-      </Link>
+    <div
+      ref={ref}
+      className="relative"
+      onBlur={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget)) setOpen(false)
+      }}
+    >
       <button
+        ref={trigger}
         type="button"
-        disabled={pending}
-        onClick={() => void handleSignOut()}
-        className="border-line bg-surface hover:border-brand-700 rounded-lg border px-3 py-2 text-xs font-semibold disabled:opacity-50 sm:text-sm"
+        aria-expanded={open}
+        aria-controls="account-navigation"
+        aria-label={`Open account navigation for ${user.name}`}
+        onClick={() => setOpen((current) => !current)}
+        className="border-line bg-surface flex min-h-10 items-center gap-2 rounded-full border p-1 pr-3"
       >
-        {pending ? 'Signing out...' : 'Sign out'}
+        <Avatar name={user.name} src={user.avatarUrl} size="sm" />
+        <span className="hidden max-w-28 truncate text-sm font-semibold sm:inline">
+          {user.name}
+        </span>
+        <span aria-hidden="true" className="text-ink-muted text-xs">
+          &#9662;
+        </span>
       </button>
-      {error && (
-        <p
-          role="alert"
-          className="border-line bg-surface absolute top-full right-0 mt-2 w-64 rounded-lg border p-3 text-xs"
+      {open && (
+        <nav
+          id="account-navigation"
+          aria-label="Account menu"
+          className="border-line bg-surface shadow-card-hover absolute right-0 z-60 mt-3 max-h-[75vh] w-64 overflow-y-auto rounded-xl border p-2"
         >
-          {error}
-        </p>
+          <p className="text-ink-muted border-line mb-2 border-b px-3 py-3 text-xs">
+            Your LaunchPad
+          </p>
+          <Link
+            to="/dashboard"
+            onClick={() => setOpen(false)}
+            className="hover:bg-surface-raised flex min-h-10 items-center rounded-lg px-3 py-2 text-sm"
+          >
+            Dashboard
+          </Link>
+          <Link
+            to="/profile"
+            onClick={() => setOpen(false)}
+            className="hover:bg-surface-raised flex min-h-10 items-center rounded-lg px-3 py-2 text-sm"
+          >
+            Profile preview
+          </Link>
+          {ACCOUNT_LINKS.map((link) => (
+            <Link
+              key={link.to}
+              to={link.to}
+              onClick={() => setOpen(false)}
+              className="hover:bg-surface-raised flex min-h-10 items-center rounded-lg px-3 py-2 text-sm"
+            >
+              {link.label}
+            </Link>
+          ))}
+          {user.registeredAt && !user.bannedAt && (
+            <Link
+              to={`/u/${user.id}`}
+              onClick={() => setOpen(false)}
+              className="hover:bg-surface-raised flex min-h-10 items-center rounded-lg px-3 py-2 text-sm"
+            >
+              View public profile &#8599;
+            </Link>
+          )}
+          {isAdmin && (
+            <Link
+              to="/admin"
+              onClick={() => setOpen(false)}
+              className="hover:bg-surface-raised flex min-h-10 items-center rounded-lg px-3 py-2 text-sm"
+            >
+              Admin
+            </Link>
+          )}
+          <div className="border-line mt-2 border-t pt-2">
+            <button
+              type="button"
+              disabled={pending}
+              onClick={() => {
+                setPending(true)
+                setError(null)
+                void signOut()
+                  .catch(() => setError('Could not confirm server sign-out.'))
+                  .finally(() => setPending(false))
+              }}
+              className="hover:bg-surface-raised min-h-10 w-full rounded-lg px-3 py-2 text-left text-sm disabled:opacity-50"
+            >
+              {pending ? 'Signing out...' : 'Sign out'}
+            </button>
+            {error && (
+              <p role="alert" className="text-danger px-3 py-2 text-xs">
+                {error}
+              </p>
+            )}
+          </div>
+        </nav>
       )}
     </div>
   )

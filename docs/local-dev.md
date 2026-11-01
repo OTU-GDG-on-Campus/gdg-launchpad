@@ -6,6 +6,9 @@ touches the hosted project.
 Read [supabase.md](supabase.md) for how the backend is wired, and [auth.md](auth.md) for the rules
 the database exists to enforce.
 
+See [onboarding.md](onboarding.md) for the seven-step signup walkthrough, Mailpit integration test,
+profile-image buckets, and browser test commands. Use Node 22.22 or newer with the current router.
+
 ## Why a local stack
 
 The hosted project holds real data, and merging to `main` pushes schema changes to it
