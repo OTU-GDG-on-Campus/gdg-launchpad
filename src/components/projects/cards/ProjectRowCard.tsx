@@ -3,10 +3,10 @@
 
 import { Link } from 'react-router'
 import { cn } from '@/lib/cn'
-import { BookmarkButton } from './BookmarkButton'
-import { PersonTrigger } from './PersonTrigger'
+import { BookmarkButton } from '@/components/projects/actions/BookmarkButton'
+import { PersonTrigger } from '@/components/projects/people/PersonTrigger'
 import { ProjectCover } from './ProjectCover'
-import { UpvoteButton } from './UpvoteButton'
+import { UpvoteButton } from '@/components/projects/actions/UpvoteButton'
 import type { Project } from '@/types'
 
 interface ProjectRowCardProps {

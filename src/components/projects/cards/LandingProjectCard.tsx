@@ -3,8 +3,8 @@
 import { Link } from 'react-router'
 import { cn } from '@/lib/cn'
 import type { Project } from '@/types'
-import { ContributorStack } from './ContributorStack'
-import { UpvoteButton } from './UpvoteButton'
+import { ContributorStack } from '@/components/projects/people/ContributorStack'
+import { UpvoteButton } from '@/components/projects/actions/UpvoteButton'
 
 type CardVariant = 'featured' | 'standard' | 'compact'
 

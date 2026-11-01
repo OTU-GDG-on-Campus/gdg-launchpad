@@ -57,7 +57,7 @@ with an isolated browser-local demo when unconfigured. Hosted setup and migratio
 | Dark and light themes | Done. Dark by default, light, or follow the system. Persisted                                                                                                               |
 | Project listing       | Discovery with shared Supabase/demo project reads, search, facets, filters, and grid/list                                                                                   |
 | Project detail        | Viewer-scoped Supabase/demo detail, discussion, author profile link, and private-submission status                                                                          |
-| Featured project      | Done in the UI. Admin picker on /admin, stored by a migration                                                                                                               |
+| Featured project      | Admin picker on /admin, stored by a migration. Not shown on any public page                                                                                                 |
 | Bookmarks             | Private saved-project page and optimistic controls. Supabase persistence or versioned local demo storage                                                                    |
 | Global search         | Done: command palette on Ctrl/Cmd+K, mounted in AppShell                                                                                                                    |
 | Semester Sprints      | Landing, filters, details, and project-linked personal sprints. Supabase reads or demo data. No team registration                                                           |
@@ -143,13 +143,21 @@ src/
     ui/                Avatar, Badge, Button, Card, FilterPills, Logo, PageHeader,
                        PageState, Pagination, SearchInput, Select, Kbd, Toast, CardSkeleton
     auth/              AuthControl, RequireAuth route guard
-    projects/          ProjectCard, ProjectRowCard, ProjectList, ProjectCover, ProjectSidebar,
-                       UpvoteButton, BookmarkButton, ContributorStack, PersonTrigger,
-                       PersonPopover, CommentList, ProjectsHero, DiscoveryTabs, TechFilterChips,
-                       AdvancedFilters, ViewToggle, FeaturedProject, FeaturedProjectPicker,
-                       CommandPalette
+    projects/
+      cards/           ProjectCard, ProjectRowCard, LandingProjectCard, ProjectCover, ProjectList
+      actions/         UpvoteButton, BookmarkButton
+      people/          PersonTrigger, PersonPopover, ContributorStack
+      discovery/       DiscoveryTabs, ProjectSearchBar, TechFilterMenu, AdvancedFilters,
+                       ViewToggle, CommandPalette
+      detail/          ProjectSidebar, CommentList
+      admin/           FeaturedProjectPicker
     sprints/           SprintCard, SprintGrid
-  pages/               One file per route, including the protected /me workspace and /u/:id profiles
+  pages/               One file per route. Home, About, Contribute, and NotFound sit at the top
+    account/           The protected /me workspace and /u/:id public profiles
+    auth/              Login and registration
+    projects/          Discovery, project detail, and submission
+    sprints/           Sprint landing and detail
+    admin/             Admin panel
 
 supabase/
   config.toml          Local stack config, kept in git. Comments sit inline, after the setting
@@ -291,7 +299,8 @@ and check them in step conditions when deployment should skip without credential
 
 ### Add a page
 
-1. Create `src/pages/YourPage.tsx` with a header comment and a named export.
+1. Create `src/pages/<section>/YourPage.tsx` with a header comment and a named export. Only
+   site-wide pages like Home and About sit directly in `src/pages/`.
 2. Add a `<Route>` to `src/App.tsx`.
 3. If it needs a signed-in student, wrap the body in `<RequireAuth>`. Add `adminOnly` for admin
    pages.

@@ -1,16 +1,15 @@
-// The projects discovery page: a hero with global search, the featured project of the week,
-// discovery tabs, technology and advanced filters, and a grid or list feed. Opening a project
-// goes to its full detail page. Every filter lives in the URL, so any view here is shareable.
+// The projects discovery page: discovery tabs, a search bar, technology and advanced filters,
+// and a grid or list feed. Opening a project goes to its full detail page. Every filter lives in
+// the URL, so any view here is shareable.
 
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router'
-import { AdvancedFilters } from '@/components/projects/AdvancedFilters'
-import { DiscoveryTabs } from '@/components/projects/DiscoveryTabs'
-import { FeaturedProject } from '@/components/projects/FeaturedProject'
-import { ProjectList } from '@/components/projects/ProjectList'
-import { ProjectsHero } from '@/components/projects/ProjectsHero'
-import { TechFilterChips } from '@/components/projects/TechFilterChips'
-import { ViewToggle } from '@/components/projects/ViewToggle'
+import { AdvancedFilters } from '@/components/projects/discovery/AdvancedFilters'
+import { DiscoveryTabs } from '@/components/projects/discovery/DiscoveryTabs'
+import { ProjectList } from '@/components/projects/cards/ProjectList'
+import { ProjectSearchBar } from '@/components/projects/discovery/ProjectSearchBar'
+import { TechFilterMenu } from '@/components/projects/discovery/TechFilterMenu'
+import { ViewToggle } from '@/components/projects/discovery/ViewToggle'
 import { Button } from '@/components/ui/Button'
 import { CardSkeleton } from '@/components/ui/CardSkeleton'
 import { ErrorState } from '@/components/ui/PageState'
@@ -19,7 +18,7 @@ import { Toast } from '@/components/ui/Toast'
 import { useProjectDiscovery } from '@/hooks/useProjectDiscovery'
 import { useProjectsUrlState } from '@/hooks/useProjectsUrlState'
 import { useProjectsView } from '@/hooks/useProjectsView'
-import { getFeaturedProject, listTechnologies } from '@/lib/api/client'
+import { listTechnologies } from '@/lib/api/client'
 import { useAuth } from '@/lib/auth/useAuth'
 import { formatCount } from '@/lib/format'
 import { useAsync } from '@/lib/useAsync'
@@ -46,7 +45,6 @@ export function ProjectsPage() {
   )
 
   const technologies = useAsync(() => listTechnologies(), 'technology-facets')
-  const featured = useAsync(() => getFeaturedProject(), 'featured-project')
 
   function toggleBookmark(projectId: string) {
     feed.toggleSaved(projectId).catch(() => {
@@ -60,24 +58,16 @@ export function ProjectsPage() {
 
   return (
     <>
-      <ProjectsHero onOpenSearch={() => window.dispatchEvent(new Event('launchpad:open-search'))} />
-
-      <div className="mx-auto max-w-6xl px-4 pb-20 sm:px-6">
-        {!filters.hasActiveFilters && featured.data && (
-          <FeaturedProject
-            selection={featured.data}
-            saved={feed.savedIds.has(featured.data.project.id)}
-            onUpvote={(id) => void feed.upvote(id)}
-            onToggleBookmark={toggleBookmark}
-            onOpen={openProject}
-          />
-        )}
-
-        <div className="mt-12 space-y-6">
+      <div className="mx-auto max-w-6xl px-4 pt-10 pb-20 sm:px-6 sm:pt-12">
+        <div className="space-y-6">
           <DiscoveryTabs value={filters.sort} onChange={filters.setSort} />
 
+          <ProjectSearchBar
+            onOpenSearch={() => window.dispatchEvent(new Event('launchpad:open-search'))}
+          />
+
           {technologies.data && technologies.data.length > 0 && (
-            <TechFilterChips
+            <TechFilterMenu
               technologies={technologies.data}
               selected={filters.technologies}
               onChange={filters.setTechnologies}

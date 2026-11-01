@@ -1,8 +1,9 @@
 // Landing page: full-width grid, community overview, featured projects, and submission banner.
+// The hero fills one screen below the navbar; the sections after it use normal spacing.
 
 import { useState } from 'react'
 import { Link } from 'react-router'
-import { LandingProjectCard } from '@/components/projects/LandingProjectCard'
+import { LandingProjectCard } from '@/components/projects/cards/LandingProjectCard'
 import { EmptyState, ErrorState, LoadingState } from '@/components/ui/PageState'
 import { useProjectFeed } from '@/hooks/useProjectFeed'
 
@@ -10,6 +11,7 @@ const PRIMARY_LINK =
   'bg-brand-500 text-on-brand hover:bg-brand-600 inline-flex min-h-12 items-center justify-center rounded-lg px-6 py-3 text-sm font-semibold transition-colors'
 const SECONDARY_LINK =
   'border-line bg-surface text-ink hover:border-brand-700 inline-flex min-h-12 items-center justify-center rounded-lg border px-6 py-3 text-sm font-semibold transition-colors'
+const HERO_LINK_SIZE = 'sm:min-h-14 sm:px-8 sm:text-base'
 
 export function HomePage() {
   const { projects, totalCount, loading, error, upvote } = useProjectFeed({
@@ -42,37 +44,34 @@ export function HomePage() {
     <div className="landing-grid">
       <section
         aria-labelledby="landing-title"
-        className="landing-hero relative flex min-h-140 flex-col items-center justify-center px-4 py-20 text-center sm:px-6 sm:py-24"
+        className="landing-hero relative flex min-h-[calc(100svh-4rem)] flex-col items-center justify-center px-4 py-16 text-center sm:px-6 sm:py-24"
       >
-        <p className="text-ink-muted mb-6 font-mono text-xs tracking-widest uppercase">
-          Built by students. Made to be shared.
-        </p>
         <h1
           id="landing-title"
-          className="mx-auto max-w-5xl text-5xl leading-[0.98] font-extrabold tracking-[-0.045em] sm:text-7xl lg:text-8xl"
+          className="mx-auto text-4xl leading-[0.98] font-extrabold tracking-[-0.045em] sm:text-5xl md:text-6xl md:whitespace-nowrap lg:text-7xl xl:text-8xl"
         >
           Where <span className="text-brand-700">Ontario Tech's</span>
           <br /> students ship<span className="text-flare">.</span>
         </h1>
-        <p className="text-ink-muted mx-auto mt-7 max-w-xl text-base leading-relaxed sm:text-lg">
+        <p className="text-ink-muted mx-auto mt-8 max-w-2xl text-base leading-relaxed sm:text-xl">
           Discover projects built by students, contribute to the ones you love, and build something
           of your own.
         </p>
-        <div className="mt-9 flex w-full flex-col justify-center gap-3 sm:w-auto sm:flex-row">
-          <Link to="/projects" className={PRIMARY_LINK}>
+        <div className="mt-10 flex w-full flex-col justify-center gap-3 sm:w-auto sm:flex-row sm:gap-4">
+          <Link to="/projects" className={`${PRIMARY_LINK} ${HERO_LINK_SIZE}`}>
             Explore Projects <span aria-hidden="true">↗</span>
           </Link>
-          <Link to="/submit" className={SECONDARY_LINK}>
+          <Link to="/submit" className={`${SECONDARY_LINK} ${HERO_LINK_SIZE}`}>
             Launch Your Project <span aria-hidden="true">+</span>
           </Link>
         </div>
-        <dl className="border-line mt-12 grid w-full max-w-2xl grid-cols-3 border-t pt-6">
+        <dl className="border-line mt-16 grid w-full max-w-3xl grid-cols-3 border-t pt-8">
           {statistics.map((statistic) => (
             <div key={statistic.label} className="px-2 sm:px-5">
-              <dt className="text-ink-muted text-[10px] leading-relaxed sm:text-xs">
+              <dt className="text-ink-muted text-[10px] leading-relaxed sm:text-sm">
                 {statistic.label}
               </dt>
-              <dd className="mt-2 font-mono text-2xl font-bold sm:text-3xl">
+              <dd className="mt-2 font-mono text-2xl font-bold sm:text-4xl">
                 {loading || error ? '-' : statistic.value}
               </dd>
             </div>
