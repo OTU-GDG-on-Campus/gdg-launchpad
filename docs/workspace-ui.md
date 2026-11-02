@@ -7,8 +7,7 @@ and panels. Featured projects use four equal cards in two columns, stacking on m
 
 Page navigation resets scrolling to the top. Changes to project filters keep the scroll position.
 
-About content appears below the home submission prompt at /#about. It is removed from the navbar;
-the footer links to the section, and the old /about route redirects there.
+About lives at /about and is linked from the navbar and footer.
 
 ## Routes
 

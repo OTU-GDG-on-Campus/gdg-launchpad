@@ -1,17 +1,17 @@
-/* Lavender bubble landscape, winding pathway, and springy pointer interactions. */
+/* Blue bubble landscape, winding pathway, and springy pointer interactions. */
 
 .sprint-event {
-  --journey-bg: #171120;
-  --journey-grid: #c5a1ff0c;
-  --journey-path: #ae88e366;
-  --journey-soft: #ab7be326;
-  --bubble-top: #faf0ff;
-  --bubble-light: #e5caff;
-  --bubble-mid: #c19aef;
-  --bubble-bottom: #8751c2;
-  --bubble-edge: #efe1ffb3;
-  --bubble-shadow: #6e3c9840;
-  --bubble-ink: #311946;
+  --journey-bg: #111820;
+  --journey-grid: #a1ceff0c;
+  --journey-path: #88b4e366;
+  --journey-soft: #7bade326;
+  --bubble-top: #f0f7ff;
+  --bubble-light: #cae3ff;
+  --bubble-mid: #9ac3ef;
+  --bubble-bottom: #5187c2;
+  --bubble-edge: #e1efffb3;
+  --bubble-shadow: #3c689840;
+  --bubble-ink: #192f46;
   background-color: var(--journey-bg);
   background-image:
     radial-gradient(ellipse at 20% 20%, var(--journey-soft), transparent 40%),
@@ -30,11 +30,11 @@
   position: relative;
 }
 [data-theme='light'] .sprint-event {
-  --journey-bg: #f4edfb;
-  --journey-grid: #9167bc12;
-  --journey-path: #9b6bcd80;
-  --journey-soft: #d7b7f22b;
-  --bubble-shadow: #8650b32b;
+  --journey-bg: #edf4fb;
+  --journey-grid: #6790bc12;
+  --journey-path: #6b9acd80;
+  --journey-soft: #b7d3f22b;
+  --bubble-shadow: #5080b32b;
 }
 .sprint-journey {
   padding-top: 90px;
@@ -56,7 +56,7 @@
 .sprint-journey h2 span,
 .sprint-bubble-questions h2 span,
 .sprint-bubble-finale h2 span {
-  color: var(--event-purple);
+  color: var(--event-accent);
 }
 .sprint-journey-heading > p:last-child {
   font-size: 13px;
@@ -154,7 +154,7 @@
   transform: scale(0.96);
 }
 .sprint-bubble:focus-visible {
-  outline: 2px solid var(--event-purple);
+  outline: 2px solid var(--event-accent);
   outline-offset: 10px;
 }
 .is-inspected .sprint-bubble {
@@ -244,7 +244,7 @@
   font-size: 12px;
   font-weight: 700;
   margin-top: 16px;
-  color: var(--event-purple);
+  color: var(--event-accent);
   text-decoration: underline;
   text-underline-offset: 5px;
   text-decoration-color: var(--journey-path);
@@ -856,24 +856,24 @@
   }
 }
 
-/* Clear lavender film keeps the grid visible through the bubble while preserving crisp labels. */
+/* Clear blue film keeps the grid visible through the bubble while preserving crisp labels. */
 .sprint-event {
-  --bubble-film: #cba5ff4d;
-  --bubble-film-rim: #c39ce2a3;
+  --bubble-film: #a5d0ff4d;
+  --bubble-film-rim: #9cbee2a3;
   --bubble-film-gloss: #fff6;
-  --bubble-film-edge: #ead5ffb3;
-  --bubble-film-shadow: #7949a242;
-  --bubble-number-ink: #f6edff;
-  --link-light: #d8b7ff;
+  --bubble-film-edge: #d5e9ffb3;
+  --bubble-film-shadow: #4974a242;
+  --bubble-number-ink: #edf6ff;
+  --link-light: #b7daff;
 }
 [data-theme='light'] .sprint-event {
-  --bubble-film: #c29ce820;
-  --bubble-film-rim: #bb91e263;
+  --bubble-film: #9cc0e820;
+  --bubble-film-rim: #91b8e263;
   --bubble-film-gloss: #fffc;
-  --bubble-film-edge: #b694d993;
-  --bubble-film-shadow: #75409d24;
-  --bubble-number-ink: #492269;
-  --link-light: #9963d0;
+  --bubble-film-edge: #94b5d993;
+  --bubble-film-shadow: #406d9d24;
+  --bubble-number-ink: #224469;
+  --link-light: #6397d0;
 }
 .sprint-bubble {
   width: 216px;
@@ -893,8 +893,7 @@
   backdrop-filter: blur(1px) saturate(1.15);
   box-shadow:
     inset 2px 3px 8px var(--bubble-film-gloss),
-    inset -5px -7px 17px var(--bubble-film-rim),
-    0 22px 35px -18px var(--bubble-film-shadow);
+    inset -5px -7px 17px var(--bubble-film-rim);
 }
 .sprint-bubble-gloss::before {
   opacity: 0.6;
@@ -931,7 +930,7 @@
   transition: opacity 220ms;
 }
 .sprint-link-draw {
-  stroke: var(--event-purple);
+  stroke: var(--event-accent);
   stroke-width: 1.7;
   stroke-linecap: round;
   stroke-dasharray: 1;
@@ -948,7 +947,7 @@
   stroke-linecap: round;
   stroke-dasharray: 0.015 0.985;
   stroke-dashoffset: calc(1 - var(--link-progress));
-  filter: drop-shadow(0 0 4px var(--event-purple));
+  filter: drop-shadow(0 0 4px var(--event-accent));
   opacity: 0.8;
   transition:
     stroke-dashoffset 320ms cubic-bezier(0.2, 0.7, 0.3, 1),
@@ -1078,22 +1077,22 @@
 .sprint-event {
   --event-bg: #03050b;
   --event-panel: #0b1730;
-  --event-ink: #f5f4ff;
+  --event-ink: #f4f9ff;
   --event-muted: #b4bfd4;
   --event-line: #293851;
-  --event-purple: #b99af6;
+  --event-accent: #9ac6f6;
   --journey-bg: #03050b;
   --journey-grid: #8bafd01b;
-  --journey-path: #b094e36b;
+  --journey-path: #94bae36b;
   --journey-soft: #174d9442;
-  --bubble-film: #cba5ff4d;
-  --bubble-film-rim: #c39ce2a3;
+  --bubble-film: #a5d0ff4d;
+  --bubble-film-rim: #9cbee2a3;
   --bubble-film-gloss: #fff7;
-  --bubble-film-edge: #ead5ffb3;
+  --bubble-film-edge: #d5e9ffb3;
   --bubble-film-shadow: #030b284d;
-  --bubble-number-ink: #f6edff;
-  --bubble-shadow: #7a4fa62b;
-  --link-light: #d8b7ff;
+  --bubble-number-ink: #edf6ff;
+  --bubble-shadow: #4f79a62b;
+  --link-light: #b7daff;
   --event-blue-haze: #0755a96b;
   --event-indigo-haze: #1c286d3d;
   --event-black: #020307;
@@ -1124,12 +1123,12 @@
   --color-surface: #0c1425;
   --color-surface-raised: #0c172c;
   --color-line: #293851;
-  --color-ink: #f5f4ff;
+  --color-ink: #f4f9ff;
   --color-ink-soft: #c6cee0;
   --color-ink-muted: #aebbd2;
-  --color-brand-500: #7552b3;
-  --color-brand-600: #8663c4;
-  --color-brand-700: #b99af6;
+  --color-brand-500: #5281b3;
+  --color-brand-600: #6392c4;
+  --color-brand-700: #9ac6f6;
   background: var(--color-surface-muted);
 }
 .sprint-bubble-stop:has([data-scroll-static]) .sprint-bubble-copy,
@@ -1160,19 +1159,19 @@
   --event-ink: #20283d;
   --event-muted: #55647c;
   --event-line: #c5d0e2;
-  --event-purple: #7351ad;
+  --event-accent: #517dad;
   --journey-bg: #fcfcfe;
   --journey-grid: #6087b018;
-  --journey-path: #9276b56b;
+  --journey-path: #7694b56b;
   --journey-soft: #a7c9f142;
-  --bubble-film: #b99ae14d;
-  --bubble-film-rim: #ba91df99;
+  --bubble-film: #9abce14d;
+  --bubble-film-rim: #91b6df99;
   --bubble-film-gloss: #fffd;
-  --bubble-film-edge: #b397d1b3;
+  --bubble-film-edge: #97b3d1b3;
   --bubble-film-shadow: #7292bd30;
-  --bubble-number-ink: #41245e;
-  --bubble-shadow: #8c83b32b;
-  --link-light: #9364c2;
+  --bubble-number-ink: #24405e;
+  --bubble-shadow: #839ab32b;
+  --link-light: #6491c2;
   --event-blue-haze: #7ab3ed52;
   --event-indigo-haze: #c4c9f845;
   --event-black: #fcfcfe;
@@ -1187,84 +1186,7 @@
   --color-ink: #20283d;
   --color-ink-soft: #3c4b65;
   --color-ink-muted: #55647c;
-  --color-brand-500: #7552b3;
-  --color-brand-600: #624198;
-  --color-brand-700: #7351ad;
-}
-.sprint-event {
-  --bubble-orbit-light: #b56affdd;
-  --bubble-orbit-core: #cd9aff;
-  --bubble-orbit-ring: #a855f766;
-}
-[data-theme='light'] .sprint-event {
-  --bubble-orbit-light: #a04fe8cc;
-  --bubble-orbit-core: #b06beeee;
-  --bubble-orbit-ring: #a04fe84d;
-}
-.sprint-bubble-aura {
-  position: absolute;
-  inset: -3px;
-  border-radius: 50%;
-  pointer-events: none;
-  opacity: 1;
-}
-.sprint-bubble-aura::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border: 2px solid var(--bubble-orbit-core);
-  border-radius: inherit;
-  box-shadow:
-    0 0 12px 3px var(--bubble-orbit-light),
-    0 0 28px 8px var(--bubble-orbit-ring),
-    0 0 48px 12px var(--bubble-orbit-ring),
-    inset 0 0 10px 1px var(--bubble-orbit-light);
-  opacity: 0.85;
-  animation: sprint-halo-flicker 12s linear infinite;
-}
-/* A steady full halo with occasional soft, staggered dips rather than an on/off flash. */
-@keyframes sprint-halo-flicker {
-  0%,
-  65%,
-  82%,
-  100% {
-    opacity: 0.72;
-  }
-  69% {
-    opacity: 0.45;
-  }
-  72% {
-    opacity: 0.82;
-  }
-  76% {
-    opacity: 0.6;
-  }
-  91% {
-    opacity: 0.72;
-  }
-  94% {
-    opacity: 0.53;
-  }
-  97% {
-    opacity: 0.8;
-  }
-}
-.sprint-hero-pearl-middle .sprint-bubble-aura::before {
-  animation-duration: 14s;
-  animation-delay: -5s;
-}
-.sprint-hero-pearl-little .sprint-bubble-aura::before {
-  animation-duration: 11s;
-  animation-delay: -3s;
-}
-.sprint-path-stops > li:nth-child(even) .sprint-bubble-aura::before,
-.sprint-question-bubbles > :nth-child(even) .sprint-bubble-aura::before {
-  animation-duration: 15s;
-  animation-delay: -7s;
-}
-@media (prefers-reduced-motion: reduce) {
-  .sprint-bubble-aura::before {
-    animation: none;
-    opacity: 0.72;
-  }
+  --color-brand-500: #5281b3;
+  --color-brand-600: #416b98;
+  --color-brand-700: #517dad;
 }

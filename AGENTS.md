@@ -357,8 +357,7 @@ panels. Featured projects form a two-column, four-card grid on desktop. Page nav
 scrolling; query-only filter changes preserve position. Decorative heading pills are removed. The navbar has an accessible profile icon and an account-name
 link. Avoid decorative text symbols next to action labels.
 
-About content lives below the home submission prompt at `/#about`. The navbar omits About;
-footer links and the legacy /about redirect lead to that section. Hash links scroll to their target.
+About lives at /about and is linked from the navbar and footer.
 
 Regular text and numbers inherit the default arrow cursor. Clickable controls use a pointer;
 text entry fields retain the text cursor. Keep text selection available.
@@ -401,7 +400,7 @@ is staggered across bubbles, never fully turns the halo off, and is disabled wit
 ## Integrating development with the custom UI
 
 Page modules follow the upstream section folders. The bubble Sprints page lives in
-`src/pages/sprints/SprintsPage.tsx`. Keep the home About section and legacy /about redirect.
+`src/pages/sprints/SprintsPage.tsx`. Keep About on its dedicated /about route.
 The persistent account editor at /me/settings/profile uses ProfileEditor and onboarding fields;
 /profile retains the private browser preview through PreviewProfileEditor. Both editors are intentional.
 The /dashboard and /contributors views read through the same Supabase/demo seam as discovery.

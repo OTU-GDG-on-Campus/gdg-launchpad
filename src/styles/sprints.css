@@ -1,18 +1,18 @@
 /* Scoped event identity, original orbital artwork, and responsive sprint-page typography. */
 
 .sprint-event {
-  --event-bg: #100e19;
-  --event-panel: #191524;
-  --event-ink: #f4f0f9;
-  --event-muted: #b2aabe;
-  --event-line: #35303f;
-  --event-purple: #b69aff;
-  --event-deep: #5123a0;
-  --event-shine: #f7f0ff;
+  --event-bg: #0e1319;
+  --event-panel: #151c24;
+  --event-ink: #f0f4f9;
+  --event-muted: #aab4be;
+  --event-line: #30373f;
+  --event-accent: #9acaff;
+  --event-deep: #235fa0;
+  --event-shine: #f0f7ff;
   --event-lime: #e7f39a;
-  --event-button-ink: #17151e;
-  --event-grid: #b69aff12;
-  --event-glow: #8252e52e;
+  --event-button-ink: #15191e;
+  --event-grid: #9acaff12;
+  --event-glow: #5299e52e;
   background: var(--event-bg);
   color: var(--event-ink);
   font-family: 'Manrope', ui-sans-serif, system-ui, sans-serif;
@@ -22,15 +22,15 @@
 [data-theme='light'] .sprint-event {
   --event-bg: #f7f5ef;
   --event-panel: #eeebe5;
-  --event-ink: #211c2c;
-  --event-muted: #655e71;
-  --event-line: #d7d1dc;
-  --event-purple: #7040c6;
-  --event-deep: #3b147e;
-  --event-shine: #f8f2ff;
+  --event-ink: #1c242c;
+  --event-muted: #5e6771;
+  --event-line: #d1d6dc;
+  --event-accent: #4080c6;
+  --event-deep: #14477e;
+  --event-shine: #f2f8ff;
   --event-lime: #dceb82;
-  --event-grid: #7040c611;
-  --event-glow: #9467e62b;
+  --event-grid: #4080c611;
+  --event-glow: #67a4e62b;
 }
 
 .sprint-wrap {
@@ -42,7 +42,7 @@
   -webkit-tap-highlight-color: transparent;
 }
 .sprint-event :focus-visible {
-  outline-color: var(--event-purple);
+  outline-color: var(--event-accent);
 }
 .sprint-event [id] {
   scroll-margin-top: 132px;
@@ -73,7 +73,7 @@
 }
 .sprint-hero-top p span {
   margin-inline: 12px;
-  color: var(--event-purple);
+  color: var(--event-accent);
 }
 .sprint-hero-top a {
   display: inline-flex;
@@ -82,7 +82,7 @@
   color: var(--event-muted);
 }
 .sprint-hero-top a:hover {
-  color: var(--event-purple);
+  color: var(--event-accent);
 }
 .sprint-hero-layout {
   display: grid;
@@ -98,7 +98,7 @@
   letter-spacing: 0.1em;
   line-height: 1.7;
   text-transform: uppercase;
-  color: var(--event-purple);
+  color: var(--color-accent-ink);
 }
 .sprint-hero h1 {
   font-family: var(--font-display);
@@ -109,7 +109,7 @@
   margin-top: 22px;
 }
 .sprint-hero h1 > span {
-  color: var(--event-purple);
+  color: var(--event-accent);
 }
 .sprint-intro {
   font-size: clamp(16px, 1.7vw, 21px);
@@ -152,7 +152,7 @@
 }
 .sprint-button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 5px 0 var(--event-purple);
+  box-shadow: 0 5px 0 var(--event-accent);
 }
 .sprint-text-link {
   display: inline-flex;
@@ -162,7 +162,7 @@
   font-weight: 600;
 }
 .sprint-text-link:hover {
-  color: var(--event-purple);
+  color: var(--event-accent);
 }
 .sprint-art {
   position: relative;
@@ -211,7 +211,7 @@
 .sprint-signal i {
   width: 5px;
   height: 5px;
-  background: var(--event-purple);
+  background: var(--event-accent);
   border-radius: 50%;
 }
 .sprint-facts {
@@ -258,7 +258,7 @@
   font-weight: 500;
   letter-spacing: -0.025em;
   line-height: 1.5;
-  color: var(--event-purple);
+  color: var(--event-accent);
 }
 .sprint-section {
   padding-block: 90px 0;
@@ -319,7 +319,7 @@
   font-size: 14px;
 }
 .sprint-phase-top svg {
-  color: var(--event-purple);
+  color: var(--event-accent);
   width: 17px;
 }
 .sprint-phases .sprint-eyebrow {
@@ -419,7 +419,7 @@
   font-size: 11px;
 }
 .sprint-lineup-action svg {
-  color: var(--event-purple);
+  color: var(--event-accent);
   transition: transform 0.2s;
 }
 .sprint-lineup-row:hover .sprint-lineup-action svg {
@@ -457,7 +457,7 @@
   z-index: 1;
 }
 .sprint-manifesto h2 span {
-  color: var(--event-purple);
+  color: var(--event-accent);
 }
 .sprint-manifesto-bottom {
   position: relative;
@@ -479,7 +479,7 @@
   height: 440px;
   right: -160px;
   top: -180px;
-  border: 1px solid var(--event-purple);
+  border: 1px solid var(--event-accent);
   border-radius: 50%;
   box-shadow:
     0 0 0 35px var(--event-panel),
@@ -527,7 +527,7 @@
 .sprint-faq-plus::after {
   content: '';
   position: absolute;
-  background: var(--event-purple);
+  background: var(--event-accent);
   width: 12px;
   height: 1px;
   top: 6px;
@@ -561,7 +561,7 @@
   margin: 24px 0 28px;
 }
 .sprint-finale h2 > span {
-  color: var(--event-purple);
+  color: var(--event-accent);
 }
 .sprint-finale-credit {
   color: var(--event-muted);

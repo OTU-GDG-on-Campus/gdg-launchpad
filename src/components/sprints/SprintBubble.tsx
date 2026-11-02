@@ -55,7 +55,6 @@ export function SprintBubble({
                 aria-label={`${open ? 'Close' : 'Inspect'} ${title}`}
                 {...handlers}
               >
-                <span className="sprint-bubble-aura" aria-hidden="true" />
                 <span className="sprint-bubble-gloss" aria-hidden="true" />
                 <span className="sprint-bubble-number">{number}</span>
                 <span className="sprint-bubble-caption">{open ? 'EXPLORING' : 'EXPLORE'}</span>

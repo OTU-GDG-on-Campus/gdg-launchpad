@@ -1,9 +1,7 @@
-// Landing page: gridded hero, featured projects, contributors, submission prompt, and About.
+// Landing page: gridded hero, featured projects, contributors, and submission prompt.
 
 import { useState } from 'react'
 import { Link } from 'react-router'
-import { SITE } from '@/config/site'
-import { allowedDomainsLabel } from '@/lib/auth/domain'
 import { Avatar } from '@/components/ui/Avatar'
 import { listContributors } from '@/lib/api/client'
 import { useAsync } from '@/lib/useAsync'
@@ -211,43 +209,6 @@ export function HomePage() {
             <Link to="/submit" className={PRIMARY_LINK}>
               Post your project
             </Link>
-          </section>
-          <section
-            id="about"
-            aria-labelledby="about-title"
-            className="border-line mt-16 scroll-mt-32 border-t pt-12 sm:pt-16"
-          >
-            <div className="grid gap-8 lg:grid-cols-[1.4fr_1fr] lg:gap-16">
-              <div>
-                <h2 id="about-title" className="text-3xl font-bold tracking-tight sm:text-4xl">
-                  What is {SITE.shortName}?
-                </h2>
-                <p className="text-ink-muted mt-5 max-w-2xl text-sm leading-relaxed sm:text-base">
-                  Good projects deserve an audience. LaunchPad gives Ontario Tech students a home
-                  for the things they build, with feedback from peers, opportunities to collaborate,
-                  and work they can share with employers. Browse what others are building, learn how
-                  they made it, or find a project that could use your help.
-                </p>
-                <p className="text-ink-muted mt-4 max-w-2xl text-sm leading-relaxed sm:text-base">
-                  There are only upvotes here. Share your work, encourage other builders, and help
-                  the projects you love reach more people.
-                </p>
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold">How it works</h3>
-                <ul className="text-ink-muted mt-4 list-disc space-y-3 pl-5 text-sm leading-relaxed">
-                  <li>Anyone can browse. No account needed.</li>
-                  <li>
-                    Posting and upvoting require a verified Ontario Tech email (
-                    {allowedDomainsLabel()}) and a completed registration.
-                  </li>
-                  <li>A coordinator reviews every submission before it goes live.</li>
-                </ul>
-                <p className="text-ink-muted mt-6 text-sm leading-relaxed">
-                  Built and maintained by {SITE.organization}.
-                </p>
-              </div>
-            </div>
           </section>
         </div>
       </div>

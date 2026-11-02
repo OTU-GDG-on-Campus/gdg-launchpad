@@ -38,6 +38,7 @@ export interface NavLink {
 export const NAV_LINKS: NavLink[] = [
   { label: 'Semester Sprints', to: '/sprints' },
   { label: 'Projects', to: '/projects' },
+  { label: 'About', to: '/about' },
   { label: 'Contribute', to: '/contribute' },
 ]
 
@@ -66,6 +67,6 @@ export const FOOTER_GROUPS: FooterGroup[] = [
   },
   {
     heading: 'About',
-    links: [{ label: 'What is LaunchPad', to: '/#about' }],
+    links: [{ label: 'What is LaunchPad', to: '/about' }],
   },
 ]

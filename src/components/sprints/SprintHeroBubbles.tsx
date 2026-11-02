@@ -60,7 +60,6 @@ function HeroPearl({
               aria-controls={controls}
               {...handlers}
             >
-              <span className="sprint-bubble-aura" aria-hidden="true" />
               <span className="sprint-bubble-gloss" aria-hidden="true" />
               <span className="sprint-bubble-number">{spark.number}</span>
               <span className="sprint-bubble-caption">
