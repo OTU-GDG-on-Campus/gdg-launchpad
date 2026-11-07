@@ -17,10 +17,10 @@ export function Wordmark({ size = 'nav' }: { size?: 'nav' | 'hero' }) {
 
   return (
     <span
-      className={cn('font-semibold tracking-tight', isHero ? 'text-4xl sm:text-6xl' : 'text-base')}
+      className={cn('font-extrabold tracking-tight', isHero ? 'text-4xl sm:text-6xl' : 'text-[19px]')}
     >
       <span className="text-brand-700">OTU</span> <span className="text-flare">Launch</span>
-      <span className="text-ink">Pad</span>
+      <span className="text-ink">Pad.</span>
     </span>
   )
 }

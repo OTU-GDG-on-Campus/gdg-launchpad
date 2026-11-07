@@ -1,7 +1,7 @@
 // Switches the feed between the card grid and the compact row list.
 
 import { cn } from '@/lib/cn'
-import type { ProjectView } from './ProjectList'
+import type { ProjectView } from '@/components/projects/cards/ProjectList'
 
 interface ViewToggleProps {
   view: ProjectView

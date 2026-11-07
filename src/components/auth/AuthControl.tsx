@@ -84,6 +84,20 @@ export function AuthControl() {
           <p className="text-ink-muted border-line mb-2 border-b px-3 py-3 text-xs">
             Your LaunchPad
           </p>
+          <Link
+            to="/dashboard"
+            onClick={() => setOpen(false)}
+            className="hover:bg-surface-raised flex min-h-10 items-center rounded-lg px-3 py-2 text-sm"
+          >
+            Dashboard
+          </Link>
+          <Link
+            to="/profile"
+            onClick={() => setOpen(false)}
+            className="hover:bg-surface-raised flex min-h-10 items-center rounded-lg px-3 py-2 text-sm"
+          >
+            Profile preview
+          </Link>
           {ACCOUNT_LINKS.map((link) => (
             <Link
               key={link.to}

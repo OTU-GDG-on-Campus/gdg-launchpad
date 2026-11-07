@@ -27,7 +27,7 @@ const { normalizeProfile } = await server.ssrLoadModule('/src/lib/profile.ts')
 const { AuthContext } = await server.ssrLoadModule('/src/lib/auth/auth-context.ts')
 const { RequireAuth } = await server.ssrLoadModule('/src/components/auth/RequireAuth.tsx')
 const { ProfileSummary } = await server.ssrLoadModule('/src/components/account/ProfileSummary.tsx')
-const { NotificationsPage } = await server.ssrLoadModule('/src/pages/NotificationsPage.tsx')
+const { NotificationsPage } = await server.ssrLoadModule('/src/pages/account/NotificationsPage.tsx')
 
 after(async () => {
   await server.close()
@@ -261,5 +261,60 @@ test('malformed browser storage cannot break the demo account loader', async () 
     storage.set('launchpad-demo-v1', raw)
     assert.equal(await api.getCurrentUser(), null)
     assert.ok((await api.listProjects()).projects.length)
+  }
+})
+
+test('legacy previews keep private edits separate from persistent profiles and reject other owners', async () => {
+  const user = await api.signInDemo()
+  const workspace = await api.getAccountWorkspace(user.id)
+  const profile = await api.getMyProfile()
+  assert.equal(workspace.profile.program, profile.program)
+  assert.ok(workspace.projects.every((project) => project.authorId === user.id))
+  const approved = workspace.projects.find((project) => project.status === 'approved')
+  const pending = workspace.projects.find((project) => project.status === 'pending')
+  const saved = await api.saveProfilePreview(user.id, {
+    ...workspace.profile,
+    name: 'Private preview name',
+    pinnedProjectIds: [approved.id, pending.id, 'unknown'],
+  })
+  assert.deepEqual(saved.pinnedProjectIds, [approved.id])
+  assert.equal((await api.getMyProfile()).name, profile.name)
+  assert.equal((await api.getAccountWorkspace(user.id)).profile.name, 'Private preview name')
+  await assert.rejects(api.getAccountWorkspace('other-user'), /Sign in/)
+  await assert.rejects(api.saveProfilePreview('other-user', saved), /Sign in/)
+  await api.signOutUser()
+  await assert.rejects(api.getAccountWorkspace(user.id), /Sign in/)
+})
+
+test('recent history deduplicates approved visits and excludes private submissions', async () => {
+  const user = await api.signInDemo()
+  await api.clearRecentlyViewed(user.id)
+  const owned = await api.listMyProjects()
+  const approved = owned.find((project) => project.status === 'approved')
+  const pending = owned.find((project) => project.status === 'pending')
+  await api.recordProjectView(user.id, approved.id)
+  await api.recordProjectView(user.id, approved.id)
+  await api.recordProjectView(user.id, pending.id)
+  const history = (await api.getAccountWorkspace(user.id)).recentlyViewed
+  assert.deepEqual(
+    history.map((entry) => entry.project.id),
+    [approved.id],
+  )
+  await api.clearRecentlyViewed(user.id)
+  assert.deepEqual((await api.getAccountWorkspace(user.id)).recentlyViewed, [])
+})
+
+test('public contributor counts come only from approved discovery projects', async () => {
+  const projects = (await api.listProjects({ perPage: 100 })).projects
+  const people = await api.listContributors()
+  assert.ok(people.length)
+  for (const person of people) {
+    const count = projects.filter(
+      (project) =>
+        project.authorId === person.id ||
+        project.contributors.some((contributor) => contributor.id === person.id),
+    ).length
+    assert.equal(person.projectCount, count)
+    assert.ok(count > 0)
   }
 })

@@ -26,6 +26,9 @@ Local tests use Mailpit. Hosted email and Brevo delivery require the deployment 
   isolated demo store in `src/lib/api/mock/session.ts`. The login page offers Try demo account,
   which needs no email or code and cannot be used with a configured backend.
 
+The profile editor saves a private browser-only preview; it does not change the public profile,
+auth identity, or moderator queue. See [workspace-ui.md](workspace-ui.md).
+
 ## Login and registration
 
 They are separate on purpose.

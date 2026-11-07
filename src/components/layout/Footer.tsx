@@ -9,7 +9,7 @@ const LINK_CLASS = 'text-ink-soft hover:text-brand-700 text-sm transition-colors
 export function Footer() {
   return (
     <footer className="border-line bg-surface-raised mt-20 border-t">
-      <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
+      <div className="mx-auto max-w-335 px-6 py-12 sm:px-11 sm:py-16">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
           <div>
             <Link to="/" aria-label="LaunchPad home" className="inline-flex">

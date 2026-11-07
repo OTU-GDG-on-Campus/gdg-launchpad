@@ -12,7 +12,7 @@ export const SITE = {
   disclaimer:
     'An independent project by a student club. Not affiliated with, endorsed by, or an official service of Ontario Tech University.',
   discordUrl: 'https://discord.gg/your-invite',
-  githubUrl: 'https://github.com/gdg-otu/launchpad',
+  githubUrl: 'https://github.com/OTU-GDG-on-Campus/gdg-launchpad',
 } as const
 
 import type { ProjectCategory } from '@/types'
@@ -38,8 +38,8 @@ export interface NavLink {
 export const NAV_LINKS: NavLink[] = [
   { label: 'Semester Sprints', to: '/sprints' },
   { label: 'Projects', to: '/projects' },
-  { label: 'Contribute', to: '/contribute' },
   { label: 'About', to: '/about' },
+  { label: 'Contribute', to: '/contribute' },
 ]
 
 export interface FooterGroup {
@@ -60,6 +60,7 @@ export const FOOTER_GROUPS: FooterGroup[] = [
     heading: 'Community',
     links: [
       { label: 'Contribute', to: '/contribute' },
+      { label: 'Contributors', to: '/contributors' },
       { label: 'GitHub', to: SITE.githubUrl, external: true },
       { label: 'Discord', to: SITE.discordUrl, external: true },
     ],

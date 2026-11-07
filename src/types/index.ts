@@ -211,3 +211,28 @@ export interface ActivityItem {
   slug: string
   createdAt: string
 }
+
+export interface ProfilePreview {
+  userId: string
+  name: string
+  program: string
+  year: string
+  about: string
+  pinnedProjectIds: string[]
+  updatedAt: string | null
+}
+
+export interface ViewedProject {
+  project: Project
+  viewedAt: string
+}
+
+export interface AccountWorkspace {
+  profile: ProfilePreview
+  projects: Project[]
+  recentlyViewed: ViewedProject[]
+}
+
+export interface CommunityContributor extends Contributor {
+  projectCount: number
+}

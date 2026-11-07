@@ -1,32 +1,36 @@
 // Public routes and protected personal workspace inside shared theme and authentication providers.
 
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router'
+import { RequireAuth } from '@/components/auth/RequireAuth'
+import { DashboardPage } from '@/pages/DashboardPage'
+import { ProfilePage } from '@/pages/ProfilePage'
+import { ContributorsPage } from '@/pages/ContributorsPage'
 import { AccountLayout } from '@/components/account/AccountLayout'
-import { MyProjectsPage } from '@/pages/MyProjectsPage'
-import { SavedProjectsPage } from '@/pages/SavedProjectsPage'
-import { MyProfilePage } from '@/pages/MyProfilePage'
-import { PublicProfilePage } from '@/pages/PublicProfilePage'
-import { EditProfilePage } from '@/pages/EditProfilePage'
-import { AccountSettingsPage } from '@/pages/AccountSettingsPage'
-import { MySprintsPage } from '@/pages/MySprintsPage'
-import { MyActivityPage } from '@/pages/MyActivityPage'
-import { NotificationsPage } from '@/pages/NotificationsPage'
+import { MyProjectsPage } from '@/pages/account/MyProjectsPage'
+import { SavedProjectsPage } from '@/pages/account/SavedProjectsPage'
+import { MyProfilePage } from '@/pages/account/MyProfilePage'
+import { PublicProfilePage } from '@/pages/account/PublicProfilePage'
+import { EditProfilePage } from '@/pages/account/EditProfilePage'
+import { AccountSettingsPage } from '@/pages/account/AccountSettingsPage'
+import { MySprintsPage } from '@/pages/account/MySprintsPage'
+import { MyActivityPage } from '@/pages/account/MyActivityPage'
+import { NotificationsPage } from '@/pages/account/NotificationsPage'
 
 import { AppShell } from '@/components/layout/AppShell'
 import { AuthProvider } from '@/lib/auth/AuthProvider'
 import { ThemeProvider } from '@/lib/theme/ThemeProvider'
 import { AboutPage } from '@/pages/AboutPage'
-import { AdminPage } from '@/pages/AdminPage'
+import { AdminPage } from '@/pages/admin/AdminPage'
 import { ContributePage } from '@/pages/ContributePage'
 import { HomePage } from '@/pages/HomePage'
-import { LoginPage } from '@/pages/LoginPage'
+import { LoginPage } from '@/pages/auth/LoginPage'
 import { NotFoundPage } from '@/pages/NotFoundPage'
-import { ProjectDetailPage } from '@/pages/ProjectDetailPage'
-import { ProjectsPage } from '@/pages/ProjectsPage'
-import { RegisterPage } from '@/pages/RegisterPage'
-import { SprintDetailPage } from '@/pages/SprintDetailPage'
-import { SprintsPage } from '@/pages/SprintsPage'
-import { SubmitProjectPage } from '@/pages/SubmitProjectPage'
+import { ProjectDetailPage } from '@/pages/projects/ProjectDetailPage'
+import { ProjectsPage } from '@/pages/projects/ProjectsPage'
+import { RegisterPage } from '@/pages/auth/RegisterPage'
+import { SprintDetailPage } from '@/pages/sprints/SprintDetailPage'
+import { SprintsPage } from '@/pages/sprints/SprintsPage'
+import { SubmitProjectPage } from '@/pages/projects/SubmitProjectPage'
 
 export default function App() {
   return (
@@ -36,6 +40,23 @@ export default function App() {
           <Routes>
             <Route element={<AppShell />}>
               <Route index element={<HomePage />} />
+              <Route
+                path="dashboard"
+                element={
+                  <RequireAuth>
+                    <DashboardPage />
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="profile"
+                element={
+                  <RequireAuth>
+                    <ProfilePage />
+                  </RequireAuth>
+                }
+              />
+              <Route path="contributors" element={<ContributorsPage />} />
               <Route path="login" element={<LoginPage />} />
               <Route path="register" element={<RegisterPage />} />
               <Route path="signup" element={<Navigate to="/register" replace />} />

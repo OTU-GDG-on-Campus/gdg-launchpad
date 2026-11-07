@@ -1,12 +1,12 @@
 // Viewer-scoped project details and discussion with guarded upvotes and explicit write errors.
 
-import { useLayoutEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { useParams } from 'react-router'
-import { CommentList } from '@/components/projects/CommentList'
-import { ProjectSidebar } from '@/components/projects/ProjectSidebar'
-import { Badge } from '@/components/ui/Badge'
+import { CommentList } from '@/components/projects/detail/CommentList'
+import { ProjectSidebar } from '@/components/projects/detail/ProjectSidebar'
+import { ContributorList } from '@/components/projects/ContributorList'
 import { EmptyState, ErrorState, LoadingState } from '@/components/ui/PageState'
-import { getProjectBySlug, listComments, toggleUpvote } from '@/lib/api/client'
+import { getProjectBySlug, listComments, toggleUpvote, recordProjectView } from '@/lib/api/client'
 import { cn } from '@/lib/cn'
 import { coverTint } from '@/lib/coverTint'
 import { useAuth } from '@/lib/auth/useAuth'
@@ -29,6 +29,9 @@ export function ProjectDetailPage() {
   const [voteError, setVoteError] = useState<string | null>(null)
   const [overrideKey, setOverrideKey] = useState(viewerKey)
   const [override, setOverride] = useState<Project | null>(null)
+  useEffect(() => {
+    if (user && data?.slug === slug) void recordProjectView(user.id, data.id).catch(() => {})
+  }, [user, data, slug])
 
   if (overrideKey !== viewerKey) {
     setOverrideKey(viewerKey)
@@ -40,7 +43,7 @@ export function ProjectDetailPage() {
   if (loading) return <LoadingState label="Loading project" />
   if (!data) return <EmptyState title="Project not found" />
 
-  const project = override ?? data
+  const project = override?.slug === data.slug ? override : data
 
   async function upvote() {
     setVoteError(null)
@@ -85,7 +88,7 @@ export function ProjectDetailPage() {
       <div className="grid gap-10 lg:grid-cols-[1fr_320px] lg:items-start">
         <div className="space-y-10">
           <header>
-            <Badge tone="success">{project.category}</Badge>
+            <p className="text-ink-muted text-sm">{project.category}</p>
             <h1 className="mt-3 text-3xl font-bold tracking-tight">{project.title}</h1>
             <p className="text-ink-soft mt-4 leading-relaxed">{project.description}</p>
           </header>
@@ -104,6 +107,22 @@ export function ProjectDetailPage() {
             </div>
           </section>
 
+          <section aria-labelledby="project-contributors-title">
+            <h2 id="project-contributors-title" className="mb-3 text-lg font-semibold">
+              Contributors
+            </h2>
+            <ContributorList
+              contributors={[
+                {
+                  id: project.authorId,
+                  name: project.authorName,
+                  avatarUrl: project.authorAvatarUrl,
+                  role: 'Project creator',
+                },
+                ...project.contributors.filter((person) => person.id !== project.authorId),
+              ]}
+            />
+          </section>
           <section>
             <h2 className="mb-3 text-lg font-semibold">Screenshots</h2>
             {project.screenshotUrls.length > 0 ? (

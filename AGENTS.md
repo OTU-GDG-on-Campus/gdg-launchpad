@@ -57,7 +57,7 @@ with an isolated browser-local demo when unconfigured. Hosted setup and migratio
 | Dark and light themes | Done. Dark by default, light, or follow the system. Persisted                                                                                                               |
 | Project listing       | Discovery with shared Supabase/demo project reads, search, facets, filters, and grid/list                                                                                   |
 | Project detail        | Viewer-scoped Supabase/demo detail, discussion, author profile link, and private-submission status                                                                          |
-| Featured project      | Done in the UI. Admin picker on /admin, stored by a migration                                                                                                               |
+| Featured project      | Admin picker on /admin, stored by a migration. Not shown on any public page                                                                                                 |
 | Bookmarks             | Private saved-project page and optimistic controls. Supabase persistence or versioned local demo storage                                                                    |
 | Global search         | Done: command palette on Ctrl/Cmd+K, mounted in AppShell                                                                                                                    |
 | Semester Sprints      | Landing, filters, details, and project-linked personal sprints. Supabase reads or demo data. No team registration                                                           |
@@ -143,13 +143,21 @@ src/
     ui/                Avatar, Badge, Button, Card, FilterPills, Logo, PageHeader,
                        PageState, Pagination, SearchInput, Select, Kbd, Toast, CardSkeleton
     auth/              AuthControl, RequireAuth route guard
-    projects/          ProjectCard, ProjectRowCard, ProjectList, ProjectCover, ProjectSidebar,
-                       UpvoteButton, BookmarkButton, ContributorStack, PersonTrigger,
-                       PersonPopover, CommentList, ProjectsHero, DiscoveryTabs, TechFilterChips,
-                       AdvancedFilters, ViewToggle, FeaturedProject, FeaturedProjectPicker,
-                       CommandPalette
+    projects/
+      cards/           ProjectCard, ProjectRowCard, LandingProjectCard, ProjectCover, ProjectList
+      actions/         UpvoteButton, BookmarkButton
+      people/          PersonTrigger, PersonPopover, ContributorStack
+      discovery/       DiscoveryTabs, ProjectSearchBar, TechFilterMenu, AdvancedFilters,
+                       ViewToggle, CommandPalette
+      detail/          ProjectSidebar, CommentList
+      admin/           FeaturedProjectPicker
     sprints/           SprintCard, SprintGrid
-  pages/               One file per route, including the protected /me workspace and /u/:id profiles
+  pages/               One file per route. Home, About, Contribute, and NotFound sit at the top
+    account/           The protected /me workspace and /u/:id public profiles
+    auth/              Login and registration
+    projects/          Discovery, project detail, and submission
+    sprints/           Sprint landing and detail
+    admin/             Admin panel
 
 supabase/
   config.toml          Local stack config, kept in git. Comments sit inline, after the setting
@@ -291,7 +299,8 @@ and check them in step conditions when deployment should skip without credential
 
 ### Add a page
 
-1. Create `src/pages/YourPage.tsx` with a header comment and a named export.
+1. Create `src/pages/<section>/YourPage.tsx` with a header comment and a named export. Only
+   site-wide pages like Home and About sit directly in `src/pages/`.
 2. Add a `<Route>` to `src/App.tsx`.
 3. If it needs a signed-in student, wrap the body in `<RequireAuth>`. Add `adminOnly` for admin
    pages.
@@ -335,3 +344,64 @@ Put it in `src/components/ui/`. It must not import anything from `types/`, `lib/
 - Reformatting files you did not otherwise change.
 - Leaving `TODO` without context. Say what is missing and what the next step is.
 - Claiming a feature works when it reads from `lib/api/mock/`.
+
+## Workspace preview behavior
+
+The profile editor stores per-account, browser-only previews, including pin choices. It does not
+publish profile changes or implement moderation. Recently Viewed records signed-in visits to
+approved sample project detail pages. All storage access stays in `src/lib/api/client.ts`.
+
+Account routes use the shared design fonts from `UI/pages/assets/fonts/`, bundled by Vite through
+`src/index.css`. Only the home hero has a full-width grid. Elsewhere grids stay inside cards and
+panels. Featured projects form a two-column, four-card grid on desktop. Page navigation resets
+scrolling; query-only filter changes preserve position. Decorative heading pills are removed. The navbar has an accessible profile icon and an account-name
+link. Avoid decorative text symbols next to action labels.
+
+About lives at /about and is linked from the navbar and footer.
+
+Regular text and numbers inherit the default arrow cursor. Clickable controls use a pointer;
+text entry fields retain the text cursor. Keep text selection available.
+
+Semester Sprints uses a full-width event page with scoped light/dark tokens in src/styles/sprints.css
+and a glossy, interactive bubble hero in SprintHeroBubbles. The lineup, FAQ, and stage content do not imply
+registration is live. The lineup uses the shared Supabase/demo seam; demo records are labelled as previews with unconfirmed dates.
+The general event format follows the supplied poster (5-6 weeks, teams of 3-5); individual briefs vary.
+
+The Sprints hero and pathway share one continuous lavender grid and glossy bubble palette. SprintJourney connects interactive
+SprintBubble stops with a measured SVG curve; expanded content can grow without disconnecting the path.
+Bubbles reveal details with click/keyboard, allow up to 20px pointer displacement per axis, and spring
+back after release. Vertical touch scrolling remains available. The Sprints page has no arrow icons.
+
+useSpringBubble is the shared pointer interaction for hero and pathway bubbles; keep their tap/drag
+threshold, 20px movement bounds, touch-scroll behavior, and keyboard access consistent.
+
+useScrollBubblePop orchestrates the Sprints scroll effect with one passive listener and a single
+animation frame. A separate visual wrapper pops bubbles near the upper viewport on downward scroll
+and regrows visible bubbles on upward scroll or keyboard focus. Anchors retain their dimensions;
+drag transforms stay independent. Reduced-motion preference disables the effect entirely.
+
+Sprints bubbles use unpadded labels and translucent lavender film with crisp text. Path sections are
+measured from stable scroll anchors, not animated button bounds. Each link section is keyed to its
+destination bubble and draws with scroll progress; popping also fades its caption, details, and link.
+Keyboard focus restores the whole stop, and reduced motion keeps all information visible.
+
+The Sprints event uses near-black/deep-blue in dark mode and pearl-white/blue in light mode;
+its scoped shell tokens also theme its navigation and footer. Purple remains the bubble accent.
+FAQ bubbles pass persistent to SprintBubble, omit data-scroll-bubble, and always retain their
+visible captions and answers during scrolling. Only the hero and pathway use scroll-away effects.
+
+Bubble material is translucent but carries a fuller lavender tint. Each interactive bubble has an
+aria-hidden aura with a continuous purple halo with occasional soft flicker. Its transform is independent of
+drag/pop layers, and the flicker stops for reduced-motion preferences.
+
+The bubble aura has a continuous full ring without a circling highlight. Its occasional soft flicker
+is staggered across bubbles, never fully turns the halo off, and is disabled with reduced motion.
+
+## Integrating development with the custom UI
+
+Page modules follow the upstream section folders. The bubble Sprints page lives in
+`src/pages/sprints/SprintsPage.tsx`. Keep About on its dedicated /about route.
+The persistent account editor at /me/settings/profile uses ProfileEditor and onboarding fields;
+/profile retains the private browser preview through PreviewProfileEditor. Both editors are intentional.
+The /dashboard and /contributors views read through the same Supabase/demo seam as discovery.
+Only preview fields, pin choices, and recent viewing history remain separate browser-local data.
