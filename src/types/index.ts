@@ -65,6 +65,18 @@ export interface Project {
   createdAt: string
 }
 
+/** What a student fills in on the submission form, after validation. */
+export interface ProjectSubmission {
+  title: string
+  summary: string
+  description: string
+  category: ProjectCategory
+  tags: string[]
+  repoUrl: string | null
+  liveUrl: string | null
+  openToContributions: boolean
+}
+
 export interface ProjectQuery {
   sort?: ProjectSort
   sprintId?: string
@@ -125,6 +137,12 @@ export interface PersonPreview {
   /** What they did on the project the preview was opened from. Null for project authors. */
   roleOnProject: string | null
   projectCount: number
+}
+
+/** A comment with enough project context for an admin to judge it and open the thread. */
+export interface ModerationComment extends Comment {
+  projectTitle: string
+  projectSlug: string
 }
 
 export interface Comment {

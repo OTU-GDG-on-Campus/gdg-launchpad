@@ -14,7 +14,7 @@ The smallest set that makes the site real. Everything P0 below rolls up here.
 
 - [ ] Students can register and log in with an emailed code to an Ontario Tech address
 - [ ] Students can submit a project
-- [ ] Coordinators can approve or reject submissions
+- [x] Coordinators can approve or reject submissions
 - [ ] Approved projects appear publicly and can be upvoted
 - [ ] October and November sprint showcases are live
 
@@ -44,7 +44,8 @@ The smallest set that makes the site real. Everything P0 below rolls up here.
 
 ## Project submission
 
-- [ ] **P0** Submission form: title, summary, description, tags, category, repo and live URLs
+- [x] **P0** Submission form: title, summary, description, tags, category, repo and live URLs
+      (plain text description, no image or video upload yet)
 - [ ] **P0** Client and server validation, with field-level errors
 - [ ] **P0** Write path in `lib/api/client.ts` plus the `projects` table
 - [ ] **P0** New submissions land as `pending`, never straight to the feed
@@ -112,7 +113,9 @@ The smallest set that makes the site real. Everything P0 below rolls up here.
 
 ## Admin and moderation
 
-- [ ] **P0** Moderation queue: list pending projects, approve or reject with a reason
+- [x] **P0** Moderation queue: list pending projects, approve or reject
+- [ ] **P1** Rejection reason, stored and shown to the author (needs a new column)
+- [x] **P1** Discussion moderation: list recent comments across projects, delete any
 - [ ] **P0** Admin role check enforced in RLS, not just in the UI
 - [ ] **P1** User management: search students, view their activity
 - [ ] **P1** Ban and unban an account, with `banned_at` blocking every write
