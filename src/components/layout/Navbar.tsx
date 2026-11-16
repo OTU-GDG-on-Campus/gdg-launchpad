@@ -1,5 +1,4 @@
-// Shared navigation: home wordmark, primary links, the global search trigger, theme toggle,
-// and auth control.
+// Shared navigation with search, themes, signed-in notifications, and account access.
 
 import { NavLink } from 'react-router'
 import { AuthControl } from '@/components/auth/AuthControl'
@@ -8,6 +7,7 @@ import { Wordmark } from '@/components/ui/Logo'
 import { NAV_LINKS } from '@/config/site'
 import { cn } from '@/lib/cn'
 import { commandKeyLabel } from '@/lib/platform'
+import { useAuth } from '@/lib/auth/useAuth'
 import { ThemeToggle } from './ThemeToggle'
 
 interface NavbarProps {
@@ -15,11 +15,12 @@ interface NavbarProps {
 }
 
 export function Navbar({ onOpenSearch }: NavbarProps) {
+  const { user } = useAuth()
   return (
     <header className="border-line bg-surface-muted/95 sticky top-0 z-50 border-b backdrop-blur">
       <nav
         aria-label="Main navigation"
-        className="mx-auto flex min-h-16 max-w-335 flex-wrap items-center gap-x-5 gap-y-2 px-6 py-3 sm:px-11"
+        className="mx-auto flex min-h-16 max-w-335 flex-wrap items-center gap-x-3 gap-y-2 px-4 py-3 sm:gap-x-5 sm:px-11"
       >
         <NavLink to="/" aria-label="LaunchPad home" className="shrink-0">
           <Wordmark />
@@ -32,7 +33,7 @@ export function Navbar({ onOpenSearch }: NavbarProps) {
                 to={link.to}
                 className={({ isActive }) =>
                   cn(
-                    'inline-flex rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+                    'inline-flex rounded-lg px-2 py-2 text-xs font-medium transition-colors sm:px-3 sm:text-sm',
                     isActive ? 'text-brand-700' : 'text-ink-soft hover:text-ink',
                   )
                 }
@@ -68,6 +69,32 @@ export function Navbar({ onOpenSearch }: NavbarProps) {
             </svg>
           </button>
           <ThemeToggle />
+          {user?.registeredAt && !user.bannedAt && (
+            <NavLink
+              to="/me/notifications"
+              aria-label="Notifications"
+              title="Notifications"
+              className={({ isActive }) =>
+                cn(
+                  'inline-flex size-10 items-center justify-center rounded-lg transition-colors',
+                  isActive
+                    ? 'bg-brand-50 text-brand-700'
+                    : 'text-ink-muted hover:bg-surface hover:text-ink',
+                )
+              }
+            >
+              <svg
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+                className="size-5 fill-none stroke-current"
+                strokeWidth={1.7}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4" />
+              </svg>
+            </NavLink>
+          )}
           <AuthControl />
         </div>
       </nav>

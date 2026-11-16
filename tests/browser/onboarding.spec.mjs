@@ -1,8 +1,9 @@
-// Real browser interactions against intercepted Auth, database, and Storage contracts, never hosted accounts.
+// Browser contracts for onboarding and profile navigation, links, pins, and private preview persistence.
 
 import { test, expect } from '@playwright/test'
 
 test.beforeEach(async ({ page }) => {
+  await page.route(/https:\/\/fonts\.(googleapis|gstatic)\.com\//, (route) => route.abort())
   page.on('pageerror', (error) => {
     throw error
   })
@@ -60,6 +61,7 @@ async function backend(page, registered = false) {
     },
     draft: null,
     links: [],
+    projects: [],
     calls: [],
     failPublish: false,
     failUpload: false,
@@ -144,6 +146,16 @@ async function backend(page, registered = false) {
       state.draft = null
       return respond(null)
     }
+    if (table === 'projects')
+      return respond(
+        state.projects.filter(
+          (project) =>
+            (!url.searchParams.has('author_id') ||
+              url.searchParams.get('author_id') === `eq.${project.author_id}`) &&
+            (!url.searchParams.has('status') ||
+              url.searchParams.get('status') === `eq.${project.status}`),
+        ),
+      )
     if (table === 'profiles') return respond(state.profile)
     if (table === 'public_profiles')
       return respond(state.profile.registered_at ? [state.profile] : [])
@@ -181,6 +193,152 @@ async function academic(page) {
   await page.getByLabel('Current year of study', { exact: true }).selectOption('Year 2')
   await page.getByRole('button', { name: 'Continue →', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Developer identity', exact: true })).toBeVisible()
+}
+
+for (const viewport of [
+  { width: 1440, height: 1000 },
+  { width: 390, height: 844 },
+]) {
+  test(`profile workspace navigation, LinkedIn, and three private pins at ${viewport.width}px`, async ({
+    page,
+  }, testInfo) => {
+    await page.setViewportSize(viewport)
+    await page.emulateMedia({ colorScheme: 'dark', reducedMotion: 'reduce' })
+    const state = await backend(page, true)
+    state.projects = [
+      'Campus Compass',
+      'Study Spaces',
+      'Course Planner',
+      'Lab Notes',
+      'Pending Project',
+    ].map((title, index) => ({
+      id: `b0000000-0000-4000-8000-00000000000${index + 1}`,
+      slug: `profile-project-${index + 1}`,
+      title,
+      summary: 'A useful tool built with other Ontario Tech students.',
+      description: 'A profile browser fixture.',
+      category: 'Web App',
+      tags: ['React'],
+      repo_url: null,
+      live_url: null,
+      cover_image_url: null,
+      screenshot_urls: [],
+      author_id: uid,
+      sprint_id: null,
+      status: index === 4 ? 'pending' : 'approved',
+      upvote_count: 7,
+      comment_count: 0,
+      open_to_contributions: true,
+      created_at: '2026-10-20T12:00:00Z',
+      project_contributors: [],
+    }))
+    await page.goto('/login')
+    await expect(
+      page
+        .getByRole('navigation', { name: 'Main navigation' })
+        .getByRole('link', { name: 'Notifications' }),
+    ).toHaveCount(0)
+    await verify(page, 'login')
+    const accountNav = page.getByRole('navigation', { name: 'Your account' })
+    await expect(accountNav.getByRole('link').first()).toHaveText('01My Profile')
+    await expect(accountNav.getByRole('link', { name: 'Notifications' })).toHaveCount(0)
+    await page.getByRole('button', { name: /Open account navigation/ }).click()
+    const menu = page.getByRole('navigation', { name: 'Account menu' })
+    await expect(menu.getByRole('link').first()).toHaveText('My Profile')
+    await expect(menu.getByRole('link').first()).toBeFocused()
+    await expect(menu.getByRole('link', { name: 'Notifications' })).toHaveCount(0)
+    await page.keyboard.press('Escape')
+    await expect(page.getByRole('button', { name: /Open account navigation/ })).toBeFocused()
+    await page.getByRole('link', { name: 'Notifications', exact: true }).click()
+    await expect(page.getByRole('heading', { name: 'Notifications' })).toBeVisible()
+    await expect(page.getByRole('link', { name: 'Notifications', exact: true })).toHaveAttribute(
+      'aria-current',
+      'page',
+    )
+    await page.getByRole('link', { name: 'My Profile', exact: false }).click()
+    await page.getByRole('link', { name: 'Preview pinned projects' }).click()
+    const edit = page.getByRole('button', { name: 'Edit profile', exact: true })
+    await edit.click()
+    await expect(page.getByRole('heading', { name: 'Edit profile' })).toBeFocused()
+    await expect(page.getByRole('checkbox', { name: /Pending Project/ })).toHaveCount(0)
+    const linkedin = page.getByLabel('LinkedIn URL')
+    await linkedin.fill('https://linkedin.com.evil.example/in/taylor')
+    await page.getByRole('button', { name: 'Save preview' }).click()
+    await expect(page.getByRole('alert')).toContainText('Use a LinkedIn profile URL')
+    await linkedin.fill('www.linkedin.com/in/taylor-chen')
+    await page
+      .getByLabel('About me', { exact: true })
+      .fill('Building tools that make campus life easier.')
+    const choices = page.getByRole('checkbox')
+    for (let index = 0; index < 3; index++) await choices.nth(index).check()
+    await expect(choices.nth(3)).toBeDisabled()
+    await expect(page.getByRole('status')).toContainText('3 of 3 selected')
+    await choices.nth(0).uncheck()
+    await expect(choices.nth(3)).toBeEnabled()
+    await choices.nth(3).check()
+    await page.evaluate(() => window.scrollTo(0, 0))
+    await page.screenshot({ path: testInfo.outputPath('editor-dark.png'), fullPage: true })
+    await page.getByRole('button', { name: 'Save preview' }).click()
+    await expect(
+      page.getByText('Profile preview saved in this browser.', { exact: true }),
+    ).toBeVisible()
+    await expect(edit).toBeFocused()
+    const pins = page.getByRole('region', { name: 'Pinned projects', exact: true })
+    await expect(pins.getByRole('heading', { level: 3 })).toHaveText([
+      'Study Spaces',
+      'Course Planner',
+      'Lab Notes',
+    ])
+    await expect(
+      page.getByText('Building tools that make campus life easier.', { exact: true }),
+    ).toHaveCount(1)
+    await expect(page.getByRole('link', { name: 'LinkedIn (opens in a new tab)' })).toHaveAttribute(
+      'href',
+      'https://www.linkedin.com/in/taylor-chen',
+    )
+    await page.reload()
+    await expect(pins.getByRole('heading', { level: 3 })).toHaveCount(3)
+    await edit.click()
+    await expect(linkedin).toHaveValue('https://www.linkedin.com/in/taylor-chen')
+    await linkedin.fill('https://www.linkedin.com/in/unsaved')
+    await page.getByRole('button', { name: 'Cancel', exact: true }).click()
+    await expect(edit).toBeFocused()
+    await expect(page.getByRole('link', { name: 'LinkedIn (opens in a new tab)' })).toHaveAttribute(
+      'href',
+      'https://www.linkedin.com/in/taylor-chen',
+    )
+    for (const theme of ['dark', 'light']) {
+      await page.emulateMedia({ colorScheme: theme })
+      await expect(page.locator('html')).toHaveAttribute('data-theme', theme)
+      expect(
+        await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
+      ).toBe(true)
+      await page.evaluate(() => window.scrollTo(0, 0))
+      await page.screenshot({ path: testInfo.outputPath(`profile-${theme}.png`), fullPage: true })
+    }
+    expect(state.links).toEqual([])
+    expect(state.profile.bio).toBe('')
+    await page.getByRole('link', { name: 'View public profile', exact: true }).click()
+    await expect(page.getByRole('link', { name: 'LinkedIn (opens in a new tab)' })).toHaveCount(0)
+    await page.goto('/me/settings/profile')
+    await page.getByRole('button', { name: '4. Your links', exact: true }).click()
+    await page.getByLabel('Add a platform', { exact: true }).selectOption('linkedin')
+    await page.getByRole('button', { name: '+ Add link', exact: true }).click()
+    await page
+      .getByLabel('Profile URL', { exact: true })
+      .fill('https://www.linkedin.com/in/taylor-public')
+    await page.getByRole('button', { name: /Continue/, exact: false }).click()
+    await page.getByRole('button', { name: 'Save profile', exact: true }).click()
+    await expect(page.getByText('Profile saved. Your public page is up to date.')).toBeVisible()
+    expect(state.links.some((link) => link.platform === 'linkedin' && link.is_public)).toBe(true)
+    state.projects = state.projects.filter((project) => project.status === 'pending')
+    await page.goto('/profile')
+    await edit.click()
+    await expect(choices).toHaveCount(0)
+    await expect(
+      page.getByText('Your published projects will be available to pin here.'),
+    ).toBeVisible()
+  })
 }
 
 test('OTP validation, cooldown, paste, focus, email changes, and login never creates accounts', async ({

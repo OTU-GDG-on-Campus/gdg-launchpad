@@ -34,6 +34,7 @@ import {
   writeDemo,
 } from './mock/session'
 import { normalizeProfile } from '@/lib/profile'
+import { MAX_PINNED_PROJECTS, normalizePreviewLinkedIn } from '@/lib/profilePreview'
 import {
   emptyOnboarding,
   normalizeOnboarding,
@@ -1225,16 +1226,28 @@ function profilePreview(user: AccountProfile, projects: Project[]): ProfilePrevi
     projects.filter((project) => project.status === 'approved').map((project) => project.id),
   )
   const pins = Array.isArray(values.pinnedProjectIds)
-    ? values.pinnedProjectIds
+    ? [...new Set(values.pinnedProjectIds)]
         .filter((id): id is string => typeof id === 'string' && eligible.has(id))
-        .slice(0, 3)
+        .slice(0, MAX_PINNED_PROJECTS)
     : []
+  let linkedinUrl = ''
+  try {
+    linkedinUrl = normalizePreviewLinkedIn(
+      text(
+        'linkedinUrl',
+        user.links?.find((link) => link.platform === 'linkedin' && link.isPublic)?.value,
+      ),
+    )
+  } catch {
+    // Browser storage can be edited outside the form; never render an unvalidated URL.
+  }
   return {
     userId: user.id,
     name: text('name', user.name),
     program: text('program', user.program),
     year: text('year', user.studyYear),
     about: text('about', user.bio),
+    linkedinUrl,
     pinnedProjectIds: pins,
     updatedAt: text('updatedAt') || null,
   }
@@ -1302,9 +1315,10 @@ export async function saveProfilePreview(
     userId: user.id,
     name: input.name.trim(),
     about: input.about.trim(),
+    linkedinUrl: normalizePreviewLinkedIn(input.linkedinUrl ?? ''),
     pinnedProjectIds: [...new Set(input.pinnedProjectIds)]
       .filter((id) => eligible.has(id))
-      .slice(0, 3),
+      .slice(0, MAX_PINNED_PROJECTS),
     updatedAt: new Date().toISOString(),
   }
   try {

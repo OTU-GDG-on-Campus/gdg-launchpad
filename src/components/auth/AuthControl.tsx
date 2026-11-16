@@ -1,4 +1,4 @@
-// Signed-in avatar navigation with keyboard focus, outside dismissal, and sign-out feedback.
+// Profile-first avatar navigation with keyboard focus, outside dismissal, and sign-out feedback.
 
 import { useEffect, useRef, useState } from 'react'
 import { Link, useLocation } from 'react-router'
@@ -84,6 +84,16 @@ export function AuthControl() {
           <p className="text-ink-muted border-line mb-2 border-b px-3 py-3 text-xs">
             Your LaunchPad
           </p>
+          {ACCOUNT_LINKS.map((link) => (
+            <Link
+              key={link.to}
+              to={link.to}
+              onClick={() => setOpen(false)}
+              className="hover:bg-surface-raised flex min-h-10 items-center rounded-lg px-3 py-2 text-sm"
+            >
+              {link.label}
+            </Link>
+          ))}
           <Link
             to="/dashboard"
             onClick={() => setOpen(false)}
@@ -98,16 +108,6 @@ export function AuthControl() {
           >
             Profile preview
           </Link>
-          {ACCOUNT_LINKS.map((link) => (
-            <Link
-              key={link.to}
-              to={link.to}
-              onClick={() => setOpen(false)}
-              className="hover:bg-surface-raised flex min-h-10 items-center rounded-lg px-3 py-2 text-sm"
-            >
-              {link.label}
-            </Link>
-          ))}
           {user.registeredAt && !user.bannedAt && (
             <Link
               to={`/u/${user.id}`}
