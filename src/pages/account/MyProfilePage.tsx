@@ -1,4 +1,4 @@
-// Owner's profile preview with links to editing and the public, shareable profile.
+// Owner's public profile overview with direct access to editing, sharing, and private pin previews.
 
 import { Link } from 'react-router'
 import { AccountPageHeader } from '@/components/account/AccountPageHeader'
@@ -33,7 +33,13 @@ export function MyProfilePage() {
           to={`/u/${user?.id}`}
           className="border-line bg-surface inline-flex min-h-11 items-center rounded-lg border px-5 text-sm font-semibold"
         >
-          View public profile &#8599;
+          View public profile
+        </Link>
+        <Link
+          to="/profile"
+          className="text-brand-700 inline-flex min-h-11 items-center rounded-lg px-2 text-sm font-semibold hover:underline"
+        >
+          Preview pinned projects
         </Link>
       </div>
       {error ? (
@@ -43,7 +49,15 @@ export function MyProfilePage() {
       ) : (
         <>
           <ProfileSummary profile={data.profile} />
-          <h2 className="mb-5 text-xl font-semibold">Published work</h2>
+          <div className="mb-5 flex flex-wrap items-baseline justify-between gap-3">
+            <h2 className="text-xl font-semibold">Published work ({data.projects.length})</h2>
+            <Link
+              to="/me/projects"
+              className="text-brand-700 inline-flex min-h-11 items-center text-sm font-semibold hover:underline"
+            >
+              Manage projects
+            </Link>
+          </div>
           {data.projects.length ? (
             <PersonalProjectList projects={data.projects} />
           ) : (

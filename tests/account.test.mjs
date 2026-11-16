@@ -286,6 +286,52 @@ test('legacy previews keep private edits separate from persistent profiles and r
   await assert.rejects(api.getAccountWorkspace(user.id), /Sign in/)
 })
 
+test('preview LinkedIn links normalize, persist privately, clear, and reject unsafe destinations', async () => {
+  const user = await api.signInDemo()
+  const { profile } = await api.getAccountWorkspace(user.id)
+  const publicBefore = await api.getPublicProfile(user.id)
+  const saved = await api.saveProfilePreview(user.id, {
+    ...profile,
+    linkedinUrl: ' www.linkedin.com/in/taylor/ ',
+  })
+  assert.equal(saved.linkedinUrl, 'https://www.linkedin.com/in/taylor')
+  assert.equal((await api.getAccountWorkspace(user.id)).profile.linkedinUrl, saved.linkedinUrl)
+  assert.deepEqual(await api.getPublicProfile(user.id), publicBefore)
+  for (const linkedinUrl of [
+    'javascript:alert(1)',
+    'https://linkedin.com.evil.example/in/taylor',
+    'https://linkedin.com@evil.example/in/taylor',
+    'https://www.linkedin.com/',
+  ]) {
+    await assert.rejects(api.saveProfilePreview(user.id, { ...saved, linkedinUrl }))
+    assert.equal((await api.getAccountWorkspace(user.id)).profile.linkedinUrl, saved.linkedinUrl)
+  }
+  await api.saveProfilePreview(user.id, { ...saved, linkedinUrl: '' })
+  assert.equal((await api.getAccountWorkspace(user.id)).profile.linkedinUrl, '')
+})
+
+test('legacy or tampered preview storage cannot render unsafe links or duplicate pins', async () => {
+  const user = await api.signInDemo()
+  const { profile, projects } = await api.getAccountWorkspace(user.id)
+  const approved = projects.find((project) => project.status === 'approved')
+  const key = `launchpad:profile-preview:${encodeURIComponent(user.id)}`
+  const { linkedinUrl: _linkedinUrl, ...legacy } = profile
+  storage.set(key, JSON.stringify(legacy))
+  assert.equal((await api.getAccountWorkspace(user.id)).profile.linkedinUrl, '')
+  storage.set(
+    key,
+    JSON.stringify({
+      ...legacy,
+      linkedinUrl: 'javascript:alert(1)',
+      pinnedProjectIds: [approved.id, approved.id, 'missing'],
+    }),
+  )
+  const restored = (await api.getAccountWorkspace(user.id)).profile
+  assert.equal(restored.linkedinUrl, '')
+  assert.deepEqual(restored.pinnedProjectIds, [approved.id])
+  storage.delete(key)
+})
+
 test('recent history deduplicates approved visits and excludes private submissions', async () => {
   const user = await api.signInDemo()
   await api.clearRecentlyViewed(user.id)

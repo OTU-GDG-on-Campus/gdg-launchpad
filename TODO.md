@@ -83,6 +83,9 @@ The smallest set that makes the site real. Everything P0 below rolls up here.
 - [x] My Projects with status filters, Saved Projects, My Profile, profile editing, and settings
 - [x] My Sprints derived from projects, private activity timeline, and notification placeholder
 - [x] Responsive account navigation and signed-in avatar menu
+- [x] My Profile first in account navigation and avatar menu; notifications placeholder moved to a navbar bell
+- [x] Private profile preview with validated LinkedIn, up to three approved pins, focused editing, and clearer empty states
+- [x] Profile browser checks for keyboard navigation, persistence, public/private links, desktop/mobile, and both themes
 - [x] One-click local demo student with persistent fixtures and confirmed reset
 - [x] Account API regression tests and configured Supabase contract tests
 - [x] Apply and verify the public-profile privacy migration on a local Supabase stack

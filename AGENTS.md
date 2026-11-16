@@ -347,9 +347,15 @@ Put it in `src/components/ui/`. It must not import anything from `types/`, `lib/
 
 ## Workspace preview behavior
 
-The profile editor stores per-account, browser-only previews, including pin choices. It does not
-publish profile changes or implement moderation. Recently Viewed records signed-in visits to
-approved sample project detail pages. All storage access stays in `src/lib/api/client.ts`.
+The profile preview editor stores per-account, browser-only previews, including LinkedIn and up to
+three distinct approved project pins. It does not publish changes or implement moderation.
+Recently Viewed records signed-in visits to approved sample project detail pages.
+All storage access stays in `src/lib/api/client.ts`.
+
+My Profile comes first in account navigation and the avatar menu. Notifications uses a signed-in
+navbar bell; the destination remains a placeholder without unread counts. The /profile preview has
+direct links to public profile settings, and /me/profile links back to private pin previews.
+Preview LinkedIn URLs use the shared platform validator on save and read, including browser storage.
 
 Account routes use the shared design fonts from `UI/pages/assets/fonts/`, bundled by Vite through
 `src/index.css`. Only the home hero has a full-width grid. Elsewhere grids stay inside cards and

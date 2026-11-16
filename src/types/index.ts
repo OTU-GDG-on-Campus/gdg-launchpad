@@ -218,6 +218,7 @@ export interface ProfilePreview {
   program: string
   year: string
   about: string
+  linkedinUrl: string
   pinnedProjectIds: string[]
   updatedAt: string | null
 }
