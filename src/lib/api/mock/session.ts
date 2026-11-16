@@ -13,6 +13,8 @@ export interface DemoState {
   signedIn: boolean
   saved: Record<string, string>
   votes: Record<string, string>
+  /** Projects submitted in this demo session. They stay pending, since nobody can approve them. */
+  submitted?: Project[]
 }
 
 function initialState(): DemoState {
@@ -126,6 +128,7 @@ export function demoProjects(): Project[] {
   const template = base.find((project) => project.authorId === state.user.id) ?? base[0]
   return [
     ...base,
+    ...(state.submitted ?? []),
     {
       ...template,
       id: 'demo-project-pending',

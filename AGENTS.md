@@ -66,8 +66,8 @@ with an isolated browser-local demo when unconfigured. Hosted setup and migratio
 | Upvoting              | Supabase unique-constrained toggle or persistent demo votes. Configured path contract-tested, live DB test pending                                                          |
 | Auth                  | Seven-step OTP onboarding with private resumable drafts, atomic completion, and existing-user login. Separate explicit demo account. Hosted delivery unverified             |
 | Personal pages        | Shared full profile editor, cropped avatar/banner uploads, developer identity, public/private social links, and safe public profiles. Notifications remain a placeholder    |
-| Submission form       | Placeholder page                                                                                                                                                            |
-| Admin panel           | Featured picker live. Moderation and user management not built                                                                                                              |
+| Submission form       | Built. Saves a pending project. No images or rich text yet                                                                                                                  |
+| Admin panel           | Featured picker, moderation queue, and discussion moderation live. Users and sprints not built                                                                              |
 | Project cover art     | Type field exists, every mock row is null so cards show derived art                                                                                                         |
 | Backend               | Supabase project created. Schema applied and tested locally, not yet pushed to the hosted project                                                                           |
 | Database schema       | Existing schema plus developer onboarding, private drafts, atomic profile RPC, links, and private media policies. Local migration replay verified; hosted migration pending |

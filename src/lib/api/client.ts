@@ -1,4 +1,5 @@
-// The only data seam for authentication, public discovery, and private account pages.
+// The only data seam for authentication, public discovery, private account pages, project
+// submission, and coordinator moderation.
 // Configured backends never fall back to the isolated browser-local demo store.
 
 import type { AuthError } from '@supabase/supabase-js'
@@ -17,10 +18,13 @@ import type {
   PublicProfile,
   Comment,
   FeaturedSelection,
+  ModerationComment,
   PersonPreview,
   Project,
   ProjectPage,
   ProjectQuery,
+  ProjectStatus,
+  ProjectSubmission,
   Sprint,
   TechnologyFacet,
   User,
@@ -42,6 +46,7 @@ import {
 } from '@/lib/onboarding'
 import { isAllowedStudentEmail } from '@/lib/auth/domain'
 import { validateProfileImage } from '@/lib/profileImage'
+import { slugifyTitle } from '@/lib/projects/submission'
 import { MOCK_SPRINTS } from './mock/sprints'
 import { isSupabaseConfigured, supabase as configuredClient } from '@/lib/supabase/client'
 
@@ -915,10 +920,15 @@ async function loadProjects({
   ownerId,
   slug,
   ids,
+  status,
   approvedOnly = false,
-}: { ownerId?: string; slug?: string; ids?: string[]; approvedOnly?: boolean } = {}): Promise<
-  Project[]
-> {
+}: {
+  ownerId?: string
+  slug?: string
+  ids?: string[]
+  status?: ProjectStatus
+  approvedOnly?: boolean
+} = {}): Promise<Project[]> {
   if (ids?.length === 0) return []
   if (!supabase) {
     const state = readDemo()
@@ -930,6 +940,7 @@ async function loadProjects({
             !state.user.bannedAt &&
             project.authorId === state.user.id)) &&
         (!approvedOnly || project.status === 'approved') &&
+        (!status || project.status === status) &&
         (!ownerId || project.authorId === ownerId) &&
         (!slug || project.slug === slug) &&
         (!ids || ids.includes(project.id)),
@@ -942,6 +953,7 @@ async function loadProjects({
   if (slug) query = query.eq('slug', slug)
   if (ids) query = query.in('id', ids)
   if (approvedOnly) query = query.eq('status', 'approved')
+  if (status) query = query.eq('status', status)
   const { data, error } = await query.returns<ProjectRow[]>()
   if (error) throw error
   const rows = data ?? []
@@ -1000,6 +1012,153 @@ async function loadProjects({
 
 async function getProjectById(id: string): Promise<Project | null> {
   return (await loadProjects({ ids: [id] }))[0] ?? null
+}
+
+async function requireAdmin(): Promise<User> {
+  const user = await getCurrentUser()
+  if (!user || user.role !== 'admin' || user.bannedAt) {
+    throw new Error('Coordinator access is required.')
+  }
+  return user
+}
+
+/**
+ * Saves a new project as pending. The database insert policy forces the pending status, so a
+ * student cannot publish their own project, whatever this function sends.
+ */
+export async function submitProject(details: ProjectSubmission): Promise<Project> {
+  const user = await requireParticipant()
+
+  if (!supabase) {
+    const state = readDemo()
+    const project: Project = {
+      id: `demo-submitted-${Date.now()}`,
+      slug: slugifyTitle(details.title),
+      title: details.title,
+      summary: details.summary,
+      description: details.description,
+      category: details.category,
+      tags: details.tags,
+      repoUrl: details.repoUrl,
+      liveUrl: details.liveUrl,
+      coverImageUrl: null,
+      screenshotUrls: [],
+      authorId: user.id,
+      authorName: state.profile.name,
+      authorAvatarUrl: null,
+      authorHeadline: `${state.profile.program} ${state.profile.studyYear}`,
+      sprintId: null,
+      status: 'pending',
+      upvoteCount: 0,
+      viewerHasUpvoted: false,
+      commentCount: 0,
+      openToContributions: details.openToContributions,
+      contributors: [],
+      createdAt: new Date().toISOString(),
+    }
+    writeDemo({ ...state, submitted: [...(state.submitted ?? []), project] })
+    return project
+  }
+
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    const { data, error } = await supabase
+      .from('projects')
+      .insert({
+        slug: slugifyTitle(details.title),
+        title: details.title,
+        summary: details.summary,
+        description: details.description,
+        category: details.category,
+        tags: details.tags,
+        repo_url: details.repoUrl,
+        live_url: details.liveUrl,
+        open_to_contributions: details.openToContributions,
+        author_id: user.id,
+        status: 'pending',
+      })
+      .select('id')
+      .single<{ id: string }>()
+    if (!error) {
+      const created = await getProjectById(data.id)
+      if (!created) throw new Error('Your project was saved, but could not be loaded.')
+      return created
+    }
+    // 23505 is a duplicate slug, so a new random suffix is worth another try.
+    if (error.code !== '23505') throw new Error('Could not submit the project. Try again.')
+  }
+  throw new Error('Could not pick an address for this project. Try again.')
+}
+
+/** Projects waiting for a decision, oldest first. Only coordinators can read other people's. */
+export async function listPendingProjects(): Promise<Project[]> {
+  await requireAdmin()
+  const projects = await loadProjects({ status: 'pending' })
+  return projects.sort((a, b) => a.createdAt.localeCompare(b.createdAt))
+}
+
+/** Approves or rejects a pending project. Row level security rejects anyone who is not an admin. */
+export async function reviewProject(
+  projectId: string,
+  decision: Extract<ProjectStatus, 'approved' | 'rejected'>,
+): Promise<void> {
+  await requireAdmin()
+  if (!supabase) throw new Error('Moderation needs a configured backend.')
+  const { data, error } = await supabase
+    .from('projects')
+    .update({ status: decision })
+    .eq('id', projectId)
+    .eq('status', 'pending')
+    .select('id')
+  if (error) throw new Error('Could not save the decision. Try again.')
+  if (!data?.length) throw new Error('This project was already reviewed.')
+}
+
+/** The newest comments across every project, with the project each one belongs to. */
+export async function listRecentComments(limit = 50): Promise<ModerationComment[]> {
+  await requireAdmin()
+  if (!supabase) return []
+  const { data, error } = await supabase
+    .from('comments')
+    .select('id, project_id, author_id, body, created_at')
+    .order('created_at', { ascending: false })
+    .limit(limit)
+    .returns<CommentRow[]>()
+  if (error) throw new Error('Could not load comments. Try again.')
+  const rows = data ?? []
+  if (!rows.length) return []
+
+  const { data: projectRows, error: projectError } = await supabase
+    .from('projects')
+    .select('id, title, slug')
+    .in('id', [...new Set(rows.map((row) => row.project_id))])
+    .returns<{ id: string; title: string; slug: string }[]>()
+  if (projectError) throw new Error('Could not load comments. Try again.')
+  const profiles = await publicProfiles(rows.map((row) => row.author_id))
+
+  return rows.map((row) => {
+    const project = projectRows?.find((candidate) => candidate.id === row.project_id)
+    const author = profiles.find((profile) => profile.id === row.author_id)
+    return {
+      id: row.id,
+      projectId: row.project_id,
+      authorId: row.author_id,
+      authorName: author?.name ?? 'Student',
+      authorAvatarUrl: author?.avatar_url ?? null,
+      body: row.body,
+      createdAt: row.created_at,
+      projectTitle: project?.title ?? 'Unknown project',
+      projectSlug: project?.slug ?? '',
+    }
+  })
+}
+
+/** Removes a comment. The count trigger on the comments table keeps the project total correct. */
+export async function deleteComment(commentId: string): Promise<void> {
+  await requireAdmin()
+  if (!supabase) throw new Error('Moderation needs a configured backend.')
+  const { data, error } = await supabase.from('comments').delete().eq('id', commentId).select('id')
+  if (error) throw new Error('Could not delete the comment. Try again.')
+  if (!data?.length) throw new Error('This comment was already removed.')
 }
 
 export async function signInDemo(): Promise<User> {

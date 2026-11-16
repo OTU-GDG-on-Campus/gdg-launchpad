@@ -1,8 +1,8 @@
-// Project submission. Form fields are placeholders until the write API exists.
+// Project submission. Signed-in, registered students send a project in for coordinator review.
 
 import { RequireAuth } from '@/components/auth/RequireAuth'
+import { SubmitProjectForm } from '@/components/projects/SubmitProjectForm'
 import { PageHeader } from '@/components/ui/PageHeader'
-import { EmptyState } from '@/components/ui/PageState'
 
 export function SubmitProjectPage() {
   return (
@@ -11,10 +11,9 @@ export function SubmitProjectPage() {
         title="Post a project"
         description="Submissions are reviewed by a coordinator before they appear on the feed."
       />
-      <EmptyState
-        title="Submission form is not built yet"
-        hint="Next milestone: the form, file upload, and the moderation queue it feeds."
-      />
+      <div className="max-w-2xl">
+        <SubmitProjectForm />
+      </div>
     </RequireAuth>
   )
 }
